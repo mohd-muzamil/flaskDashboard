@@ -46,8 +46,7 @@ function bubble_chart() {
                 d.isGrowing = false;
                 d.Employment_High = Number(d.Employment);
                 d.Employment_Low = Number(d.Employment) + Number(d.Employment_Growth);
-            }
-            else {
+            } else {
                 d.isGrowing = true;
                 d.Employment_High = Number(d.Employment) + Number(d.Employment_Growth);
                 d.Employment_Low = Number(d.Employment);
@@ -56,11 +55,11 @@ function bubble_chart() {
             return d;
         });
 
-        let root = { children: data1.slice(1) };// remove the first value from the dataset - which is an aggregate we don't need
+        let root = { children: data1.slice(1) }; // remove the first value from the dataset - which is an aggregate we don't need
         flatNodeHeirarchy = d3.hierarchy(root).sum(d => d.Employment)
 
-        let width = 930;
-        let height = 930;
+        let width = 500;
+        let height = 500;
         let pack = d3.pack()
             .size([width, height])
             .padding(3)
@@ -140,7 +139,7 @@ function bubble_chart() {
         // circle.on("click", selectOccupation)
 
 
-        highest_data_grouped_as_json = (function () {
+        highest_data_grouped_as_json = (function() {
             const data = JSON.parse(JSON.stringify(highest_data_as_json));
             let balance = [];
             let surplus = [];
@@ -155,17 +154,13 @@ function bubble_chart() {
 
                 if (recent_condititions === "BALANCE" && future_condititions === "BALANCE") {
                     balance.push(record);
-                }
-                else if (recent_condititions === "SHORTAGE" && future_condititions === "SHORTAGE") {
+                } else if (recent_condititions === "SHORTAGE" && future_condititions === "SHORTAGE") {
                     shortage.push(record);
-                }
-                else if (recent_condititions === "SURPLUS" && future_condititions === "SURPLUS") {
+                } else if (recent_condititions === "SURPLUS" && future_condititions === "SURPLUS") {
                     surplus.push(record);
-                }
-                else if (recent_condititions === "BALANCE" && future_condititions === "SHORTAGE") {
+                } else if (recent_condititions === "BALANCE" && future_condititions === "SHORTAGE") {
                     balance_to_shortage.push(record);
-                }
-                else if (recent_condititions === "BALANCE" && future_condititions === "SURPLUS") {
+                } else if (recent_condititions === "BALANCE" && future_condititions === "SURPLUS") {
                     balance_to_surplus.push(record);
                 }
 
@@ -182,35 +177,33 @@ function bubble_chart() {
         })();
 
         // Create the heirarchy like we did before, but with the new heirarchical data
-        width = 930;
-        height = 930;
+        width = 250;
+        height = 250;
         pack = d3.pack()
             .size([width, height])
             .padding(3)
 
         const nodeHeirarchy = d3.hierarchy({
-            children: highest_data_grouped_as_json
-        })
+                children: highest_data_grouped_as_json
+            })
             .sum(d => d.Employment_High);
 
         root = pack.padding(7)(nodeHeirarchy)
 
         const leaf = inner_svg.selectAll("g")
-            .data(root.descendants())          // Use descendants() in the join - changed from leaves()
+            .data(root.descendants()) // Use descendants() in the join - changed from leaves()
             .enter().append("g")
             .attr("transform", d => `translate(${d.x + 1},${d.y + 1})`);
 
         const circle = leaf.append("circle")
             .attr("r", d => d.r)
             .attr("fill", d => {
-                if (d.height !== 0) {   // if you're not a leaf, you don't get a fill
+                if (d.height !== 0) { // if you're not a leaf, you don't get a fill
                     return "none";
-                }
-                else {
+                } else {
                     if (d.data.isGrowing) {
                         return "#5cb85c";
-                    }
-                    else {
+                    } else {
                         return "#d9534f";
                     }
                 }
@@ -231,7 +224,7 @@ function bubble_chart() {
             // select the circle
             current_circle = d3.select(this);
             current_circle.attr("stroke", d => "#000000")
-            current_circle.attr("stroke-width", d => "3px");
+            current_circle.attr("stroke-width", d => "1px");
 
         }
         circle.on("click", selectOccupation);

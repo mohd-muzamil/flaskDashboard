@@ -33,25 +33,25 @@ function glyph() {
         .style("opacity", 0);
 
     // Adds the svg canvas
-    var svg = d3.select("#mydiv").append("svg")
-        .attr("width", width)
-        .attr("height", height)
+    var svg = d3.select("#myViz1")
+        // .attr("width", width)
+        // .attr("height", height)
 
     // Brightness data  Color:Green
     // Get the data
-    d3.csv("../../data/brightness_d3", function (error, data) {
-        data = data.filter(function (row) {
+    d3.csv("../../data/brightness_d3", function(error, data) {
+        data = data.filter(function(row) {
             return row['participant'] == 'PROSITC000234' && row['date'] == "2020-07-22";
         })
-        data.forEach(function (d) {
+        data.forEach(function(d) {
             // d.date = parseDate(d.date);
             d.minuteOfTheDay = +d.minuteOfTheDay;
             d.brightnessLevel = +d.brightnessLevel;
         });
 
         // Scale the range of the data
-        x.domain(d3.extent(data, function (d) { return d.minuteOfTheDay; }));
-        y.domain([0, d3.max(data, function (d) { return d.brightnessLevel; })]);
+        x.domain(d3.extent(data, function(d) { return d.minuteOfTheDay; }));
+        y.domain([0, d3.max(data, function(d) { return d.brightnessLevel; })]);
 
         // Add the valueline path.
         // svg.selectAll("path")
@@ -80,15 +80,15 @@ function glyph() {
         // Add the area
         svg.append("path")
             .datum(data)
-            .attr("fill", "#99d8c9")    //green
+            .attr("fill", "#99d8c9") //green
             // .attr("fill", "none")    
             .attr("stroke", "#2ca25f")
             .attr("stroke-width", strokewidth)
             .style("opacity", opacity)
             .attr("d", d3.area()
-                .x(function (d) { return x(d.minuteOfTheDay) })
+                .x(function(d) { return x(d.minuteOfTheDay) })
                 .y0(y(0))
-                .y1(function (d) { return y(d.brightnessLevel) })
+                .y1(function(d) { return y(d.brightnessLevel) })
             )
             .attr("transform", `translate(0, ${0 * height / num_days})`)
 
@@ -105,64 +105,64 @@ function glyph() {
 
     // Accelerometer data   RED
     // Get the data
-    d3.csv("../../data/accelerometer_d3", function (error, data) {
-        data = data.filter(function (row) {
+    d3.csv("../../data/accelerometer_d3", function(error, data) {
+        data = data.filter(function(row) {
             return row['participant'] == 'PROSITC000234' && row['date'] == "2020-07-22";
         })
-        data.forEach(function (d) {
+        data.forEach(function(d) {
             // d.date = parseDate(d.date);
             d.minuteOfTheDay = +d.minuteOfTheDay;
             d.acc = +d.acc;
         });
 
         // Scale the range of the data
-        x.domain(d3.extent(data, function (d) { return d.minuteOfTheDay; }));
-        y.domain([0, d3.max(data, function (d) { return d.acc; })]);
+        x.domain(d3.extent(data, function(d) { return d.minuteOfTheDay; }));
+        y.domain([0, d3.max(data, function(d) { return d.acc; })]);
 
         // Add the area
         svg.append("path")
             .datum(data)
-            .attr("fill", "#fc9272")    //red
+            .attr("fill", "#fc9272") //red
             // .attr("fill", "none")   
             .attr("stroke", "#de2d26")
             .attr("stroke-width", strokewidth)
             .style("opacity", opacity)
             .attr("d", d3.area()
-                .x(function (d) { return x(d.minuteOfTheDay) })
+                .x(function(d) { return x(d.minuteOfTheDay) })
                 .y0(y(0))
-                .y1(function (d) { return y(d.acc) })
+                .y1(function(d) { return y(d.acc) })
             )
             .attr("transform", `translate(0, ${0.1 * height / num_days})`)
     });
 
     // Gyroscope data   BLUE
     // Get the data
-    d3.csv("../../data/gyroscope_d3", function (error, data) {
-        data = data.filter(function (row) {
+    d3.csv("../../data/gyroscope_d3", function(error, data) {
+        data = data.filter(function(row) {
             return row['participant'] == 'PROSITC000234' && row['date'] == "2020-07-22";
         })
-        data.forEach(function (d) {
+        data.forEach(function(d) {
             // d.date = parseDate(d.date);
             d.minuteOfTheDay = +d.minuteOfTheDay;
             d.gyro = +d.gyro;
         });
 
         // Scale the range of the data
-        x.domain(d3.extent(data, function (d) { return d.minuteOfTheDay; }));
-        y.domain([0, d3.max(data, function (d) { return d.gyro; })]);
+        x.domain(d3.extent(data, function(d) { return d.minuteOfTheDay; }));
+        y.domain([0, d3.max(data, function(d) { return d.gyro; })]);
 
         // Add the area
         svg.append("path")
             .datum(data)
-            .attr("fill", "#9ecae1")    //blue
+            .attr("fill", "#9ecae1") //blue
             // .attr("fill", "none")    //blue
             .attr("stroke", "#3182bd")
             .attr("stroke-width", strokewidth)
             .style("opacity", opacity)
             .attr("d", d3.area()
-                .x(function (d) { return x(d.minuteOfTheDay) })
+                .x(function(d) { return x(d.minuteOfTheDay) })
                 .y0(y(0))
-                .y1(function (d) { return y(d.gyro) })
+                .y1(function(d) { return y(d.gyro) })
             )
             .attr("transform", `translate(0, ${0.2 * height / num_days})`)
     });

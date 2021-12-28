@@ -36,18 +36,18 @@
         border: solid 1px black;
     }
     
-    #svg1 {
-        height: 50%;
-        width: 50%;
+    .svg1 {
+        height: 60%;
+        width: 40%;
     }
     
-    #svg2 {
-        height: 50%;
-        width: 50%
+    .svg2 {
+        height: 60%;
+        width: 58%
     }
     
-    #svg3 {
-        height: 50%;
+    .svg3 {
+        height: 40%;
         width: 33%;
     }
     
