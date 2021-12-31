@@ -1,71 +1,68 @@
 function barchart(chart) {
-    console.log("#" + chart)
     var margin = { top: 20, right: 20, bottom: 70, left: 40 },
         width = $("#" + chart).width() - margin.left - margin.right,
         height = $("#" + chart).height() - margin.top - margin.bottom;
 
-    // Parse the date / time
-    var parseDate = d3.time.format("%Y-%m").parse;
+    let svg = d3.select("#" + chart),
+        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+    g.append("g")
+        .attr("class", "x axis");
 
-    var y = d3.scale.linear().range([height, 0]);
+    g.append("g")
+        .attr("class", "y axis");
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .tickFormat(d3.time.format("%Y-%m"));
+    let myData = [
+        { name: "John", age: 23, height: 1.93 },
+        { name: "Mafe", age: 22, height: 1.70 },
+        { name: "Sonia", age: 27, height: 1.60 },
+        { name: "Vicente", age: 73, height: 0.32 }
+    ];
 
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10);
+    let x = d3.scaleBand()
+        .padding(0.2)
+        .range([0, width]);
 
-    var svg = d3.select("#" + chart)
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+    let y = d3.scaleLinear()
+        .range([height, 0]);
 
-    d3.csv("../../data/demo/barData.csv", function(error, data) {
+    function update(myData) {
+        x.domain(myData.map(d => d.name));
+        y.domain([0, d3.max(myData, d => d.height)]);
 
-        data.forEach(function(d) {
-            d.date = parseDate(d.date);
-            d.value = +d.value;
-        });
+        let points = g.selectAll(".point")
+            .data(myData); //update
 
-        x.domain(data.map(function(d) { return d.date; }));
-        y.domain([0, d3.max(data, function(d) { return d.value; })]);
+        pointsEnter = points
+            .enter()
+            .append("rect")
+            .attr("class", "point");
 
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", "-.55em")
-            .attr("transform", "rotate(-90)");
+        points.merge(pointsEnter) //Enter + Update
+            .attr("x", d => x(d.name))
+            .attr("y", d => y(d.height))
+            .attr("width", d => x.bandwidth())
+            .attr("height", d => height - y(d.height))
 
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .style("text-anchor", "end")
-            .text("Value ($)");
+        .style("fill", "steelblue");
 
-        svg.selectAll("bar")
-            .data(data)
-            .enter().append("rect")
-            .style("fill", "steelblue")
-            .attr("x", function(d) { return x(d.date); })
-            .attr("width", x.rangeBand())
-            .attr("y", function(d) { return y(d.value); })
-            .attr("height", function(d) { return height - y(d.value); });
+        points.exit()
+            .remove();
 
-    });
+
+        g.select(".x.axis")
+            .call(d3.axisBottom(x))
+            .attr("transform",
+                "translate(0, " + height + ")");
+
+        g.select(".y.axis")
+            .call(d3.axisLeft(y));
+    }
+
+
+    update(myData);
+
+
+
+    console.log("w", width, " h", height);
 }

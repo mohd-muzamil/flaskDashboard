@@ -26,6 +26,10 @@
             stroke: #000;
             shape-rendering: crispEdges;
         }
+        
+        svg {
+            border: solid 1px black;
+        }
     </style>
 
 </head>
@@ -121,10 +125,26 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js "></script>
         <!-- D3.js -->
         <!-- <script src="https://d3js.org/d3.v7.min.js "></script> -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js "></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js "></script> -->
+        <script src="https://d3js.org/d3.v4.min.js"></script>
         <!-- D3.js charts -->
         <!-- <script src="../js/demo/chart1.js "></script> -->
         <script src="../js/demo/barchart.js "></script>
+        <!-- demo forceSimulation -->
+        <script src="../js/demo/forceSimulation.js "></script>
+        <!-- paralled cord chart -->
+        <script src="../js/demo/parallelCord.js "></script>
+
+        <!-- PROSIT Charts -->
+        <!-- Glyph scatter plot -->
+        <script src="../js/glyph_scatter_plot.js"></script>
+        <script src="../js/glyph_scatter_plot_copy.js"></script>
+        <!-- Spiral time chart -->
+        <script src="../js/glyph_test.js"></script>
+        <!-- dummy glyph -->
+        <script src="../js/glyph.js"></script>
+        <!-- dummy ploar chart -->
+        <script src="../js/polar_chart.js"></script>
 
         <script type="text/javascript ">
             $(document).ready(function() {
@@ -139,11 +159,23 @@
                 });
             });
             // chart1();
-            barchart('chart1');
-            barchart('chart2');
-            barchart('chart3');
-            barchart('chart4');
+            glyph_scatter_plot_copy("chart1", "chart2");
+            polar_chart("chart2")
+            forceSimulation('chart3');
+            parallelCord('chart4');
             barchart('chart5');
+
+            jQuery(function($) {
+                var windowWidth = $(window).width();
+                var windowHeight = $(window).height();
+
+                $(window).resize(function() {
+                    if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+                        location.reload();
+                        return;
+                    }
+                });
+            });
         </script>
 </body>
 

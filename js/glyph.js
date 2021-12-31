@@ -1,11 +1,15 @@
-function glyph() {
+function glyph(chart) {
     opacity = 0.8
     strokewidth = 1
 
     // Set the dimensions of the canvas / graph
-    var margin = { top: 30, right: 50, bottom: 30, left: 50 },
-        width = 1500 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
+
+    var svg = d3.select("#" + chart).selectAll("g").remove();
+
+    // Set the dimensions of the canvas / graph
+    var margin = { top: 10, right: 10, bottom: 10, left: 10 },
+        width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
+        height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
 
     // Parse the date / time
     // var parseDate = d3.time.format("%d-%b-%y").parse;
@@ -32,16 +36,12 @@ function glyph() {
         .attr("class", "tooltip")
         .style("opacity", 0);
 
-    // Adds the svg canvas
-    var svg = d3.select("#myViz1")
-        // .attr("width", width)
-        // .attr("height", height)
 
     // Brightness data  Color:Green
     // Get the data
     d3.csv("../../data/brightness_d3", function(error, data) {
         data = data.filter(function(row) {
-            return row['participant'] == 'PROSITC000234' && row['date'] == "2020-07-22";
+            return row['participant'] == 'PROSITC0007'
         })
         data.forEach(function(d) {
             // d.date = parseDate(d.date);
@@ -166,4 +166,5 @@ function glyph() {
             )
             .attr("transform", `translate(0, ${0.2 * height / num_days})`)
     });
+
 }

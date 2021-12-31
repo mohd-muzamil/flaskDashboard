@@ -6,47 +6,48 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/d3-dsv@3"></script> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script> -->
-    <!-- <script src="js/demo/muzz.js"></script> -->
-    <!-- <script src="js/demo/linear_chart.js"></script> -->
+    <!-- <script src="js/muzz.js"></script> -->
+    <!-- <script src="js/linear_chart.js"></script> -->
     <link rel="shortcut icon" href="#">
 </head>
 
 <style>
     svg {
-  border: solid 1px blue;
-}
-
-.container {
-  float: left;
-}
+        border: solid 1px blue;
+    }
+    
+    .container {
+        float: left;
+    }
 </style>
+
 <body>
     <h2 id="myadd">Test workspace3...</h2>
     <p> Test charts for building conventrig line charts</p>
 
-    <div class="container" id="chart1">
-        <svg id="myViz1"></svg>
-    </div>
-    
-    <div class="container" id="chart2">
-        <svg id="myViz2"></svg>
-    </div>
+    <!-- <div class="container" id="chart"> -->
+    <!-- <svg id="chart1"></svg> -->
+    <!-- </div> -->
 
-    <div id="mydiv"></div>
-    
-    
+    <!-- <div class="container" id="chart"> -->
+    <!-- <svg id="chart2"></svg> -->
+    <!-- </div> -->
+
+    <!-- <div id="mydiv"></div> -->
+
+
     <!-- <svg id="myViz3"></svg> -->
 
 
-    <script src="../js/demo/glyph.js"></script>
-    <script src="../js/demo/glyph_test.js"></script>
-    <script src="../js/demo/glyph_scatter_plot.js"></script>
-    <!-- <script src="js/demo/polar_chart.js"></script>
-    <script src="js/demo/bubble_chart.js"></script>
-    <script src="js/demo/bubble_chart1.js"></script>
-    <script src="js/demo/d3_table_example.js"></script> -->
-    <!-- <script src="js/demo/glyph.js"></script> -->
-    <!-- <script src="js/demo/circle_packing.js"></script> -->
+    <script src="../js/glyph.js"></script>
+    <script src="../js/glyph_test.js"></script>
+    <script src="../js/glyph_scatter_plot.js"></script>
+    <!-- <script src="js/polar_chart.js"></script>
+    <script src="js/bubble_chart.js"></script>
+    <script src="js/bubble_chart1.js"></script>
+    <script src="js/d3_table_example.js"></script> -->
+    <!-- <script src="js/glyph.js"></script> -->
+    <!-- <script src="js/circle_packing.js"></script> -->
 </body>
 <script>
     //add your function call here
@@ -55,12 +56,11 @@
         'PROSITC000219', 'PROSITC000226', 'PROSITC000229', 'PROSITC000234',
        'PROSITC000235', 'PROSITC000237', 'PROSITC0003', 'PROSITC0006',
        'PROSITC0007', 'PROSITC0008']*/
-       participant = glyph_scatter_plot()
+    // participant = glyph_scatter_plot('chart1', 'chart2')
     //    console.log("rendering data for participant: ", participant)
     //    if (participant != null ){
     //     glyph_test(participant=participant)
     //    }
-
 </script>
 
 </html>
