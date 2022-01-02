@@ -1,6 +1,7 @@
 function glyph(chart) {
-    opacity = 0.8
-    strokewidth = 1
+    console.log(chart)
+    opacity = 0.8;
+    strokewidth = 1;
 
     // Set the dimensions of the canvas / graph
 
@@ -32,7 +33,7 @@ function glyph(chart) {
     //     .curve(d3.curveCardinal);
 
     // Define the div for the tooltip
-    var div = d3.select("body").append("div")
+    var div = d3.select("#" + chart).append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
 
@@ -40,6 +41,7 @@ function glyph(chart) {
     // Brightness data  Color:Green
     // Get the data
     d3.csv("../../data/brightness_d3", function(error, data) {
+        console.log("brightness data", data)
         data = data.filter(function(row) {
             return row['participant'] == 'PROSITC0007'
         })

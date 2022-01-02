@@ -1,182 +1,205 @@
 <!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <title>Collapsible sidebar using Bootstrap 3</title>
-
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS CDN -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <!-- Our Custom CSS -->
-    <link rel="stylesheet" href="../css/style.css">
-    <!-- Scrollbar Custom CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-
-    <style>
-        .axis {
-            font: 10px sans-serif;
-        }
-        
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: #000;
-            shape-rendering: crispEdges;
-        }
-        
-        svg {
-            border: solid 1px black;
-        }
-    </style>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="../css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!--[if lt IE 7]><p class="browsehappy">You are using an <strong>outdated</strong>browser. Please <a href="#">upgrade your browser</a>to improve your experience.</p><![endif]-->
+    <div class="container-fluid" style="height:100%">
+        <div class="row flex-nowrap" style="height:100%">
+            <div class="col-auto px-0">
+                <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                    <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
 
-    <div class="wrapper">
-        <!-- Sidebar Holder -->
-        <nav id="sidebar" class="active">
-            <div class="sidebar-header">
-                <h4 id="dashboardHeader">Filters</h4>
-                <hr class="line">
+                        <h4 id="dashboardHeader">Filters</h4>
+                        <hr class="line">
+                        <div style="padding-left:10px; padding-right:10px;">
+                            <input type="search" id="form1" class="form-control" placeholder="Rules query" aria-label="Search" />
+                        </div>
 
-            </div>
+                        <hr class="line">
 
-            <div style="padding-left:10px; padding-right:10px;">
-                <input type="search" id="form1" class="form-control" placeholder="Rules query" aria-label="Search" />
-            </div>
+                        <!-- <div class="box" style="text-align: center;">
+                            <div class="rangeSlider">
+                                <input type="range" class="circleRange" min="0" max="10" value="6">
+                            </div>
+                            <div class="value"></div>
+                        </div> -->
 
-            <hr class="line">
-
-            <div>
-                <table style="width:100%;">
-                    <tr>
-                        <td class="filterCheckbox">
-                            <input type="checkbox" id="one" name="BRT" value="one" align="center" checked>
+                        <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px">
+                            <p>Glyph Radius: </p>
+                            <span id="demo"></span>
                             <br>
-                            <label>BRT</label>
-                        </td>
-                        <td class="filterCheckbox">
-                            <input type="checkbox" id="one" name="BRT" value="one" align="center" checked>
-                            <br>
-                            <label>ACC</label>
-                        </td>
-                        <td class="filterCheckbox">
-                            <input type="checkbox" id="one" name="BRT" value="one" align="center" checked>
-                            <br>
-                            <label>GYRO</label>
-                        </td>
-                        <td class="filterCheckbox">
-                            <input type="checkbox" id="one" name="BRT" value="one" align="center" checked>
-                            <br>
-                            <label>LOCK</label>
-                        </td>
-                    </tr>
-                </table>
+                            <input type="range" min="1" max="30" value="10" steps='1' lass="slider" id="myRange">
+                        </div>
 
-            </div>
+                        <hr class="line">
+                        <!-- Default switch -->
+                        <label class="form-check-label" for="toggleGlyph" style="text-align: center;">Toggle Glyph</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph" style="float: none; margin-left: 20%; " />
+                        </div>
 
-            <hr class="line">
+                        <hr class="line">
 
-            <div style="display:flex; justify-content: center; align-items: center;">
-                <button type="button" class="btn btn-outline-primary btn-sm">Submit</button>
-            </div>
-            <hr class="line">
-        </nav>
 
-        <!-- Page Content Holder -->
-        <div id="content" class="active">
-            <div class="header">
-                <nav class="navbar navbar-default">
-                    <div class='btn-toolbar pull-left'>
-                        <div class='btn-group'>
-                            <button type="button" id="sidebarCollapse" style="padding-top: 3px;">
-                            <i class="glyphicon glyphicon-align-left"></i>
-                            <!-- <span id="sidebarCollapse">Toggle Sidebar</span> -->
-                    </button>
+                        <div>
+                            <table style="width:100%;">
+                                <tr>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" checked>
+                                        <br>
+                                        <label>BRT</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" checked>
+                                        <br>
+                                        <label>ACC</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" checked>
+                                        <br>
+                                        <label>GYR</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" checked>
+                                        <br>
+                                        <label>LCK</label>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+                        <hr class="line">
+
+                        <div style="display:flex; justify-content: center; align-items: center;">
+                            <button type="button" class="btn btn-outline-primary btn-sm">Submit</button>
                         </div>
                     </div>
-                    <h4 id="dashboardHeader">PROSIT Dashboard</h4>
-                </nav>
+                </div>
             </div>
+            <main class="col ps-md-2 pt-2">
+                <div class="row" id="header">
+                    <div class="col-1" style="vertical-align: center;">
+                        <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse" class="border rounded-3 p-1 text-decoration-none">
+                            Menu
+                        </a>
+                    </div>
+                    <div class="col-11" style="text-align:left;">
+                        <h4 id="dashboardHeader">PROSIT Dashboard</h4>
+                    </div>
+                </div>
+                <div id="bottom">
+                    <svg class="svg1" id="chart1"></svg>
+                    <svg class="svg2" id="chart2"></svg>
+                    <svg class="svg3" id="chart3"></svg>
+                    <svg class="svg3" id="chart4"></svg>
+                    <svg class="svg3" id="chart5"></svg>
+                </div>
 
-            <div id="bottom">
-                <svg class="svg1" id="chart1"></svg>
-                <svg class="svg2" id="chart2"></svg>
-                <svg class="svg3" id="chart3"></svg>
-                <svg class="svg3" id="chart4"></svg>
-                <svg class="svg3" id="chart5"></svg>
-            </div>
 
+            </main>
         </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+    </script>
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- D3.js charts -->
+    <!-- <script src="../js/demo/chart1.js "></script> -->
+    <script src="../js/demo/barchart.js "></script>
+    <!-- demo forceSimulation -->
+    <script src="../js/demo/forceSimulation.js "></script>
+    <!-- paralled cord chart -->
+    <script src="../js/demo/parallelCord.js "></script>
 
+    <!-- PROSIT Charts -->
+    <!-- Glyph scatter plot -->
+    <script src="../js/radialGlyphsPlot.js"></script>
+    <script src="../js/flowerGlyphPlot.js"></script>
+    <!-- Spiral time chart -->
+    <script src="../js/glyph_test.js"></script>
+    <!-- dummy glyph -->
+    <script src="../js/glyph.js"></script>
+    <!-- dummy ploar chart -->
+    <script src="../js/polar_chart.js"></script>
+    <script src="../js/grid.js"></script>
 
+    <script>
+        updateRadialGlyphs("chart1", "chart2", radius = 10);
+        // polar_chart("chart2")
+        // forceSimulation('chart3');
+        // parallelCord('chart4');
+        // barchart('chart5');
 
+        // auto refresh after window resizing
+        jQuery(function($) {
+            var windowWidth = $(window).width();
+            var windowHeight = $(window).height();
 
-
-        <!-- jQuery CDN -->
-        <script src="https://code.jquery.com/jquery-1.12.0.min.js "></script>
-        <!-- Bootstrap Js CDN -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js "></script>
-        <!-- jQuery Custom Scroller CDN -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js "></script>
-        <!-- D3.js -->
-        <!-- <script src="https://d3js.org/d3.v7.min.js "></script> -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js "></script> -->
-        <script src="https://d3js.org/d3.v4.min.js"></script>
-        <!-- D3.js charts -->
-        <!-- <script src="../js/demo/chart1.js "></script> -->
-        <script src="../js/demo/barchart.js "></script>
-        <!-- demo forceSimulation -->
-        <script src="../js/demo/forceSimulation.js "></script>
-        <!-- paralled cord chart -->
-        <script src="../js/demo/parallelCord.js "></script>
-
-        <!-- PROSIT Charts -->
-        <!-- Glyph scatter plot -->
-        <script src="../js/glyph_scatter_plot.js"></script>
-        <script src="../js/glyph_scatter_plot_copy.js"></script>
-        <!-- Spiral time chart -->
-        <script src="../js/glyph_test.js"></script>
-        <!-- dummy glyph -->
-        <script src="../js/glyph.js"></script>
-        <!-- dummy ploar chart -->
-        <script src="../js/polar_chart.js"></script>
-
-        <script type="text/javascript ">
-            $(document).ready(function() {
-                $("#sidebar ").mCustomScrollbar({
-                    theme: "minimal "
-                });
-
-                $('#sidebarCollapse').on('click', function() {
-                    $('#sidebar, #content').toggleClass('active');
-                    $('.collapse.in').toggleClass('in');
-                    $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-                });
+            $(window).resize(function() {
+                if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+                    location.reload();
+                    return;
+                }
             });
-            // chart1();
-            glyph_scatter_plot_copy("chart1", "chart2");
-            polar_chart("chart2")
-            forceSimulation('chart3');
-            parallelCord('chart4');
-            barchart('chart5');
+        });
 
-            jQuery(function($) {
-                var windowWidth = $(window).width();
-                var windowHeight = $(window).height();
+        //range slider 
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("demo");
+        output.innerHTML = slider.value;
+        slider.oninput = function() {
+            plotCharts(this.value, toggleGlyph)
+            output.innerHTML = this.value;
+        }
 
-                $(window).resize(function() {
-                    if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
-                        location.reload();
-                        return;
-                    }
-                });
-            });
-        </script>
+        //toggleGlyph switch
+        var toggleGlyph = "radialGlyph"
+        $("#toggleGlyph").on('change', function() {
+            if ($(this).is(':checked')) {
+                toggleGlyph = "flowerGlyph";
+                // updateFlowerGlyphs("chart1", "chart2", radius = slider.value);
+
+            } else {
+                toggleGlyph = "radialGlyph";
+                // updateRadialGlyphs("chart1", "chart2", radius = slider.value);
+            }
+            plotCharts(slider.value, toggleGlyph)
+        });
+
+        elem = $("#bottom")[0];
+
+        let resizeObserver = new ResizeObserver(() => {
+            console.log("sidebar closed");
+            plotCharts(slider.value, toggleGlyph)
+        });
+
+        resizeObserver.observe(elem);
+
+        function plotCharts(radius, toggleGlyph) {
+            if (toggleGlyph == "radialGlyph") {
+                updateRadialGlyphs("chart1", "chart2", radius);
+            } else
+                updateFlowerGlyphs("chart1", "chart2", radius);
+
+        }
+    </script>
 </body>
 
 </html>
