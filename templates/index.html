@@ -42,9 +42,12 @@
 
                         <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px">
                             <p>Glyph Radius: </p>
+
                             <span id="demo"></span>
                             <br>
-                            <input type="range" min="1" max="30" value="10" steps='1' lass="slider" id="myRange">
+                            <div>
+                                <input type="range" min="1" max="30" value="10" steps='1' lass="slider" id="myRange">
+                            </div>
                         </div>
 
                         <hr class="line">
@@ -93,8 +96,8 @@
                     </div>
                 </div>
             </div>
-            <main class="col ps-md-2 pt-2">
-                <div class="row" id="header">
+            <main class="col ps-md-2 pb-10">
+                <div class="row pb-2" id="header">
                     <div class="col-1" style="vertical-align: center;">
                         <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse" class="border rounded-3 p-1 text-decoration-none">
                             Menu
@@ -120,6 +123,7 @@
     </script>
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- <script src="https://d3js.org/d3.v3.min.js"></script> -->
     <!-- D3.js charts -->
     <!-- <script src="../js/demo/chart1.js "></script> -->
     <script src="../js/demo/barchart.js "></script>
@@ -141,11 +145,17 @@
     <script src="../js/grid.js"></script>
 
     <script>
+        // glyphChart = "chart1";
+        // parallelCordChart = "chart2";
+        // polarChart = "chart3";
+        // forcedSimulationChart = "chart4"
+        // barchart = "chart5"
+
         updateRadialGlyphs("chart1", "chart2", radius = 10);
+        parallelCord('chart3');
         // polar_chart("chart2")
-        // forceSimulation('chart3');
-        // parallelCord('chart4');
-        // barchart('chart5');
+        forceSimulation('chart4');
+        barchart('chart5');
 
         // auto refresh after window resizing
         jQuery(function($) {
