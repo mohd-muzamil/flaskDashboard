@@ -86,8 +86,8 @@ function glyph_test(chart, participant, sensor) {
                 .datum(data)
                 .attr("fill", pathColor)
                 .attr("opacity", config.opacity)
-                // .attr("stroke", "steelblue")
-                // .attr("stroke-width", 1 / 10)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1 / 10)
                 .attr("d", my_path)
         })
 
@@ -95,12 +95,21 @@ function glyph_test(chart, participant, sensor) {
         // Creating a grid for reference
         radius = Math.min(width, height) / 2 + 10;
 
+        // var grad = svg.append("defs")
+        //     .append("linearGradient").attr("id", "grad")
+        //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
+
+        // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
+        // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
+
+
         svg.selectAll(".gridCircles")
             .data(d3.range(0, numDates, 1))
             .enter()
             .append("circle")
             .attr("class", "griCircles")
-            .attr("fill", "none")
+            // .attr("fill", "grey")
+            .style("fill", "url(#grad)")
             .attr("stroke", "grey")
             .attr("opacity", 0.5)
             .attr("stroke-width", 1 / 10)
@@ -173,7 +182,7 @@ function createGrid(chart) {
 function updateglyph_test(chart, participant) {
     // ["acc", "gyr", "brt", "lck"]
     d3.select("#" + chart).selectAll('g').remove();
-    glyph_test(chart, participant, "acc")
-        // glyph_test(chart, participant, sensor = "gyr")
+    // glyph_test(chart, participant, "acc")
+    glyph_test(chart, participant, sensor = "brt")
 
 }

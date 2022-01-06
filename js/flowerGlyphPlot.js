@@ -231,7 +231,7 @@ const glyph_scatter_plot_copy = (chart, dependendChart, radius) => {
             })
             .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px"); })
             .on("click", function(d) {
-                glyph_test(dependendChart, d.participant)
+                updateglyph_test(dependendChart, d.participant)
             });
 
 

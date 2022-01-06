@@ -82,6 +82,8 @@ const glyph_scatter_plot = (chart, dependendChart, radius) => {
                     .attr('opacity', config.opacity)
             });
 
+        let current_circle = undefined;
+
         svg1.selectAll('circle')
             .data(data)
             .enter()
@@ -91,40 +93,45 @@ const glyph_scatter_plot = (chart, dependendChart, radius) => {
             .attr("r", config.r)
             .style("fill", 'white')
             .attr('opacity', 0)
-            .attr('stroke', 'black')
-            .attr('stroke-width', 2)
+
+        .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px"); })
             .on('mouseover', function(d) {
-                var mouse = d3.mouse(this);
-                // var xVal = mouse[0];
-
-                // this would work, but not when its called in a function
-                // d3.select(this)
-                //  .attr('font-size', '2em')
-
-                // this works
                 d3.select(this)
-                    .attr("opacity", 0.4)
+                    .attr("opacity", config.opacity)
                     .style("fill", "grey")
-                    .attr('stroke-width', config.strokeWidth)
                 tooltip.text(`O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
                 return tooltip.style("visibility", "visible");
-                //  .attr('fill', 'red')
             })
             .on('mouseout', function() {
-                var mouse = d3.mouse(this);
-                // this works
-                d3.select(this)
-                    .attr("opacity", 0)
-                    .attr('stroke-width', 0)
-                    //  .attr('fill', 'red')
+                if (d3.select(this).attr("class") != "selectedGlyph")
+                    d3.select(this).attr("opacity", 0)
+                    .style("fill", "white");
                 tooltip.style("visibility", "hidden")
+
             })
-            .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px"); })
             .on("click", function(d) {
+                // click on unselected point
+                if (d3.select(this).attr("class") != "selectedGlyph") {
+                    svg1.selectAll('.selectedGlyph')
+                        .classed('selectedGlyph', false)
+                        .attr("opacity", 0)
+                        .style("fill", "white");
+
+                    d3.select(this).classed('selectedGlyph', true)
+                        .attr("opacity", config.opacity)
+                        .style("fill", "grey")
+                        .attr("stroke", "black")
+                        .attr("stroke-width", config.strokeWidth);
+
+                    // click on selected point
+                } else {
+                    d3.select(this).classed('selectedGlyph', false);
+                    d3.select(this).attr("opacity", 0)
+                        .style("fill", "white");
+                }
                 updateglyph_test(dependendChart, d.participant)
+
             });
-
-
 
         svg1.selectAll('text')
             .data(data)
