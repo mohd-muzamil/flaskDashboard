@@ -1,4 +1,4 @@
-participant,con,agree,extra,neuro,open,pca0,pca1
+participant,con,agree,extra,neuro,open,x0,x1
 Test1,10,10,10,10,10,0,1
 Test2,5,5,5,5,5,0.05,1
 Test3,1,2,3,4,5,0.1,1

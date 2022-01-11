@@ -25,9 +25,6 @@ function glyph_test(chart, participant, sensor) {
     var radians = 0.0174532925,
         hourLabelYOffset = 7;
 
-
-    console.log("Chart2 participant: ", participant, sensor)
-
     // Set the dimensions of the canvas / graph
     var margin = { top: 25, right: 25, bottom: 25, left: 25 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
@@ -36,6 +33,7 @@ function glyph_test(chart, participant, sensor) {
     var parseDate = d3.timeFormat("%Y-%b-%d");
 
     var arcGenerator = d3.arc();
+
 
     // Select the svg
     var svg = d3.select("#" + chart)
@@ -46,8 +44,8 @@ function glyph_test(chart, participant, sensor) {
 
 
     d3.csv(datapath, function(error, data) {
-        data = data.filter(function(row) {
-            return row['participant'] == participant //&& row['date'] <= "2020-07-23";// && row['date'] <= "2020-07-23";
+        data = data.filter(function(row, i) {
+            return row['participant'] == participant //&& row['date'] <= "2020-06-20";
         })
 
         data.forEach(function(d) {
@@ -57,11 +55,13 @@ function glyph_test(chart, participant, sensor) {
         });
 
         var attrMinMax = d3.extent(data, function(d) { return d[attr]; });
-
+        console.log("attrMinMax", attrMinMax)
         dates = Array.from(new Set(data.map(x => x.date)).values()).sort();
         d2i = {};
+
         dates.forEach((d, i) => d2i[d] = i);
         numDates = Object.keys(dates).length
+
         var find_radius = d3.scaleLinear()
             // .domain(d3.extent(data, function(d) { return + (new Date(...d.date.split("-").map((x)=>(+x)))); }))
             .domain([0, numDates])
@@ -71,29 +71,87 @@ function glyph_test(chart, participant, sensor) {
             .domain([0, 24])
             .range([0, 360]);
 
+        x = d3.scaleLinear()
+            .domain([0, 1440])
+            .range([0, 2 * Math.PI]);
 
-        slicePerAngle = (2 * Math.PI) / 1440;
-        slices = data.map((d, i) => {
-            const my_path = arcGenerator({
-                startAngle: d.minuteOfTheDay * slicePerAngle,
-                endAngle: (d.minuteOfTheDay + 1) * slicePerAngle,
-                innerRadius: find_radius(d2i[d.date]),
-                outerRadius: find_radius(d2i[d.date]) + (d[attr] / attrMinMax[1] * 10)
-            });
+        dates.forEach((d, i) => {
+            datum = data.filter(function(row, i) {
+                return row['date'] == d // && row['date'] <= "2020-06-20";
+            })
+
+            currDate = d;
+            y = d3.scaleLinear()
+                .domain(d3.extent(datum, function(d) { return d[attr]; }))
+                .range([find_radius(d2i[currDate]), find_radius(d2i[currDate] + 1)]);
+            // line = d3.lineRadial()
+            //     .angle(d => x(d.minuteOfTheDay))
+            //     .innerRadius(d => y(0))
+            //     .outerRadius(d => y(d.attr));
+
+            // console.log("line", line({ raduis: find_radius(currDate) }))
+
+
+            const area = d3.areaRadial()
+                .angle(d => x(d.minuteOfTheDay))
+                .innerRadius(d => y(0))
+                .outerRadius(d => y(d[attr]));
+
+            myArea = area(datum)
+
+            console.log(myArea)
 
             // Add the line
             svg.append("path")
-                .datum(data)
-                .attr("fill", pathColor)
-                .attr("opacity", config.opacity)
+                .datum(datum)
+                .attr("fill", "red")
+                .attr('opacity', 1)
                 .attr("stroke", "black")
-                .attr("stroke-width", 1 / 10)
-                .attr("d", my_path)
+                .attr("stroke-width", 1 / 20)
+                .attr("d", myArea)
+                // }
         })
 
 
+
+        // console.log(area(datum))
+
+        // Add the line
+        // svg.append("path")
+        //     .enter()
+        //     .data(datum)
+        //     .attr("fill", "lightsteelblue")
+        //     .attr("fill-opacity", 0.2)
+        //     .attr("d", area({
+        //             innerRadius: (find_radius(d2i[currDate])),
+        //             outerRadius: function(d) {
+        //                 return y(d.attr)
+        //             }
+        //         })
+
+
+        // svg.append("path")
+        //     .attr("fill", "steelblue")
+        //     .attr("fill-opacity", 0.2)
+        //     .attr("d", area
+        //         .innerRadius(d => y(d.min))
+        //         .outerRadius(d => y(d.max))
+        //         (data));
+
+        // svg.append("path")
+        //     .enter()
+        //     .data(datum)
+        //     .attr("fill", "none")
+        //     .attr("stroke", "steelblue")
+        //     .attr("stroke-width", 1.5)
+        //     .attr("d", area(datum))
+        // })
+
+        // })
+
+
         // Creating a grid for reference
-        radius = Math.min(width, height) / 2 + 10;
+        // radius = Math.min(width, height) / 2 + 15;
 
         // var grad = svg.append("defs")
         //     .append("linearGradient").attr("id", "grad")
@@ -103,64 +161,74 @@ function glyph_test(chart, participant, sensor) {
         // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
 
 
-        svg.selectAll(".gridCircles")
-            .data(d3.range(0, numDates, 1))
-            .enter()
-            .append("circle")
-            .attr("class", "griCircles")
-            // .attr("fill", "grey")
-            .style("fill", "url(#grad)")
-            .attr("stroke", "grey")
-            .attr("opacity", 0.5)
-            .attr("stroke-width", 1 / 10)
-            .attr("r", function(d) {
-                return find_radius(d)
-            })
+        // svg.selectAll(".gridCircles")
+        //     .data(d3.range(0, numDates + 1, 1))
+        //     .enter()
+        //     .append("circle")
+        //     .attr("class", "griCircles")
+        //     .attr("fill", "none")
+        //     // .style("fill", "url(#grad)")
+        //     .attr("stroke", "black")
+        //     .attr("opacity", 1)
+        //     .attr("stroke-width", 1 / 5)
+        //     .attr("r", function(d) {
+        //         return find_radius(d)
+        //     })
 
-        svg.selectAll(".gridlines")
-            .data(d3.range(0, 24, 1))
-            .enter()
-            .append("line")
-            .attr("class", 'gridlines')
-            .attr("x1", find_radius(0))
-            .attr("x2", find_radius(numDates - 1))
-            .attr("opacity", 0.5)
-            .attr("stroke", "black")
-            .attr("stroke-width", 1 / 10)
-            .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
+        // svg.selectAll(".gridlines")
+        //     .data(d3.range(0, 24, 1))
+        //     .enter()
+        //     .append("line")
+        //     .attr("class", 'gridlines')
+        //     .attr("x1", find_radius(0))
+        //     .attr("x2", find_radius(numDates))
+        //     .attr("opacity", 1)
+        //     .attr("stroke", "black")
+        //     .attr("stroke-width", 1 / 5)
+        //     .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
 
-        svg.selectAll('.hourLabel')
-            .data(d3.range(0, 24, 1))
-            .enter()
-            .append('text')
-            .attr('class', 'hourLabel')
-            .attr('text-anchor', 'middle')
-            .style('font-size', '0.8em')
-            .attr('x', function(d) {
-                return radius * Math.sin(hourScale(d) * radians);
-            })
-            .attr('y', function(d) {
-                return -radius * Math.cos(hourScale(d) * radians) + 7;
-            })
-            .text(function(d) {
-                return d + "hr";
-            });
+        // svg.selectAll('.hourLabel')
+        //     .data(d3.range(0, 24, 1))
+        //     .enter()
+        //     .append('text')
+        //     .attr('class', 'hourLabel')
+        //     .attr('text-anchor', 'middle')
+        //     .style('font-size', '0.8em')
+        //     .attr('x', function(d) {
+        //         return radius * Math.sin(hourScale(d) * radians);
+        //     })
+        //     .attr('y', function(d) {
+        //         return -radius * Math.cos(hourScale(d) * radians) + 7;
+        //     })
+        //     .text(function(d) {
+        //         return d + "hr";
+        //     });
 
-        svg.selectAll('.dayLabel')
-            .data(d3.range(0, numDates, 1))
-            .enter()
-            .append('text')
-            .attr('class', 'dayLabel')
-            .attr('text-anchor', 'middle')
-            .style('font-size', '0.6em')
-            .attr('x', 0)
-            .attr('y', function(d) {
-                return find_radius(d);
-            })
-            .text(function(d) {
-                return d;
-            });
 
+        // svg.selectAll('.dayLabel')
+        //     .data(d3.range(0, numDates, 1))
+        //     .enter()
+        //     .append('text')
+        //     .attr('class', 'dayLabel')
+        //     .attr('text-anchor', 'middle')
+        //     .style('font-size', '0.6em')
+        //     .attr('x', 0)
+        //     .attr('y', function(d) {
+        //         return find_radius(d + 1);
+        //     })
+        //     .text(function(d) {
+        //         return d;
+        //     })
+        //     .on('mouseover', function(d) {
+        //         d3.select(this)
+        //             .style('font-size', '1.6em')
+        //             .style("cursor", "default")
+        //     })
+        //     .on('mouseout', function(d) {
+        //         d3.select(this)
+        //             .style('font-size', '0.6em')
+        //             .style("fill", "black");
+        // });
     })
 }
 
@@ -183,6 +251,7 @@ function updateglyph_test(chart, participant) {
     // ["acc", "gyr", "brt", "lck"]
     d3.select("#" + chart).selectAll('g').remove();
     // glyph_test(chart, participant, "acc")
-    glyph_test(chart, participant, sensor = "brt")
+    glyph_test(chart, participant, "gyr")
+        // glyph_test(chart, participant, sensor = "brt")
 
 }

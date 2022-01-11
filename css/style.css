@@ -15,11 +15,11 @@ body {
 
 #header {
     /* background-color: red; */
-    height: 30px;
+    height: 40px;
 }
 
 #bottom {
-    height: calc(100% - 40px);
+    height: calc(100% - 50px);
     /* background-color: green; */
 }
 
