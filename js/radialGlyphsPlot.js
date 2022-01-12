@@ -1,5 +1,5 @@
 // Warning: The following plot is rather computation intensive, comment it out if you experience lagging.
-const radialGlyph = (chart, dependendChart, radius) => {
+const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) => {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -129,7 +129,7 @@ const radialGlyph = (chart, dependendChart, radius) => {
                         .attr('strokeWidth', config.strokeWidthLow)
                         .style("fill", config.fillColor);
                 }
-                updateglyph_test(dependendChart, d.participant)
+                updateglyph_test(dependendChart, d.participant, brtChecked, accChecked, gyrChecked, lckChecked)
 
             });
 
@@ -153,9 +153,9 @@ const radialGlyph = (chart, dependendChart, radius) => {
     })
 }
 
-function updateRadialGlyphs(chart, dependendChart, radius) {
+function updateRadialGlyphs(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     console.log("muzzu1", radius, chart)
     d3.select("#" + chart).selectAll('g').remove();
     d3.select("#" + dependendChart).selectAll('g').remove();
-    radialGlyph(chart, dependendChart, radius)
+    radialGlyph(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked)
 }

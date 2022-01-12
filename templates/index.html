@@ -71,22 +71,22 @@
                             <table style="width:100%;">
                                 <tr>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" checked>
+                                        <input type="checkbox" id="brtCheckBox" checked>
                                         <br>
                                         <label>BRT</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" checked>
+                                        <input type="checkbox" id="accCheckBox" checked>
                                         <br>
                                         <label>ACC</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" checked>
+                                        <input type="checkbox" id="gyrCheckBox" checked>
                                         <br>
                                         <label>GYR</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" checked>
+                                        <input type="checkbox" id="lckCheckBox" checked>
                                         <br>
                                         <label>LCK</label>
                                     </td>
@@ -158,8 +158,13 @@
         // forcedSimulationChart ="chart4"
         // barchart ="chart5"
 
+        var brtChecked = true;
+        var accChecked = true;
+        var gyrChecked = true;
+        var lckChecked = true;
 
-        updateRadialGlyphs("chart1", "chart2", radius = 10);
+
+        updateRadialGlyphs("chart1", "chart2", radius = 10, brtChecked, accChecked, gyrChecked, lckChecked);
         parallelCord('chart3');
         // polar_chart("chart2")
         forceSimulation('chart4');
@@ -183,7 +188,7 @@
         var output = document.getElementById("sliderVal");
         output.innerHTML = slider.value;
         slider.oninput = function() {
-            plotCharts(this.value, toggleGlyph)
+            plotCharts(this.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
             output.innerHTML = this.value;
         }
 
@@ -192,13 +197,54 @@
         $("#toggleGlyph").on('change', function() {
             if ($(this).is(':checked')) {
                 toggleGlyph = "flowerGlyph";
-                // updateFlowerGlyphs("chart1","chart2", radius = slider.value);
-
             } else {
                 toggleGlyph = "radialGlyph";
-                // updateRadialGlyphs("chart1","chart2", radius = slider.value);
             }
-            plotCharts(slider.value, toggleGlyph)
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
+
+        $("#brtCheckBox").on('change', function() {
+            if ($(this).is(':checked')) {
+                brtChecked = true
+                console.log("Brt Checked")
+            } else {
+                brtChecked = false
+                console.log("Brt Unchecked")
+            }
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
+
+        $("#accCheckBox").on('change', function() {
+            if ($(this).is(':checked')) {
+                accChecked = true
+                console.log("Acc Checked")
+            } else {
+                accChecked = false
+                console.log("Acc Unchecked")
+            }
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
+
+        $("#gyrCheckBox").on('change', function() {
+            if ($(this).is(':checked')) {
+                gyrChecked = true
+                console.log("Gyr Checked")
+            } else {
+                gyrChecked = false
+                console.log("Gyr Unchecked")
+            }
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
+
+        $("#lckCheckBox").on('change', function() {
+            if ($(this).is(':checked')) {
+                lckChecked = true
+                console.log("Lck Checked")
+            } else {
+                lckChecked = false
+                console.log("Lck Unchecked")
+            }
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
         //togglePolarChart switch
@@ -221,16 +267,16 @@
 
         let resizeObserver = new ResizeObserver(() => {
             console.log("sidebar closed");
-            plotCharts(slider.value, toggleGlyph)
+            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
         resizeObserver.observe(elem);
 
-        function plotCharts(radius, toggleGlyph) {
+        function plotCharts(radius, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked) {
             if (toggleGlyph == "radialGlyph") {
-                updateRadialGlyphs("chart1", "chart2", radius);
+                updateRadialGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
             } else if (toggleGlyph == "flowerGlyph") {
-                updateFlowerGlyphs("chart1", "chart2", radius);
+                updateFlowerGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }
         }
     </script>

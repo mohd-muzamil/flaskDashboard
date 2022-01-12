@@ -1,5 +1,5 @@
 // Warning: The following plot is rather computation intensive, comment it out if you experience lagging.
-const flowerGlyph = (chart, dependendChart, radius) => {
+const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) => {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -139,7 +139,7 @@ const flowerGlyph = (chart, dependendChart, radius) => {
                         .attr('strokeWidth', config.strokeWidthLow)
                         .style("fill", config.fillColor);
                 }
-                updateglyph_test(dependendChart, d.participant)
+                updateglyph_test(dependendChart, d.participant, brtChecked, accChecked, gyrChecked, lckChecked)
             });
 
 
@@ -161,8 +161,8 @@ const flowerGlyph = (chart, dependendChart, radius) => {
     })
 }
 
-function updateFlowerGlyphs(chart, dependendChart, radius) {
+function updateFlowerGlyphs(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     d3.select("#" + chart).selectAll('g').remove();
     d3.select("#" + dependendChart).selectAll('g').remove();
-    flowerGlyph(chart, dependendChart, radius)
+    flowerGlyph(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked)
 }
