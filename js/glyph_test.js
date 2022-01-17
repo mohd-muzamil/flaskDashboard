@@ -220,8 +220,8 @@ function plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotte
 
 function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
 
-    var range = [min, max + 1]
-    var starting_range = [starting_min, starting_max + 1]
+    var range = [min, max]
+    var starting_range = [starting_min, starting_max]
 
     // set width and height of svg
     var margin = { top: 25, right: 25, bottom: 25, left: 25 },
@@ -239,7 +239,7 @@ function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
 
     // draw background lines
     g.append('g').selectAll('line')
-        .data(d3.range(range[0], range[1] + 1))
+        .data(d3.range(range[0], range[1]))
         .enter()
         .append('line')
         .attr('x1', d => x(d)).attr('x2', d => x(d))
