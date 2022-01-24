@@ -1,41 +1,40 @@
-function glyph_test(chart, participant, brtChecked, accChecked, gyrChecked, lckChecked) {
-    console.log("from here ", chart, participant, brtChecked, accChecked, gyrChecked, lckChecked)
-    gridPlotted = false
-        // brightnessData
+function glyph_test(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked) {
+    // test_data = d3.csv("../data/dummyBrightness", function(data) {
+    //     console.log("checking data read", data)
+    // })
+
+
+    gridPlotted = false;
+    // brightnessData
     if (brtChecked == true) {
-        datapath = "../../data/brightness_d3";
+        filename = "dummyBrightness";
         attr = "brt";
         pathColor = "green";
-        gridPlotted = plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotted)
-        console.log("gridPlottedbtr", gridPlotted)
+        gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted)
     }
     //accelerometerData
     if (accChecked == true) {
-        datapath = "../../data/accelerometer_d3";
+        filename = "dummyAccelerometer";
         attr = "acc";
         pathColor = "red";
-        gridPlotted = plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotted)
-        console.log('gridPlottedacc', gridPlotted)
+        gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted)
     }
     //gyroscopeData
     if (gyrChecked == true) {
-        datapath = "../../data/gyroscope_d3";
+        filename = "dummyGyroscope";
         attr = "gyr";
         pathColor = "blue";
-        gridPlotted = plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotted)
-        console.log('gridPlottedgyr', gridPlotted)
-
+        gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted)
     }
     //lockstateData
     if (lckChecked == true) {
         pathColor = "purple";
         datapath = "../../data/lockstate_d3";
         attr = "lck";
-        console.log('need to get this lock state file ready')
     }
 }
 
-function plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotted) {
+function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted) {
     const config = {
         opacity: 0.8,
         strokewidth: 1
@@ -49,7 +48,7 @@ function plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotte
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
     // Parse the date / time
-    // var parseDate = d3.timeFormat("%Y-%b-%d");
+    var parseDate = d3.timeFormat("%Y-%m-%d");
 
     // var arcGenerator = d3.arc();
 
@@ -58,162 +57,172 @@ function plotAreaChart(chart, participant, datapath, attr, pathColor, gridPlotte
         .attr("width", width)
         .attr("height", height)
         .append('g')
-        .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
+        .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top/2 + height + margin.bottom) / 2})`);
+    var postForm = { //Fetch form data
+        'filename': filename, //Store name fields value
+        'participantId': participantId //Store name fields value
+    };
 
+    //fetcing filtered participant data from flask server
+    d3.csv("/filterParticipants")
+        .header("Content-Type", "application/json")
+        .post(JSON.stringify(postForm),
+            function(data) {
+                data = data.filter(function(row, i) {
+                        return row['participantId'] == participantId; //&& row['date'] <= "2020-06-20";
+                    })
+                    // data.forEach(function(d) {
+                    //     // d.date = parseDate(d.date);
+                    //     d.minuteOfTheDay = +d.minuteOfTheDay;
+                    //     d[attr] = +d[attr];
+                    // });
 
-    d3.csv(datapath, function(error, data) {
-        data = data.filter(function(row, i) {
-            return row['participant'] == participant //&& row['date'] <= "2020-06-20";
-        })
+                var attrMinMax = d3.extent(data, function(d) { return d[attr]; });
+                dates = Array.from(new Set(data.map(x => x.date)).values()).sort();
+                d2i = {};
 
-        data.forEach(function(d) {
-            // d.date = parseDate(d.date);
-            d.minuteOfTheDay = +d.minuteOfTheDay;
-            d[attr] = +d[attr];
-        });
+                dates.forEach((d, i) => d2i[d] = i);
+                numDates = Object.keys(dates).length
 
-        var attrMinMax = d3.extent(data, function(d) { return d[attr]; });
-        dates = Array.from(new Set(data.map(x => x.date)).values()).sort();
-        d2i = {};
+                var sliderMin = 0
+                var sliderMax = numDates
+                if (gridPlotted === false) {
+                    sliderValues = brushSlider(chart, min = 0, max = numDates, starting_min = min, starting_max = max);
+                    sliderMin = sliderValues[0]
+                    sliderMax = sliderValues[1]
+                    console.log(sliderMin, sliderMax)
+                }
 
-        dates.forEach((d, i) => d2i[d] = i);
-        numDates = Object.keys(dates).length
+                // data = data.filter(function(row, i) {
+                //     return d2i[row['date']] >= sliderMin && d2i[row['date']] <= sliderMax;;
+                // })
 
-        var sliderMin = 0
-        var sliderMax = numDates
-        if (gridPlotted === false) {
-            sliderValues = brushSlider(chart, min = 0, max = numDates, starting_min = min, starting_max = max);
-            sliderMin = sliderValues[0]
-            sliderMax = sliderValues[1]
-            console.log(sliderMin, sliderMax)
-        }
+                var find_radius = d3.scaleLinear()
+                    // .domain(d3.extent(data, function(d) { return + (new Date(...d.date.split("-").map((x)=>(+x)))); }))
+                    .domain([0, numDates])
+                    .rangeRound([Math.min(height, width) / 2 / numDates, Math.min(height, width) / 2]);
 
-        // data = data.filter(function(row, i) {
-        //     return d2i[row['date']] >= sliderMin && d2i[row['date']] <= sliderMax;;
-        // })
+                var hourScale = d3.scaleLinear()
+                    .domain([0, 24])
+                    .range([0, 360]);
 
-        var find_radius = d3.scaleLinear()
-            // .domain(d3.extent(data, function(d) { return + (new Date(...d.date.split("-").map((x)=>(+x)))); }))
-            .domain([0, numDates])
-            .rangeRound([Math.min(height, width) / 2 / numDates, Math.min(height, width) / 2]);
+                x = d3.scaleLinear()
+                    .domain([0, 1440])
+                    .range([0, 2 * Math.PI]);
 
-        var hourScale = d3.scaleLinear()
-            .domain([0, 24])
-            .range([0, 360]);
+                dates.forEach((d, i) => {
+                    datum = data.filter(function(row, i) {
+                        return row['date'] == d && d2i[row['date']] >= sliderMin && d2i[row['date']] <= sliderMax;
+                    })
 
-        x = d3.scaleLinear()
-            .domain([0, 1440])
-            .range([0, 2 * Math.PI]);
+                    currDate = d;
+                    y = d3.scaleLinear()
+                        .domain(d3.extent(datum, function(d) { return d[attr]; }))
+                        .range([find_radius(d2i[currDate]), find_radius(d2i[currDate] + 1)]);
 
-        dates.forEach((d, i) => {
-            datum = data.filter(function(row, i) {
-                return row['date'] == d //&& d2i[row['date']] >= sliderMin && d2i[row['date']] <= sliderMax;
-            })
+                    const area = d3.areaRadial()
+                        .angle(d => x(d.minuteOfTheDay))
+                        .innerRadius(d => y(0))
+                        .outerRadius(d => y(d[attr]));
 
-            currDate = d;
-            y = d3.scaleLinear()
-                .domain(d3.extent(datum, function(d) { return d[attr]; }))
-                .range([find_radius(d2i[currDate]), find_radius(d2i[currDate] + 1)]);
+                    myArea = area(datum)
 
-            const area = d3.areaRadial()
-                .angle(d => x(d.minuteOfTheDay))
-                .innerRadius(d => y(0))
-                .outerRadius(d => y(d[attr]));
+                    // Add the line
+                    svg.append("path")
+                        .datum(datum)
+                        .attr("fill", pathColor)
+                        .attr('opacity', 1)
+                        // .attr("stroke", "black")
+                        // .attr("stroke-width", 1 / 20)
+                        .attr("d", myArea)
+                        // }
 
-            myArea = area(datum)
-
-            // Add the line
-            svg.append("path")
-                .datum(datum)
-                .attr("fill", pathColor)
-                .attr('opacity', 1)
-                // .attr("stroke", "black")
-                // .attr("stroke-width", 1 / 20)
-                .attr("d", myArea)
-                // }
-        })
-
-        if (gridPlotted === false) {
-            // Creating a grid for reference
-            radius = Math.min(width, height) / 2 + 15;
-
-            // var grad = svg.append("defs")
-            //     .append("linearGradient").attr("id", "grad")
-            //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
-
-            // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
-            // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
-
-            svg.selectAll(".gridCircles")
-                .data(d3.range(0, numDates + 1, 1))
-                .enter()
-                .append("circle")
-                .attr("class", "griCircles")
-                .attr("fill", "none")
-                // .style("fill", "url(#grad)")
-                .attr("stroke", "black")
-                .attr("opacity", config.opacity)
-                .attr("stroke-width", 1 / 10)
-                .attr("r", function(d) {
-                    return find_radius(d)
+                    d3.select("#" + chart).selectAll('.buffer').remove();
                 })
 
-            svg.selectAll(".gridlines")
-                .data(d3.range(0, 24, 1))
-                .enter()
-                .append("line")
-                .attr("class", 'gridlines')
-                .attr("x1", find_radius(0))
-                .attr("x2", find_radius(numDates))
-                .attr("opacity", config.opacity)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1 / 10)
-                .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
+                if (gridPlotted === false) {
+                    // Creating a grid for reference
+                    radius = Math.min(width, height) / 2 + 15;
 
-            svg.selectAll('.hourLabel')
-                .data(d3.range(0, 24, 1))
-                .enter()
-                .append('text')
-                .attr('class', 'hourLabel')
-                .attr('text-anchor', 'middle')
-                .style('font-size', '0.8em')
-                .attr('x', function(d) {
-                    return radius * Math.sin(hourScale(d) * radians);
-                })
-                .attr('y', function(d) {
-                    return -radius * Math.cos(hourScale(d) * radians) + 7;
-                })
-                .text(function(d) {
-                    return d + "hr";
-                });
+                    // var grad = svg.append("defs")
+                    //     .append("linearGradient").attr("id", "grad")
+                    //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
+
+                    // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
+                    // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
+
+                    svg.selectAll(".gridCircles")
+                        .data(d3.range(0, numDates + 1, 1))
+                        .enter()
+                        .append("circle")
+                        .attr("class", "griCircles")
+                        .attr("fill", "none")
+                        // .style("fill", "url(#grad)")
+                        .attr("stroke", "black")
+                        .attr("opacity", config.opacity)
+                        .attr("stroke-width", 1 / 10)
+                        .attr("r", function(d) {
+                            return find_radius(d)
+                        })
+
+                    svg.selectAll(".gridlines")
+                        .data(d3.range(0, 24, 1))
+                        .enter()
+                        .append("line")
+                        .attr("class", 'gridlines')
+                        .attr("x1", find_radius(0))
+                        .attr("x2", find_radius(numDates))
+                        .attr("opacity", config.opacity)
+                        .attr("stroke", "black")
+                        .attr("stroke-width", 1 / 10)
+                        .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
+
+                    svg.selectAll('.hourLabel')
+                        .data(d3.range(0, 24, 1))
+                        .enter()
+                        .append('text')
+                        .attr('class', 'hourLabel')
+                        .attr('text-anchor', 'middle')
+                        .style('font-size', '0.8em')
+                        .attr('x', function(d) {
+                            return radius * Math.sin(hourScale(d) * radians);
+                        })
+                        .attr('y', function(d) {
+                            return -radius * Math.cos(hourScale(d) * radians) + 7;
+                        })
+                        .text(function(d) {
+                            return d + "hr";
+                        });
 
 
-            svg.selectAll('.dayLabel')
-                .data(d3.range(0, numDates, 1))
-                .enter()
-                .append('text')
-                .attr('class', 'dayLabel')
-                .attr('text-anchor', 'middle')
-                .style('font-size', '0.6em')
-                .attr('x', 0)
-                .attr('y', function(d) {
-                    return find_radius(d + 1);
-                })
-                .text(function(d) {
-                    return d;
-                })
-                .on('mouseover', function(d) {
-                    d3.select(this)
-                        .style('font-size', '1.6em')
-                        .style("cursor", "default")
-                })
-                .on('mouseout', function(d) {
-                    d3.select(this)
+                    svg.selectAll('.dayLabel')
+                        .data(d3.range(0, numDates, 1))
+                        .enter()
+                        .append('text')
+                        .attr('class', 'dayLabel')
+                        .attr('text-anchor', 'middle')
                         .style('font-size', '0.6em')
-                        .style("fill", "black");
-                });
-        }
-    })
+                        .attr('x', 0)
+                        .attr('y', function(d) {
+                            return find_radius(d + 1);
+                        })
+                        .text(function(d) {
+                            return d;
+                        })
+                        .on('mouseover', function(d) {
+                            d3.select(this)
+                                .style('font-size', '1.6em')
+                                .style("cursor", "default")
+                        })
+                        .on('mouseout', function(d) {
+                            d3.select(this)
+                                .style('font-size', '0.6em')
+                                .style("fill", "black");
+                        });
+                }
+                //jenu
+                d3.select("#" + chart).selectAll('.buffer').remove();
+            })
     return true;
 }
 
@@ -235,15 +244,15 @@ function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
 
     // create svg and translated g
     var svg = d3.select('#' + chart)
-    var g = svg.append('g').attr('transform', `translate(${margin.left}, ${height + (margin.bottom)})`)
+    var g = svg.append('g').attr('transform', `translate(${margin.left}, ${height + 1.5*(margin.bottom)})`)
 
     // draw background lines
     g.append('g').selectAll('line')
-        .data(d3.range(range[0], range[1]))
+        .data(d3.range(range[0], range[1] + 1))
         .enter()
         .append('line')
         .attr('x1', d => x(d)).attr('x2', d => x(d))
-        .attr('y1', 0).attr('y2', margin.bottom)
+        .attr('y1', 0).attr('y2', margin.bottom / 2)
         .style('stroke', '#ccc')
 
     // labels
@@ -263,7 +272,7 @@ function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
     var brush = d3.brushX()
         .extent([
             [0, 0],
-            [width, margin.bottom]
+            [width, margin.bottom / 2]
         ])
         .on('brush', function() {
             var s = d3.event.selection;
@@ -296,7 +305,7 @@ function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
     var brushResizePath = function(d) {
         var e = +(d.type == "e"),
             x = e ? 1 : -1,
-            y = margin.bottom / 2;
+            y = margin.bottom / 3;
         return "M" + (.5 * x) + "," + y + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6) + "V" + (2 * y - 6) +
             "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y) + "Z" + "M" + (2.5 * x) + "," + (y + 8) + "V" + (2 * y - 8) +
             "M" + (4.5 * x) + "," + (y + 8) + "V" + (2 * y - 8);
@@ -345,11 +354,12 @@ function createGrid(chart) {
         .attr("height", height)
         .append('g')
         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
-
 }
 
-function updateglyph_test(chart, participant, brtChecked, accChecked, gyrChecked, lckChecked) {
+function updateglyph_test(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked) {
     // ["acc", "gyr", "brt", "lck"]
     d3.select("#" + chart).selectAll('g').remove();
-    glyph_test(chart, participant, brtChecked, accChecked, gyrChecked, lckChecked)
+    buffering(chart);
+    glyph_test(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked)
+
 }

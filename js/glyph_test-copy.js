@@ -44,7 +44,7 @@ function glyph_test(chart, participant, sensor) {
 
     d3.csv(datapath, function(error, data) {
         data = data.filter(function(row, i) {
-            return row['participant'] == participant //&& row['date'] <= "2020-06-20";
+            return row['participant'] == participant && row['date'] <= "2020-06-20";
         })
 
         data.forEach(function(d) {

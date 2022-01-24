@@ -1,9 +1,9 @@
-// Warning: The following plot is rather computation intensive, comment it out if you experience lagging.
+//This script is used to plot radial glyphs in first svg
 const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) => {
     const config = {
         r: +radius,
         opacityLow: 0,
-        opacityHigh: 0.8,
+        opacityHigh: 0.7,
         strokeWidthLow: 0,
         strokeWidthHigh: 0.5,
         fillColorHover: "#ddd",
@@ -25,23 +25,26 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         .style("z-index", "10")
         .style("visibility", "hidden")
         .style('font-size', '1em')
+        .style("border-width", "2px")
+        .style("padding", "5px")
         .style('background-color', 'white')
         .style('border-radius', '10% 10% 10% 10%');
 
     // reading data
-    d3.csv("../../data/participant_scores", function(error, data) {
+    //d3.csv("../../data/participant_scores", function(error, data) {
+    d3.csv("../../data/dummyPersonalityScores", function(error, data) {
         data.forEach(d => {
-            d.x0 = +d.x0
-            d.x1 = +d.x1
+            d.x = +d.x
+            d.y = +d.y
         });
 
         const xScale = d3.scaleLinear()
-            .domain(d3.extent(data.map(d => d.x0)))
+            .domain(d3.extent(data.map(d => d.x)))
             .range([margin.left + config.r, width - margin.right - config.r])
 
 
         const yScale = d3.scaleLinear()
-            .domain(d3.extent(data.map(d => d.x1)))
+            .domain(d3.extent(data.map(d => d.y)))
             .range([height - margin.bottom - config.r, margin.top + config.r])
 
 
@@ -69,12 +72,12 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                         10 - d.neuro,
                         d.open
                     ].map((v, i) => [Math.PI * (i) / 2.5, radialScale(v)])))
-                    .attr('transform', `translate(${xScale(d.x0)}, ${yScale(d.x1)})`)
-                    // .attr('stroke', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participant) > -1 ? 'red' : 'black')
+                    .attr('transform', `translate(${xScale(d.x)}, ${yScale(d.y)})`)
+                    // .attr('stroke', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'black')
                     .attr('stroke', 'black')
                     .attr('stroke-width', config.strokeWidthHigh)
-                    .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participant) > -1 ? 'red' : 'blue')
-                    // .attr('fill', 'none') //use this coloring for showing device type ios or android, can also show cluster
+                    // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'blue')
+                    .attr('fill', d => d.device == "ios" ? "red" : "black") //use this coloring for showing device type ios or android, can also show cluster
                     .attr('opacity', config.opacityHigh)
             });
 
@@ -84,8 +87,8 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
             .data(data)
             .enter()
             .append('circle')
-            .attr("cx", function(d) { return xScale(d.x0); })
-            .attr("cy", function(d) { return yScale(d.x1); })
+            .attr("cx", function(d) { return xScale(d.x); })
+            .attr("cy", function(d) { return yScale(d.y); })
             .attr("r", config.r)
             .style("fill", config.fillColor)
             .attr('opacity', config.opacityLow)
@@ -97,7 +100,7 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                     .attr("opacity", config.opacityHigh)
                     .style('fill', config.fillColorHover)
                     .attr('stroke-width', config.strokeWidthHigh)
-                tooltip.text(`O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
+                tooltip.text(`${d.participantId} O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
                 return tooltip.style("visibility", "visible");
             })
             .on('mouseout', function() {
@@ -129,23 +132,22 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                         .attr('strokeWidth', config.strokeWidthLow)
                         .style("fill", config.fillColor);
                 }
-                updateglyph_test(dependendChart, d.participant, brtChecked, accChecked, gyrChecked, lckChecked)
-
+                updateglyph_test(dependendChart, d.participantId, brtChecked, accChecked, gyrChecked, lckChecked)
             });
 
         svg1.selectAll('text')
             .data(data)
             .enter()
             .append("text")
-            .attr("x", function(d) { return xScale(d.x0); })
-            .attr("y", function(d) { return yScale(d.x1); })
+            .attr("x", function(d) { return xScale(d.x); })
+            .attr("y", function(d) { return yScale(d.y); })
             .attr("dx", "-15px")
             .attr("dy", "-10px")
             .attr("font-size", "0.7em")
             .text(function(d) {
-                // return d.participant.includes() ? d.participant : "";
-                if (["PROSITC0003", "PROSITC0007", "PROSITC0008", "Test"].some(v => d.participant.includes(v))) {
-                    return d.participant
+                // return d.participantId.includes() ? d.participantId : "";
+                if (["PROSITC0003", "PROSITC0007", "PROSITC0008", "Test"].some(v => d.participantId.includes(v))) {
+                    return d.participantId
                 } else { return "" }
             })
 
@@ -154,7 +156,6 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
 }
 
 function updateRadialGlyphs(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
-    console.log("muzzu1", radius, chart)
     d3.select("#" + chart).selectAll('g').remove();
     d3.select("#" + dependendChart).selectAll('g').remove();
     radialGlyph(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked)

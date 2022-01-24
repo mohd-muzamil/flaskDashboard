@@ -10,6 +10,7 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         fillColor: "rgb(255, 255, 255)",
         petals: 5, //no of petals in the glyph
     }
+
     const margin = { left: 10, top: 10, right: 10, bottom: 10 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
@@ -25,14 +26,16 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         .style("z-index", "10")
         .style("visibility", "hidden")
         .style('font-size', '1em')
+        .style("border-width", "2px")
+        .style("padding", "5px")
         .style('background-color', 'white')
         .style('border-radius', '10% 10% 10% 10%');
 
-
-    d3.csv("../../data/participant_scores", function(error, data) {
+    // d3.csv("../../data/participant_scores", function(error, data) {
+    d3.csv("../../data/dummyPersonalityScores", function(error, data) {
         data.forEach(d => {
-            d.x0 = +d.x0
-            d.x1 = +d.x1
+            d.x = +d.x
+            d.y = +d.y
         });
         //star
         // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //normal
@@ -52,11 +55,11 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         var colorInterpolator1 = d3.quantize(d3.interpolateRgb("green", "brown"), 11);
 
         const xScale = d3.scaleLinear()
-            .domain(d3.extent(data.map(d => d.x0)))
+            .domain(d3.extent(data.map(d => d.x)))
             .range([margin.left + config.r, width - margin.right - config.r])
 
         const yScale = d3.scaleLinear()
-            .domain(d3.extent(data.map(d => d.x1)))
+            .domain(d3.extent(data.map(d => d.y)))
             .range([height - margin.bottom - config.r, margin.top + config.r])
 
         // flowerGlyph
@@ -75,15 +78,15 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                         return customPath
                     })
                     .attr('transform', function(v, i) {
-                        return `translate(${xScale(d.x0)}, ${yScale(d.x1)}), rotate(${360/config.petals * i}), scale(${config.r * v / 1000 })`
+                        return `translate(${xScale(d.x)}, ${yScale(d.y)}), rotate(${360/config.petals * i}), scale(${config.r * v / 1000 })`
                     })
                     .attr("fill", function(v, i) {
                         return i < config.petals ? colorInterpolator[Math.floor(v)] : colorInterpolator1[Math.floor(v)]
                     })
-                    // .attr('stroke', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participant) > -1 ? 'red' : 'black')
+                    // .attr('stroke', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'black')
                     .attr('stroke', 'black')
                     .attr('stroke-width', config.strokeWidthLow)
-                    // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participant) > -1 ? 'red' : 'blue')
+                    // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'blue')
                     // .attr('fill', 'none') //use this coloring for showing device type ios or android, can also show cluster
                     .attr('opacity', config.opacityHigh)
             });
@@ -92,11 +95,11 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
             .data(data)
             .enter()
             .append('circle')
-            .attr("cx", function(d) { return xScale(d.x0); })
-            .attr("cy", function(d) { return yScale(d.x1); })
+            .attr("cx", function(d) { return xScale(d.x); })
+            .attr("cy", function(d) { return yScale(d.y); })
             .attr("r", config.r)
             .style("fill", config.fillColor)
-            // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participant) > -1 ? 'red' : 'blue')
+            // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'blue')
             .attr('opacity', config.opacityLow)
             .attr('stroke', 'black')
             .attr('stroke-width', config.strokeWidthLow)
@@ -106,7 +109,7 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                     .attr("opacity", config.opacityHigh)
                     .style('fill', config.fillColorHover)
                     .attr('stroke-width', config.strokeWidthHigh)
-                tooltip.text(`O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
+                tooltip.text(`${d.participantId} O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
                 return tooltip.style("visibility", "visible");
                 //  .attr('fill', 'red')
             })
@@ -139,7 +142,8 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                         .attr('strokeWidth', config.strokeWidthLow)
                         .style("fill", config.fillColor);
                 }
-                updateglyph_test(dependendChart, d.participant, brtChecked, accChecked, gyrChecked, lckChecked)
+                // updateglyph_test(dependendChart)
+                updateglyph_test(dependendChart, d.participantId, brtChecked, accChecked, gyrChecked, lckChecked)
             });
 
 
@@ -148,14 +152,14 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
             .data(data)
             .enter()
             .append("text")
-            .attr("x", function(d) { return xScale(d.x0); })
-            .attr("y", function(d) { return yScale(d.x1); })
+            .attr("x", function(d) { return xScale(d.x); })
+            .attr("y", function(d) { return yScale(d.y); })
             .attr("dx", "-15px")
             .attr("dy", "-10px")
             .attr("font-size", "0.7em")
             .text(function(d) {
-                if (["PROSITC0003", "PROSITC0007", "PROSITC0008", "Test"].some(v => d.participant.includes(v))) {
-                    return d.participant
+                if (["PROSITC0003", "PROSITC0007", "PROSITC0008", "Test"].some(v => d.participantId.includes(v))) {
+                    return d.participantId
                 } else { return "" }
             })
     })
