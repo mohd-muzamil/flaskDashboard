@@ -1,6 +1,7 @@
 from importlib.machinery import DEBUG_BYTECODE_SUFFIXES
 from math import ceil
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
+from matplotlib.pyplot import connect
 from pymongo import MongoClient
 import json
 from bson import json_util
@@ -12,6 +13,7 @@ import os
 import numpy as np
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
+import time
 # import * from generate_data_circle_packing
 
 featureDataFile = "dummyFeatureData"
@@ -157,21 +159,24 @@ def filterParticipants():
         content = request.get_json()
         filename = content['filename']
         participantId = content['participantId']
-    
+        print("request recieved", content)
         filename=os.path.join("data", filename)
         
+        strt = time.time()
         df = pd.read_csv(filename)
-        df = df[df["participantId"].str.contains(participantId, case=False)]#.sample(frac=0.1)
-
+        df = df[df["participantId"].str.contains(participantId, case=False)]
+        print(time.time())
         for i in range(ceil(df.shape[0]/1440)):
             x = np.random.randint(0, 3*60)
             sleepDur = np.random.randint(6,9)
             startindex = i * 1440 + x
             df.iloc[startindex:(startindex+sleepDur*60), -1] = 0
-
         resp = make_response(df.to_csv())
         resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
         resp.headers["Content-Type"] = "text/csv"
+
+        print("d3.js in Action",df)
+        print(time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} participant:{participantId}")
 

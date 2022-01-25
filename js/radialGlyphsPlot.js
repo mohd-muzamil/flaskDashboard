@@ -130,6 +130,7 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                 // svg1.selectAll('.glyph').remove();
                 xScale.domain([xScale.invert(extent[0][0]), xScale.invert(extent[1][0])])
                 yScale.domain([yScale.invert(extent[1][1]), yScale.invert(extent[0][1])])
+                tooltip.style("visibility", "hidden")
                 svg1.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
             }
 
@@ -217,6 +218,7 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                             .style("fill", config.fillColor);
                     }
                     updateglyph_test(dependendChart, d.participantId, brtChecked, accChecked, gyrChecked, lckChecked)
+                    
                 });
 
             scatter.selectAll('text')

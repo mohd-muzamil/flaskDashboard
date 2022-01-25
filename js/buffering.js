@@ -1,4 +1,4 @@
-function buffering(chart) {
+function buffering(chart, participantId) {
     'use strict';
     var margin = { top: 25, right: 25, bottom: 75, left: 25 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
@@ -9,7 +9,7 @@ function buffering(chart) {
     var svg = d3.select('#' + chart);
 
     var planets = [
-        { R: height / 20, r: 10, speed: 50, phi0: 90 }
+        { R: height/30, r:height/100, speed: 80, phi0: 90 }
     ];
 
 
@@ -19,9 +19,10 @@ function buffering(chart) {
     // margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom)
 
     container.append("text")
-        .attr("dx", "-4em")
-        .attr("dy", "3em")
-        .text("Loading Raidal Chart...")
+        .attr("dx", -width/3+"px")
+        .attr("dy", height/10+"px")
+        .text(`"Loading Raidal Chart for ${participantId}..."`)
+        .style("font-size", width/30 + "px");
 
     container.selectAll('g.planet')
         .data(planets)

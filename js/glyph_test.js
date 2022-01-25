@@ -58,7 +58,8 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
         .attr("height", height)
         .append('g')
         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top/2 + height + margin.bottom) / 2})`);
-    var postForm = { //Fetch form data
+    
+        var postForm = { //Fetch form data
         'filename': filename, //Store name fields value
         'participantId': participantId //Store name fields value
     };
@@ -150,6 +151,12 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
 
                     // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
                     // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
+
+                    svg.append("text")
+                    .attr("x", -width/5)
+                    .attr("y", -margin.top - height/2)
+                    .attr("dy", "-0.1em")
+                    .text("Participant: "+participantId)
 
                     svg.selectAll(".gridCircles")
                         .data(d3.range(0, numDates + 1, 1))
@@ -244,7 +251,7 @@ function brushSlider(chart, min, max, starting_min = min, starting_max = max) {
 
     // create svg and translated g
     var svg = d3.select('#' + chart)
-    var g = svg.append('g').attr('transform', `translate(${margin.left}, ${height + 1.5*(margin.bottom)})`)
+    var g = svg.append('g').attr('transform', `translate(${margin.left}, ${height + 1.25*(margin.bottom)})`)
 
     // draw background lines
     g.append('g').selectAll('line')
