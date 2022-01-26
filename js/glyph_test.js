@@ -1,15 +1,14 @@
-function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted) {
+function plotAreaChart(chart, participantId, attributes) {
     var chart = chart
     var participantId = participantId
-    var filename = filename
-    var attr = attr
-    var pathColor = pathColor
-    var gridPlotted = gridPlotted
-    var brushPlotted = brushPlotted
+    var attributes = attributes
+    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}
+    var gridPlotted = false
 
     var postForm = { //Fetch form data
-        'filename': filename, //Store name fields value
-        'participantId': participantId //Store name fields value
+        // 'filename': filename, //Store name fields value
+        'participantId': participantId, //Store name fields value
+        "attributes" : attributes
     };
 
     //fetcing filtered participant data from flask server
@@ -20,7 +19,9 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
                 data.forEach(function(d) {
                     // d.date = parseDate(d.date);
                     d.minuteOfTheDay = +d.minuteOfTheDay;
-                    d[attr] = +d[attr];
+                    d.brt = +d.brt;
+                    d.acc = +d.acc;
+                    d.gyr = +d.gyr;
                 });
 
                 dates = Array.from(new Set(data.map(x => x.date)).values()).sort();
@@ -34,7 +35,7 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
                 var starting_max = numDates
 
                 plotRadial(starting_min, starting_max)
-                if (!brushPlotted){
+                if (true){
                     brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max+1);
                 }
                 // sliderMin = sliderValues[0]
@@ -78,41 +79,47 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
                     x = d3.scaleLinear()
                         .domain([0, 1440])
                         .range([0, 2 * Math.PI]);
-                
-                    // d3.range(starting_min, starting_max)((d, i) =>
-                    for (let d=starting_min; d<=starting_max; d++){
-                        currDate = d;
-                
-                        datum = data.filter(function(row, i) {
-                            return d2i[row['date']] == currDate;
-                        })
-                
-                        y = d3.scaleLinear()
-                            .domain(d3.extent(datum, function(d) { return d[attr]; }))
-                            .range([find_radius(currDate-1), find_radius(currDate)]);
-                
-                        const area = d3.areaRadial()
-                            .angle(d => x(d.minuteOfTheDay))
-                            .innerRadius(d => y(0))
-                            .outerRadius(d => y(d[attr]));
+                    
+                    for (let i=0; i<Object.keys(attributes).length; i++){
+                        attr = Object.keys(attributes)[i]
+                        if (attributes[attr]){
+                            // d3.range(starting_min, starting_max)((d, i) =>
+                            for (let d=starting_min; d<=starting_max; d++){
+                                currDate = d;
                         
-                        var xScale = d3.scaleLinear()
-                            .domain([0, 6])
-                            .range([0, 2 * Math.PI]);
-                        var yScale = d3.scaleLinear()
-                            .domain([0, 20])
-                            .range([width/2, height/2]);
-                
-                        // Add the line
-                        svg.append("path")
-                        .attr("class", "areaPath")
-                        .attr("fill", pathColor)
-                        .attr('opacity', 1)
-                        .attr("stroke", "black")
-                        .attr("stroke-width", 1 / 20)
-                        .attr("d", area(datum))
-                
-                        d3.select("#" + chart).selectAll('.buffer').remove();
+                                datum = data.filter(function(row, i) {
+                                    return d2i[row['date']] == currDate && row[attr] != NaN;
+                                })
+                        
+                                y = d3.scaleLinear()
+                                    .domain(d3.extent(datum, function(d) { return d[attr]; }))
+                                    .range([find_radius(currDate-1), find_radius(currDate)]);
+                        
+                                const area = d3.areaRadial()
+                                    .angle(d => x(d.minuteOfTheDay))
+                                    .innerRadius(d => y(0))
+                                    .outerRadius(d => y(d[attr]));
+                                
+                                var xScale = d3.scaleLinear()
+                                    .domain([0, 6])
+                                    .range([0, 2 * Math.PI]);
+
+                                var yScale = d3.scaleLinear()
+                                    .domain([0, 20])
+                                    .range([width/2, height/2]);
+                        
+                                // Add the line
+                                svg.append("path")
+                                .attr("class", "areaPath")
+                                .attr("fill", pathColor[attr])
+                                .attr('opacity', 1)
+                                .attr("stroke", "black")
+                                .attr("stroke-width", 1 / 20)
+                                .attr("d", area(datum))
+                        
+                                d3.select("#" + chart).selectAll('.buffer').remove();
+                            }
+                        }
                     }
                 
                     if (gridPlotted === false) {
@@ -277,7 +284,6 @@ function plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlot
                         if (d1[0]<d1[1]){
                             d3.select(this).transition().call(d3.event.target.move, d1.map(x))
                             
-                            gridPlotted = false
                             d3.select("#" + chart).selectAll('.areaPath').remove();
                             d3.select("#" + chart).selectAll('.gridCircles').remove();
                             d3.select("#" + chart).selectAll('.gridLines').remove();
@@ -365,33 +371,35 @@ function updateglyph_test(chart, participantId, brtChecked, accChecked, gyrCheck
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
 
-    gridPlotted = false;
-    brushPlotted = false;
+    // gridPlotted = false;
+    // brushPlotted = false;
+    attributes = {"brt":brtChecked, "acc":accChecked, "gyr":gyrChecked}
+
     // brightnessData
-    if (brtChecked == true) {
-        filename = "dummyBrightness";
-        attr = "brt";
-        pathColor = "green";
-        brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
-    }
-    //accelerometerData
-    if (accChecked == true) {
-        filename = "dummyAccelerometer";
-        attr = "acc";
-        pathColor = "red";
-        brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
-    }
-    //gyroscopeData
-    if (gyrChecked == true) {
-        filename = "dummyGyroscope";
-        attr = "gyr";
-        pathColor = "blue";
-        brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
-    }
-    //lockstateData
-    if (lckChecked == true) {
-        pathColor = "purple";
-        datapath = "../../data/lockstate_d3";
-        attr = "lck";
-    }
+    // filename = "dummyBrightness";
+    // attr = "brt";
+    // pathColor = "green";
+    
+    plotAreaChart(chart, participantId, attributes)
+
+    // //accelerometerData
+    // if (accChecked == true) {
+    //     filename = "dummyAccelerometer";
+    //     attr = "acc";
+    //     pathColor = "red";
+    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    // }
+    // //gyroscopeData
+    // if (gyrChecked == true) {
+    //     filename = "dummyGyroscope";
+    //     attr = "gyr";
+    //     pathColor = "blue";
+    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    // }
+    // //lockstateData
+    // if (lckChecked == true) {
+    //     pathColor = "purple";
+    //     datapath = "../../data/lockstate_d3";
+    //     attr = "lck";
+    // }
 }

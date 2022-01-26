@@ -9,6 +9,7 @@ const radialGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         fillColorHover: "#ddd",
         fillColor: "rgb(255, 255, 255)"
     }
+
     const margin = { left: 10, top: 10, right: 10, bottom: 10 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;

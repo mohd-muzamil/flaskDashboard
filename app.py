@@ -157,27 +157,38 @@ def dimReduceParticipants():
 def filterParticipants():
     if request.method == 'POST':
         content = request.get_json()
-        filename = content['filename']
+        # filename = content['filename']
         participantId = content['participantId']
-        print("request recieved", content)
-        filename=os.path.join("data", filename)
+        attributes = content["attributes"]
+
+        print("request recieved", content)  #print statement
         
         strt = time.time()
-        df = pd.read_csv(filename)
-        # df = df[df["participantId"].str.contains(participantId, case=False)]
-        df = df[df["participantId"]==participantId]#.sample(frac=0.001)
-        print(time.time())
-        for i in range(ceil(df.shape[0]/1440)):
-            x = np.random.randint(0, 3*60)
-            sleepDur = np.random.randint(6,9)
-            startindex = i * 1440 + x
-            df.iloc[startindex:(startindex+sleepDur*60), -1] = 0
-        # df = df[df.iloc[:,-1] != 0]    
-        resp = make_response(df.to_csv(index=False))
+        filenames = {"brt":"dummyBrightness", "acc":"dummyAccelerometer", "gyr":"dummyGyroscope"}
+        data = pd.DataFrame()
+        for attr,checkState in attributes.items():
+            print("attr:", attr, "checkState:", checkState)
+            if checkState:
+                filename=os.path.join("data", filenames[attr])
+                df = pd.read_csv(filename)
+                df = df[df["participantId"]==participantId]#.sample(frac=0.001)
+
+                #Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
+                for i in range(ceil(df.shape[0]/1440)):
+                    x = np.random.randint(0, 3*60)
+                    sleepDur = np.random.randint(6,9)
+                    startindex = i * 1440 + x
+                    df.iloc[startindex:(startindex+sleepDur*60), -1] = 0
+                    # data = data[data.iloc[:,-1] != 0]
+
+                data = pd.concat([data, df])
+    
+        resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
         resp.headers["Content-Type"] = "text/csv"
 
-        print("d3.js in Action",df)
+        print("d3.js in Action",data)
+
         print(time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} participant:{participantId}")
