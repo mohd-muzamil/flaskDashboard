@@ -164,14 +164,16 @@ def filterParticipants():
         
         strt = time.time()
         df = pd.read_csv(filename)
-        df = df[df["participantId"].str.contains(participantId, case=False)]
+        # df = df[df["participantId"].str.contains(participantId, case=False)]
+        df = df[df["participantId"]==participantId]#.sample(frac=0.001)
         print(time.time())
         for i in range(ceil(df.shape[0]/1440)):
             x = np.random.randint(0, 3*60)
             sleepDur = np.random.randint(6,9)
             startindex = i * 1440 + x
             df.iloc[startindex:(startindex+sleepDur*60), -1] = 0
-        resp = make_response(df.to_csv())
+        # df = df[df.iloc[:,-1] != 0]    
+        resp = make_response(df.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
         resp.headers["Content-Type"] = "text/csv"
 
