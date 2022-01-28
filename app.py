@@ -153,8 +153,27 @@ def dimReduceParticipants():
     
     return jsonify(message)
 
-@app.route('/filterParticipants', methods=['GET', 'POST'])
+@app.route('/fetchPersonalityScores', methods=['GET'])
+def fetchPersonalityScores():
+    """
+    Return Data for Chart1: Personality scores that are used to make glyphs
+    """
+    if request.method == 'GET':
+        print("Request recieved for fetching Personality scores")
+        filename = os.path.join("data", "dummyPersonalityScores")
+        data = pd.read_csv(filename)
+
+        resp = make_response(data.to_csv(index=False))
+        resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
+        resp.headers["Content-Type"] = "text/csv"
+        return resp
+
+@app.route('/filterParticipants', methods=['POST'])
 def filterParticipants():
+    """
+    Returns Data for Chart2: Radial chart to visualize sleep/awake activity using 
+    brightness, accelerometer and gyroscope data
+    """
     if request.method == 'POST':
         content = request.get_json()
         # filename = content['filename']
@@ -169,7 +188,7 @@ def filterParticipants():
         for attr,checkState in attributes.items():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
-                filename=os.path.join("data", filenames[attr])
+                filename = os.path.join("data", filenames[attr])
                 df = pd.read_csv(filename)
                 df = df[df["participantId"]==participantId]#.sample(frac=0.001)
 

@@ -40,18 +40,19 @@ svg {
 }
 
 .svg1 {
-    height: 60%;
+    height: 70%;
     width: 58.6%;
 }
 
 .svg2 {
-    height: 60%;
+    height: 70%;
     width: 40%;
 }
 
 .svg3 {
-    height: 40%;
-    width: 32.8%;
+    height: 30%;
+    /* width: 32.8%; */
+    width:99.1%;
 }
 
 #dashboardHeader {
@@ -98,6 +99,5 @@ table {
 tr {
     height: 50px;
 }
-
 
 /* bootstrapslider */

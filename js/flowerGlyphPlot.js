@@ -1,5 +1,5 @@
 // Warning: The following plot is rather computation intensive, comment it out if you experience lagging.
-const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) => {
+function flowerGlyph(chart, dependendChart, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -20,6 +20,7 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         //     .attr("width", width)
         //     .attr("height", height)
 
+    // tooltip
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
@@ -31,12 +32,14 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
         .style('background-color', 'white')
         .style('border-radius', '10% 10% 10% 10%');
 
+    // reading data
     // d3.csv("../../data/participant_scores", function(error, data) {
     d3.csv("../../data/dummyPersonalityScores", function(error, data) {
         data.forEach(d => {
             d.x = +d.x
             d.y = +d.y
         });
+        
         //star
         // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //normal
         //swrill
@@ -145,8 +148,6 @@ const flowerGlyph = (chart, dependendChart, radius, brtChecked, accChecked, gyrC
                 // updateglyph_test(dependendChart)
                 updateglyph_test(dependendChart, d.participantId, brtChecked, accChecked, gyrChecked, lckChecked)
             });
-
-
 
         svg1.selectAll('text')
             .data(data)

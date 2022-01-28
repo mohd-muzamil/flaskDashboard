@@ -13,10 +13,12 @@
 </head>
 
 <body>
+    <!-- latest versio of bootstrap -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
 
+    <!-- older version of bootstrap with working multiselect dropdown -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
@@ -28,7 +30,9 @@
     <div class="container-fluid" style="height:100%">
         <div class="row flex-nowrap" style="height:100%">
             <div class="col-auto px-0">
-                <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                <div id="sidebar" class="collapse collapse-horizontal border-end">
+                <!-- show is used here to hide or show the sidebar by default-->
+                <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end">  -->
                     <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
 
                         <h4 id="dashboardHeader">Filters</h4>
@@ -104,36 +108,34 @@
                             <div class="value"></div>
                         </div> -->
 
-                        <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px">
-                            <p>Glyph Radius: </p>
-
+                        <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px; margin-bottom:0px;">
+                            <label>Glyph Radius: </label>
                             <span id="sliderVal"></span>
                             <br>
                             <div>
                                 <input type="range" min="1" max="30" value="10" steps='1' class="slider" id="myRange">
                             </div>
                         </div>
-
                         <hr class="line">
-                        <!-- Toggle glyph switch -->
-                        <div>
+                        <!-- Toggle glyph switch -->`
+                        <div style="text-align: center;">
                             <label class="form-check-label" for="toggleGlyph" style="text-align: center;">Toggle Glyph</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph" style="float: none; margin-left: 20%;" />
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph"/>
                             </div>
                         </div>
 
                         <hr class="line">
 
-                        <!-- Toggle polar chart switch -->
-                        <div>
+                        <!-- Toggle polar chart switch  -->
+                        <!-- Decided not to implement this feature -->
+                        <!-- <div>
                             <label class="form-check-label" for="toggleGlyph" style="text-align: center;">Toggle Polar chart</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="togglePolarChart" style="float: none; margin-left: 20%;" />
                             </div>
                         </div>
-
-                        <hr class="line">
+                        <hr class="line"> -->
 
                         <div>
                             <table style="width:100%;">
@@ -153,11 +155,12 @@
                                         <br>
                                         <label>GYR</label>
                                     </td>
-                                    <td class="filterCheckbox">
+                                    <!-- Decided not to implement this feature -->
+                                    <!-- <td class="filterCheckbox">
                                         <input type="checkbox" id="lckCheckBox">
                                         <br>
                                         <label>LCK</label>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             </table>
 
@@ -187,20 +190,43 @@
                     <svg class="svg1" id="chart1"></svg>
                     <svg class="svg2" id="chart2"></svg>
                     <svg class="svg3" id="chart3"></svg>
-                    <svg class="svg3" id="chart4"></svg>
-                    <svg class="svg3" id="chart5"></svg>
+                    <!-- <svg class="svg3" id="chart4"></svg> -->
+                    <!-- <svg class="svg3" id="chart5"></svg> -->
                 </div>
 
 
             </main>
         </div>
     </div>
+
+    <script> 
+    //settings for multiselect dropdown
+    $('#featureSelect').multiselect({
+        enableClickableOptGroups: true,
+        enableCollapsibleOptGroups: true,
+        enableFiltering: true,
+        filterPlaceholder: 'Search',
+        includeSelectAllOption: true,
+        buttonWidth: '140px',
+        maxHeight: screen.height * 0.6,
+        // buttonClass: 'btn btn-link',
+        numberDisplayed: 1
+    })
+
+    // Calling server route to find dim reduce for all columns
+    $.ajax({
+        type: "GET",
+        contentType: 'application/json',
+        url: "/dimReduceParticipants"
+    });
     </script>
+    
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <!-- <script src="https://unpkg.com/d3-fetch"></script> -->
     <!-- <script src="https://d3js.org/d3.v3.min.js"></script> -->
-    <!-- D3.js charts -->
+    
+    <!-- Demo d3.js charts -->
     <!-- <script src="../js/demo/chart1.js"></script> -->
     <script src="../js/demo/barchart.js"></script>
     <!-- demo forceSimulation -->
@@ -209,41 +235,36 @@
     <script src="../js/demo/parallelCord.js"></script>
 
     <!-- PROSIT Charts -->
-    <!-- Glyph scatter plot -->
-    <script src="../js/radialGlyphsPlot.js"></script>
-    <script src="../js/flowerGlyphPlot.js"></script>
-    <!-- Spiral time chart -->
-    <script src="../js/glyph_test.js"></script>
-    <!-- dummy glyph -->
-    <script src="../js/glyph.js"></script>
-    <!-- dummy ploar chart -->
-    <script src="../js/polar_chart.js"></script>
-    <script src="../js/grid.js"></script>
+    <!-- glyphs scatter plot : svg1 -->
+    <script src="../js/glyphs.js"></script>
+    <!-- spiral time chart : svg2 -->
+    <script src="../js/radialTimeChart.js"></script>
+    <!-- loading symbol during buffer : svg2 -->
     <script src="../js/buffering.js"></script>
-
     <script>
-        // glyphChart ="chart1";
-        // parallelCordChart ="chart2";
-        // polarChart ="chart3";
-        // forcedSimulationChart ="chart4"
-        // barchart ="chart5"
-        var brtChecked = true;
-        var accChecked = false;
-        var gyrChecked = false;
-        var lckChecked = false;
+        // parameters
+        let glyphsChart ="chart1";
+        let radialTimeChart ="chart2";
+        let parallerCordChart ="chart3";
+        let forcedSimulationChart ="chart4"
+        let barChart ="chart5"
+        let toggleGlyph = "radialGlyph" //toggleGlyph switch
+        let brtChecked = true;
+        let accChecked = false;
+        let gyrChecked = false;
+        let lckChecked = false;
+        
+        // plotting glyphs
+        updateGlyphs(glyphsChart, radialTimeChart, toggleGlyph, radius = 10, brtChecked, accChecked, gyrChecked, lckChecked);
 
-        function updateChart1() {
-            if (toggleGlyph == "radialGlyph") {
-                updateRadialGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
-            } else if (toggleGlyph == "flowerGlyph") {
-                updateFlowerGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
-            }
-        }
-        updateRadialGlyphs("chart1", "chart2", radius = 10, brtChecked, accChecked, gyrChecked, lckChecked);
-        parallelCord('chart3');
-        // polar_chart("chart2")
-        forceSimulation('chart4');
-        // barchart('chart5');
+        // plotting paraller cordinates
+        updateParallelCord(parallerCordChart);
+
+        // plotting dummy forced network chart
+        updateForceSimulation(forcedSimulationChart);
+
+        // plotting dummuy bar chart
+        updateBarChart(barChart);
 
         // auto refresh after window resizing
         jQuery(function($) {
@@ -267,8 +288,7 @@
             output.innerHTML = this.value;
         }
 
-        //toggleGlyph switch
-        var toggleGlyph = "radialGlyph"
+        // switch to select glyphs
         $("#toggleGlyph").on('change', function() {
             if ($(this).is(':checked')) {
                 toggleGlyph = "flowerGlyph";
@@ -278,6 +298,7 @@
             plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
+        // checkbox to select brightness
         $("#brtCheckBox").on('change', function() {
             if ($(this).is(':checked')) {
                 brtChecked = true
@@ -287,6 +308,7 @@
             plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
+        // checkbox to select accelerometer
         $("#accCheckBox").on('change', function() {
             if ($(this).is(':checked')) {
                 accChecked = true
@@ -296,6 +318,7 @@
             plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
+        // checkbox to select gyroscope
         $("#gyrCheckBox").on('change', function() {
             if ($(this).is(':checked')) {
                 gyrChecked = true
@@ -305,27 +328,28 @@
             plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
-        $("#lckCheckBox").on('change', function() {
-            if ($(this).is(':checked')) {
-                lckChecked = true
-            } else {
-                lckChecked = false
-            }
-            plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
-        });
+        // // checkbox to select gyroscope lockstate:  Decided not to implement this feature
+        // $("#lckCheckBox").on('change', function() {
+        //     if ($(this).is(':checked')) {
+        //         lckChecked = true
+        //     } else {
+        //         lckChecked = false
+        //     }
+        //     plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        // });
 
-        //togglePolarChart switch
-        var togglePolarChart = "circular"
-        $("#togglePolarChart").on('change', function() {
-            if ($(this).is(':checked')) {
-                togglePolarChart = "lateral";
-                // updateFlowerGlyphs("chart1","chart2", radius = slider.value);
-            } else {
-                toggleGlyph = "circular";
-                // updateRadialGlyphs("chart1","chart2", radius = slider.value);
-            }
+        // //togglePolarChart switch:  Decided not to implement this feature
+        // var togglePolarChart = "circular"
+        // $("#togglePolarChart").on('change', function() {
+        //     if ($(this).is(':checked')) {
+        //         togglePolarChart = "lateral";
+        //         // updateFlowerGlyphs("chart1","chart2", radius = slider.value);
+        //     } else {
+        //         togglePolarChart = "circular";
+        //         // updateGlyphs("chart1","chart2", radius = slider.value);
+        //     }
 
-        });
+        // });
 
 
         elem = $("#bottom")[0];
@@ -335,30 +359,6 @@
         });
 
         resizeObserver.observe(elem);
-
-        function plotCharts(radius, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked) {
-            if (toggleGlyph == "radialGlyph") {
-                updateRadialGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
-            } else if (toggleGlyph == "flowerGlyph") {
-                updateFlowerGlyphs("chart1", "chart2", radius, brtChecked, accChecked, gyrChecked, lckChecked);
-            }
-        }
-
-
-        //select features dropdown
-        $('#featureSelect').multiselect({
-            enableClickableOptGroups: true,
-            enableCollapsibleOptGroups: true,
-            enableFiltering: true,
-            filterPlaceholder: 'Search',
-            includeSelectAllOption: true,
-            buttonWidth: '140px',
-            maxHeight: screen.height * 0.6,
-            // buttonClass: 'btn btn-link',
-            numberDisplayed: 1
-
-
-        })
 
         //feature select filter
         $("#featureSelectFilter").click(function() {
@@ -386,16 +386,12 @@
                 }
             });
         });
+        
+        function plotCharts(radius, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked) {
+            updateGlyphs(glyphsChart, radialTimeChart, toggleGlyph, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+        }
 
-        $.ajax({
-            type: "GET",
-            contentType: 'application/json',
-            url: "/dimReduceParticipants",
-            success: function(status) {
-                plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
-                console.log(status);
-            }
-        });
+
     </script>
 </body>
 

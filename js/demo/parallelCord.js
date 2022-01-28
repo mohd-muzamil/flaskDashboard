@@ -200,3 +200,7 @@ function parallelCord(chart) {
     // })
 
 }
+
+function updateParallelCord(chart) {
+    parallelCord(chart)
+}

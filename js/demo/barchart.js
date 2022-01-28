@@ -1,3 +1,4 @@
+// demo chart to plot a barchar with dummy data
 function barchart(chart) {
     var margin = { top: 20, right: 20, bottom: 70, left: 40 },
         width = $("#" + chart).width() - margin.left - margin.right,
@@ -62,7 +63,9 @@ function barchart(chart) {
 
     update(myData);
 
+    // console.log("w", width, " h", height);
+}
 
-
-    console.log("w", width, " h", height);
+function updateBarChart(chart) {
+    barchart(chart)   
 }

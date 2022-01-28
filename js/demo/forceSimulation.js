@@ -111,3 +111,7 @@ function forceSimulation(chart) {
         d.fy = null;
     }
 }
+
+function updateForceSimulation(chart){
+    forceSimulation(chart)
+}
