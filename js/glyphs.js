@@ -1,7 +1,7 @@
 // ****Importatnt file****
 //This script is used to plot radial glyphs in first svg
 
-function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+function glyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -12,6 +12,9 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
         fillColor: "rgb(255, 255, 255)",
         petals: 5, //no of petals in the glyph
     }
+
+    console.log("cocococo radius", config.r)
+    var selectedParticipantId = "";
 
     const margin = { left: 10, top: 10, right: 10, bottom: 10 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
@@ -41,6 +44,9 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
             d.x = +d.x
             d.y = +d.y
         });
+
+        const participants = Array.from(new Set(data.map(x => x.participantId)).values()).sort();
+        selectedParticipantId = participants[Math.floor(Math.random() * participants.length)];    //randomly selecting one of the participants from the list
 
         // custom shaped for flower glyphs
         //star
@@ -83,8 +89,8 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
             ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
             .on("end", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
 
-        // Create the scatter variable: where both the circles and the brush take place
-        var scatter = svg//.append('g')
+        // Create the svg variable: where both the circles and the brush take place
+        // var svg = svg//.append('g')
         // .attr("clip-path", "url(#clip)")
 
         if (glyph == "radialGlyph") 
@@ -96,7 +102,7 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
         plotFloweGlyph()
 
         // Add the brushing
-        scatter
+        svg
             .append("g")
             .attr("class", "brush")
             .call(brush);
@@ -113,7 +119,7 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
 
         function plotRadialGlyph(){
             // RadialGlyph
-            scatter.selectAll('circle')
+            svg.selectAll('circle')
                 .data(data)
                 .enter()
                 .each(function(d) {
@@ -143,7 +149,7 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
 
         function plotFloweGlyph() {
             // flowerGlyph
-            scatter.selectAll('path')
+            svg.selectAll('path')
                 .data(data)
                 .enter()
                 .append('g')
@@ -175,11 +181,10 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
 
         function addHoverCircle(){
             // let current_circle = undefined;
-            scatter.selectAll('circle')
+            svg.selectAll('circle')
             .data(data)
             .enter()
             .append('circle')
-            .attr("class", "hoverCircle")
             .attr("cx", function(d) { return xScale(d.x); })
             .attr("cy", function(d) { return yScale(d.y); })
             .attr("r", config.r)
@@ -189,11 +194,12 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
             .attr('stroke-width', config.strokeWidthLow)
             .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px") })
             .on('mouseover', function(d) {
-                d3.select(this)
-                    .attr("opacity", config.opacityHigh)
-                    .style('fill', config.fillColorHover)
-                    .attr('stroke-width', config.strokeWidthHigh)
-                tooltip.text(`[${d.participantId}] O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
+                if (d3.select(this).attr("class") != "selectedGlyph")
+                    d3.select(this)
+                        .attr("opacity", config.opacityHigh)
+                        .style('fill', config.fillColorHover)
+                        .attr('stroke-width', config.strokeWidthHigh)
+                tooltip.text(`${d.participantId} O:${Math.floor(d.open)} C:${Math.floor(d.con)} E:${Math.floor(d.extra)} A:${Math.floor(d.agree)} N:${Math.floor(d.neuro)}`);
                 return tooltip.style("visibility", "visible");
             })
             .on('mouseout', function() {
@@ -207,7 +213,7 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
             .on("click", function(d) {
                 // click on unselected point
                 if (d3.select(this).attr("class") != "selectedGlyph") {
-                    scatter.selectAll('.selectedGlyph')
+                    svg.selectAll('.selectedGlyph')
                         .classed('selectedGlyph', false)
                         .attr("opacity", config.opacityLow)
                         .attr("stroke-width", config.strokeWidthLow)
@@ -225,12 +231,17 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
                         .attr('strokeWidth', config.strokeWidthLow)
                         .style("fill", config.fillColor);
                 }
-                updatePlotAreaChart(dependendChart, d.participantId, brtChecked, accChecked, gyrChecked, lckChecked)
+
+                selectedParticipantId = d.participantId
+                updatePlotAreaChart(dependendChart1, selectedParticipantId, brtChecked, accChecked, gyrChecked, lckChecked)
+                updateParallelCord(dependendChart2, selectedParticipantId, feature)
+                console.log("Selected Participant: ", selectedParticipantId)
+                return selectedParticipantId
             });
         }
 
         function addSelectedText(){
-            scatter.selectAll('text')
+            svg.selectAll('text')
                 .data(data)
                 .enter()
                 .append("text")
@@ -258,19 +269,19 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
                 yScale.domain(d3.extent(data.map(d => d.y)))
 
             } else {
-                // scatter.selectAll('.glyph').remove();
+                // svg.selectAll('.glyph').remove();
                 xScale.domain([xScale.invert(extent[0][0]), xScale.invert(extent[1][0])])
                 yScale.domain([yScale.invert(extent[1][1]), yScale.invert(extent[0][1])])
                 tooltip.style("visibility", "hidden")
-                scatter.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+                svg.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
             }
 
             // // Update axis and circle position
             // xAxis.transition().duration(1000).call(d3.axisBottom(x))
-            scatter.selectAll("path").remove()
-            scatter.selectAll("circle").remove()
-            // scatter.selectAll("hovercircle").remove()
-            // scatter.selectAll("labelText").remove()
+            svg.selectAll("path").remove()
+            svg.selectAll("circle").remove()
+            // svg.selectAll("hovercircle").remove()
+            // svg.selectAll("labelText").remove()
 
             if (glyph == "radialGlyph") {
             // plotting the radial glyphs
@@ -288,12 +299,16 @@ function glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gy
             // // adding text to show over selected participants
             addSelectedText()
         }
-        
+    
+    // Plotting chart2 and chart3 with randomly selected participant 
+    updatePlotAreaChart(dependendChart1, selectedParticipantId, brtChecked, accChecked, gyrChecked, lckChecked)
+    updateParallelCord(dependendChart2, selectedParticipantId, feature)
     })
 }
 
-function updateGlyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+function updateGlyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     d3.select("#" + chart).selectAll('g').remove();
-    d3.select("#" + dependendChart).selectAll('g').remove();
-    glyphs(chart, dependendChart, glyph, radius, brtChecked, accChecked, gyrChecked, lckChecked)
+    d3.select("#" + dependendChart1).selectAll('g').remove();
+    d3.select("#" + dependendChart2).selectAll('g').remove();
+    glyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius, brtChecked, accChecked, gyrChecked, lckChecked)
 }

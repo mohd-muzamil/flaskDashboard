@@ -1,6 +1,6 @@
-function parallelCord() {
+// This file is important and I have worked on implementing it for my dummy data
 
-
+function parallelCord(chart) {
     const svg1 = d3.select("#" + chart)
         .append('g')
         //     .attr("width", width)
@@ -14,8 +14,18 @@ function parallelCord() {
     var devicePixelRatio = window.devicePixelRatio || 1;
 
     var color = d3.scaleOrdinal()
-        .domain(["Radial Velocity", "Imaging", "Eclipse Timing Variations", "Astrometry", "Microlensing", "Orbital Brightness Modulation", "Pulsar Timing", "Pulsation Timing Variations", "Transit", "Transit Timing Variations"])
-        .range(["#DB7F85", "#50AB84", "#4C6C86", "#C47DCB", "#B59248", "#DD6CA7", "#E15E5A", "#5DA5B3", "#725D82", "#54AF52", "#954D56", "#8C92E8", "#D8597D", "#AB9C27", "#D67D4B", "#D58323", "#BA89AD", "#357468", "#8F86C2", "#7D9E33", "#517C3F", "#9D5130", "#5E9ACF", "#776327", "#944F7E"]);
+        .domain(["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", 
+                "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
+                "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", 
+                "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
+                "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", 
+                "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"])
+        .range(["#DB7F85", "#50AB84", "#4C6C86", "#C47DCB", "#B59248", 
+                "#DD6CA7", "#E15E5A", "#5DA5B3", "#725D82", "#54AF52", 
+                "#954D56", "#8C92E8", "#D8597D", "#AB9C27", "#D67D4B", 
+                "#D58323", "#BA89AD", "#357468", "#8F86C2", "#7D9E33", 
+                "#517C3F", "#9D5130", "#5E9ACF", "#776327", "#944F7E",
+                "#517000", "#9D5000", "#5E9000", "#776000", "#944000"]);
 
     var types = {
         "Number": {
@@ -42,85 +52,85 @@ function parallelCord() {
     };
 
     var dimensions = [{
-            key: "pl_discmethod",
-            description: "Discovery Method",
-            type: types["String"],
+            key: "noScreenLocks",
+            description: "No of screen Locks",
+            type: types["Number"],
             axis: d3.axisLeft()
                 .tickFormat(function(d, i) {
                     return d;
                 })
         },
         {
-            key: "pl_letter",
-            description: "Planet Letter",
-            type: types["String"]
-        },
-        {
-            key: "pl_pnum",
-            description: "Number of Planets in System",
+            key: "firstScreenUnlock",
+            description: "First screen unlock",
             type: types["Number"]
         },
         {
-            key: "pl_orbper",
+            key: "lastScreenLock",
+            description: "Last Screen lock",
+            type: types["Number"]
+        },
+        {
+            key: "maxScreenTime",
+            description: "Max screen on time",
             type: types["Number"],
-            description: "Planet Orbital Period",
             scale: d3.scaleLog().range([innerHeight, 0])
         },
         {
-            key: "pl_orbsmax",
+            key: "totalScreenTime",
+            description: "Total screen on time",
             type: types["Number"],
-            description: "Planet Semi-Major Axis",
             scale: d3.scaleLog().range([innerHeight, 0])
         },
         {
-            key: "pl_orbeccen",
-            description: "Planet Eccentricity",
+            key: "noMissed",
+            description: "No of missed calls",
             type: types["Number"]
         },
         {
-            key: "pl_orbincl",
-            description: "Planet Inclination",
+            key: "noDialled",
+            description: "No of dialled calls",
             type: types["Number"]
         },
         {
-            key: "pl_bmassj",
-            description: "Mass in Jupiters",
+            key: "noIncoming",
+            description: "No of incoming calls",
             type: types["Number"]
         },
         {
-            key: "pl_rade",
-            description: "Planet Radius in Earth Radii",
+            key: "minDurationIncoming",
+            description: "Smallest incoming call",
             type: types["Number"]
         },
         {
-            key: "pl_eqt",
-            description: "Planet Equilibrium Temperature (K)",
+            key: "maxDurationIncoming",
+            description: "Largest incoming call",
             type: types["Number"]
         },
         {
-            key: "pl_imppar",
-            description: "Impact Parameter",
+            key: "totalDurationIncoming",
+            description: "Total duration of incoming calls",
             type: types["Number"]
         },
         {
-            key: "pl_trandep",
-            description: "Transit Depth (%)",
+            key: "noOutgoing",
+            description: "No of outgoing calls",
             type: types["Number"]
         },
         {
-            key: "pl_trandur",
-            description: "Transit Duration (days)",
+            key: "minDurationOutgoing",
+            description: "Smallest outgoing call",
             type: types["Number"]
         },
         {
-            key: "pl_ratror",
-            description: "Planet-Star Radius Ratio",
+            key: "maxDurtaionOutgoing",
+            description: "Largest outgoing call",
             type: types["Number"]
         },
         {
-            key: "st_spstr",
-            description: "Star Spectral Type",
-            type: types["String"],
+            key: "totalDurationOutgoing",
+            description: "Total duration of outgoing calls",
+            type: types["Number"],
             axis: d3.axisLeft()
                 .tickFormat(function(d, i) {
                     if (i % 4) return;
@@ -128,52 +138,20 @@ function parallelCord() {
                 })
         },
         {
-            key: "pl_locale",
-            type: types["String"],
-            axis: d3.axisLeft()
-                .tickFormat(function(d, i) {
-                    if (d == "Multiple Locales") return "Multiple";
-                    return d;
-                })
-
+            key: "totalNoCalls",
+            description: "Total no of calls",
+            type: types["Number"],
         },
         {
-            key: "pl_disc",
-            description: "Year of Discovery",
-            type: types["Date"]
+            key: "totalDurationCalls",
+            description: "Total duration of calls",
+            type: types["Number"]
         },
         {
-            key: "pl_facility",
-            description: "Facility",
-            type: types["String"],
-            domain: ["Kepler", "La Silla Observatory", "K2", "W. M. Keck Observatory", "SuperWASP", "Multiple Observatories", "HATNet", "Haute-Provence Observatory", "Anglo-Australian Telescope", "OGLE", "Lick Observatory", "HATSouth", "CoRoT", "McDonald Observatory", "Okayama Astrophysical Observatory", "MOA", "Bohyunsan Optical Astronomical Observatory", "Las Campanas Observatory", "SuperWASP-South", "Roque de los Muchachos Observatory", "Paranal Observatory", "Gemini Observatory", "KELT", "Subaru Telescope", "Thueringer Landessternwarte Tautenburg", "XO", "Multiple Facilities", "Hubble Space Telescope", "Fred Lawrence Whipple Observatory", "TrES", "kepler", "KELT-South", "Spitzer Space Telescope", "Arecibo Observatory", "United Kingdom Infrared Telescope", "Large Binocular Telescope Observatory", "Xinglong Station", "Cerro Tololo Inter-American Observatory", "Palomar Observatory", "SuperWASP-North", "Qatar", "Teide Observatory", "European Southern Observatory", "Leoncito Astronomical Complex", "Infrared Survey Facility", "KMTNet", "Parkes Observatory", "Apache Point Observatory", "Oak Ridge Observatory", "MEarth Project", "Yunnan Astronomical Observatory", "Kitt Peak National Observatory"],
-            axis: d3.axisRight()
-                .tickFormat(function(d, i) {
-                    return d;
-                })
+            key: "stepCount",
+            description: "No of steps",
+            type: types["Number"],
         }
-        /*
-        {
-          key: "pl_telescope",
-          description: "Telescope",
-          type: types["String"],
-          axis: d3.axisRight()
-            .tickFormat(function(d,i) {
-              return d;
-            })
-        }
-        */
-        /*
-        {
-          key: "pl_instrument",
-          description: "Instrument",
-          type: types["String"],
-          axis: d3.axisRight()
-            .tickFormat(function(d,i) {
-              return d;
-            })
-        }
-        */
     ];
 
 
@@ -193,6 +171,7 @@ function parallelCord() {
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
+        .append("id", "canvas")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var canvas = container.append("canvas")
@@ -202,6 +181,8 @@ function parallelCord() {
         .style("height", height + "px")
         .style("margin-top", margin.top + "px")
         .style("margin-left", margin.left + "px");
+    
+    // var canvas = document.getElementById('canvas');
 
     var ctx = canvas.node().getContext("2d");
     ctx.globalCompositeOperation = 'darken';
@@ -217,7 +198,7 @@ function parallelCord() {
         .attr("class", function(d) { return "axis " + d.key.replace(/ /g, "_"); })
         .attr("transform", function(d, i) { return "translate(" + xscale(i) + ")"; });
 
-    d3.csv("planets.csv", function(error, data) {
+    d3.csv("../data/dummyFeatureData", function(error, data) {
         if (error) throw error;
 
         data.forEach(function(d) {
@@ -246,9 +227,9 @@ function parallelCord() {
 
         var render = renderQueue(draw).rate(30);
 
-        ctx.clearRect(0, 0, width, height);
-        ctx.globalAlpha = d3.min([1.15 / Math.pow(data.length, 0.3), 1]);
-        render(data);
+        // ctx.clearRect(0, 0, width, height);
+        // ctx.globalAlpha = d3.min([1.15 / Math.pow(data.length, 0.3), 1]);
+        // render(data);
 
         axes.append("g")
             .each(function(d) {
@@ -404,6 +385,6 @@ function parallelCord() {
 
 }
 
-function updateParallelCord() {
-
+function updateParallelCord(chart) {
+    parallelCord(chart)
 }

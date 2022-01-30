@@ -1,8 +1,13 @@
 function forceSimulation(chart) {
     let svg = d3.select("#" + chart),
+
         margin = { top: 20, right: 20, bottom: 70, left: 40 },
-        width = $("#" + chart).width(), //- margin.left - margin.right,
+        width = $("#" + chart).width()/30, //- margin.left - margin.right,
         height = $("#" + chart).height() //- margin.top - margin.bottom,
+
+    svg.attr("width", width)
+        .attr("height", height)
+
     N = 100,
         r = d3.scaleSqrt()
         .domain([0, 50])

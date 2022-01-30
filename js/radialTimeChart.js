@@ -2,7 +2,7 @@ function plotAreaChart(chart, participantId, attributes) {
     var chart = chart
     var participantId = participantId
     var attributes = attributes
-    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}
+    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}   //dark green/Orange/Purple: colorblind safe
     var gridPlotted = false
 
     var postForm = { //Fetch form data
@@ -57,7 +57,9 @@ function plotAreaChart(chart, participantId, attributes) {
                     var parseDate = d3.timeFormat("%Y-%m-%d");
                 
                     // var arcGenerator = d3.arc();
-                
+                    
+                    d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
+                    
                     // Select the svg
                     var svg = d3.select("#" + chart)
                         .attr("width", width)
@@ -123,18 +125,20 @@ function plotAreaChart(chart, participantId, attributes) {
                     if (gridPlotted === false) {
                         // Creating a grid for reference
                         radius = Math.min(width, height) / 2 + 15;
-                
+                        
                         // var grad = svg.append("defs")
                         //     .append("linearGradient").attr("id", "grad")
                         //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
                 
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
-                
+                        
                         svg.append("text")
-                        .attr("x", -width/5)
+                        .attr("x", 0)
                         .attr("y", -margin.top - height/2)
                         .attr("dy", "-0.1em")
+                        .style("text-anchor", "middle")
+                        .style("font-size", "20px")
                         .text("Participant: "+participantId)
                 
                         svg.selectAll(".gridCircles")
@@ -338,7 +342,6 @@ function plotAreaChart(chart, participantId, attributes) {
                 return [range[0], range[1]]
             }
             })
-    return true, true;
 }
 
 

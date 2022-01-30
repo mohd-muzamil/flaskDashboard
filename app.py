@@ -213,8 +213,44 @@ def filterParticipants():
         # return jsonify(f"post works filename:{filename} participant:{participantId}")
 
     else:
-        print("Snowwoman no post values")
         return jsonify("no post requests")
+
+@app.route('/fetchAggFeatures', methods=['GET', 'POST'])
+def fetchAggFeatures():
+    """
+    Returns Data for Chart3: Parallel cordinate chart to visualize extracted features
+    """
+    print("Request recieved for fetching Aggregated feature data")
+    filename = os.path.join("data", "dummyFeatureData")
+    data = pd.read_csv(filename)
+    # Aggregating based on participantId
+    data = data.groupby("participantId").mean().reset_index()
+
+    resp = make_response(data.to_csv(index=False))
+    resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
+    resp.headers["Content-Type"] = "text/csv"
+    return resp
+
+@app.route('/fetchIndividualFeatures', methods=['POST'])
+def fetchIndividualFeatures():
+    """
+    Returns Data for Chart3: Parallel cordinate chart to visualize extracted features - This will return the feature of single participant.
+    """
+    if request.method == 'POST':
+        content = request.get_json()
+        # filename = content['filename']
+        participantId = content['participantId']
+
+        print("Request recieved for fetching individual feature data")
+        filename = os.path.join("data", "dummyFeatureData")
+        data = pd.read_csv(filename)
+        # Fetching data for selected participant
+        data = data[data["participantId"]==participantId]#.sample(frac=0.001)
+
+        resp = make_response(data.to_csv(index=False))
+        resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
+        resp.headers["Content-Type"] = "text/csv"
+        return resp
 
 
 if __name__ == "__main__":
