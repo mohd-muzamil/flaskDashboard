@@ -10,7 +10,10 @@ function parallelCord( chart, participantId, feature ){
     var margin = { left: 50, top: 30, right: 50, bottom: 50 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom,
-        deltawidth = width/featuresNames.length;
+        // deltawidth = width/featuresNames.length;
+        line_color = (feature == "aggregatedFeatures") ? "red" : "steelblue";
+        deltawidth = width/30;
+
 
     // defininf tooltip
     var tooltip = d3.select("body")
@@ -29,6 +32,7 @@ function parallelCord( chart, participantId, feature ){
 
     var line = d3.line(),
     //        axis = d3.svg.axis().orient("left"),
+        background,
         foreground;
 
     var svg = d3.select( "#" + chart)
@@ -46,7 +50,7 @@ function parallelCord( chart, participantId, feature ){
     }
     else if (feature == "individualFeatures"){
         serverRoute = "/fetchIndividualFeatures"
-        titleText = "Daily wise feature of participant: " + participantId
+        titleText = "Daily wise features of participant: " + participantId
         // featuresNames.push("date")
         // featuresCodes.push("date")
     }
@@ -55,16 +59,13 @@ function parallelCord( chart, participantId, feature ){
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
-                console.log(data)
     // d3.csv("/fetchAggFeatures", function(data) {
         const participants = [...new Set(data.map(item => item.participantId))];
-        
-        console.log(featuresCodes)
 
         // Create a scale and brush for each trait.
         featuresCodes.forEach(function(d) {
             // Coerce values to numbers.
-            data.forEach(function(p) { p[d] = +p[d]; });
+            data.forEach(function(p) {p[d] = +p[d]; });
 
             if( d == "participantId" ) {
                 console.log('participantId')
@@ -77,7 +78,7 @@ function parallelCord( chart, participantId, feature ){
             }
             else {
             y[d] = d3.scaleLinear()
-                .domain(d3.extent(data, function(p) { return p[d]; }))
+                .domain(d3.extent(data, function(p) { return +p[d]; }))
                 .range([height, 0]);
             }
 
@@ -89,7 +90,7 @@ function parallelCord( chart, participantId, feature ){
         // Add a title.
         var title = svg.append("text")
             .attr("x", width/2 )
-            .attr("y", -margin.top/3)
+            .attr("y", -2*margin.top/5)
             .style("font-size", "20px")
             .style("font-weight", "normal")
             .style("text-anchor", "middle")
@@ -136,6 +137,14 @@ function parallelCord( chart, participantId, feature ){
             .attr("dy", ".31em")
             .text(function(d) { return d; });
 
+        // Add grey background lines for context.
+        background = svg.append("svg:g")
+            .attr("class", "background")
+            .selectAll("path")
+            .data(data)
+            .enter().append("svg:path")
+            .attr("d", path);
+
         // Add foreground lines.
         foreground = svg.append("svg:g")
             .attr("class", "foreground")
@@ -143,7 +152,7 @@ function parallelCord( chart, participantId, feature ){
             .data(data)
             .enter().append("svg:path")
             .attr("d", path)
-            .attr("class", function(d) { return d.featuresNames; });
+            // .attr("class", function(d) { return d.featuresNames; });
 
         // Add a group element for each trait.
         var g = svg.selectAll(".trait")
@@ -151,11 +160,11 @@ function parallelCord( chart, participantId, feature ){
             .enter().append("svg:g")
             .attr("class", "trait")
             .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
-            .call(d3.drag()
-                .subject(function(d) { return {x: x(d)}; })
-                .on("start", dragstart)
-                .on("drag", drag)
-                .on("end", dragend));
+            // .call(d3.drag()
+            //     .subject(function(d) { return {x: x(d)}; })
+            //     .on("start", dragstart)
+            //     .on("drag", drag)
+            //     .on("end", dragend));
 
         // Add an axis and title.
         g.append("svg:g")
@@ -165,7 +174,7 @@ function parallelCord( chart, participantId, feature ){
             .attr("text-anchor", "middle")
             .attr("y", -9)
             .attr("opacity", 0.1)
-            .text(String);
+            .text(String); 
 
         // Add a brush for each axis.
         g.append("svg:g")
@@ -174,28 +183,7 @@ function parallelCord( chart, participantId, feature ){
             .selectAll("rect")
             .attr("x", -8)
             .attr("width", 16);
-
-        function dragstart(d) {
-            i = featuresCodes.indexOf(d);
-        }
-
-        function drag(d) {
-            x.range()[i] = d3.event.x; //unsovled issue
-            featuresCodes.sort(function(a, b) { return x(a) - x(b); });
-            g.attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-            foreground.attr("d", path);
-        }
-
-        function dragend(d) {
-    //            x.domain(featuresCodes).rangePoints([0, w]);
-            var t = d3.transition().duration(500);
-            t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-            t.selectAll(".foreground path").attr("d", path);
-        }
-
-        d3.select("#" + chart).selectAll('.buffer').remove();
-
-    });
+            
 
     // Returns the path for a given data point.
     function path(d) {
@@ -218,7 +206,6 @@ function parallelCord( chart, participantId, feature ){
             });
         //set un-brushed foreground line disappear
         foreground.classed("fade", function(d,i) {
-
             return !actives.every(function(active) {
                 var dim = active.dimension;
                 return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim])  <= active.extent[1];
@@ -226,7 +213,8 @@ function parallelCord( chart, participantId, feature ){
         });
 
     }
-
+    d3.select("#" + chart).selectAll('.buffer').remove();
+});
 }
 
 function updateParallelCord(chart, participantId, feature){

@@ -5,8 +5,15 @@ svg {
 .foreground path {
   fill: none;
   stroke: steelblue;
-  stroke-opacity: 0.6;
+  stroke-opacity: 1;
   stroke-width: 1.5px;
+}
+
+.background path {
+  fill: none;
+  stroke: black;
+  stroke-opacity: 0.5;
+  stroke-width: 0.2px;
 }
 
 .foreground path.fade {
