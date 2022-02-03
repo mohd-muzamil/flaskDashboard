@@ -1,11 +1,10 @@
 svg {
-  font-size: 14px;
+  font-size: 16pt;
 }
 
 .foreground path {
   fill: none;
-  stroke: steelblue;
-  stroke-opacity: 1;
+  stroke-opacity: 0.8;
   stroke-width: 1.5px;
 }
 
@@ -58,7 +57,22 @@ svg {
 }
 
 .axis text {
-  text-shadow: 0 1px 0 #fff;
+  /* text-shadow: 0 1px 0 #fff; */
   cursor: move;
+  font-size: 5pt;
   opacity: 1;
+  fill: black
+}
+
+/* Brush no eixo */
+.brush .extent .selection {
+  fill: red;
+  fill-opacity: .3;
+  /* stroke: #fff; */
+  shape-rendering: crispEdges;
+}
+
+.boxes {
+fill: "gray";
+fill-opacity : 0.1;
 }

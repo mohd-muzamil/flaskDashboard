@@ -11,6 +11,8 @@ import pandas as pd
 # from templates.Preprocessing_Scripts.fetch_data import *
 import os
 import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.cluster import SpectralClustering
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 import time
@@ -35,12 +37,26 @@ def getTSNE(df, columns):
     tsne_y = tsne_result[:,1]
     return tsne_x, tsne_y
 
+def getClusters(df, columns, clusteringMethod="kmeans"):
+    print("clustering befin" + '*'*100)
+    X = df.loc[:, columns]
+    clusters = []
+    # kmeans clustering
+    if clusteringMethod == "kmeans":
+        clustering = KMeans(n_clusters=3, random_state=0).fit(X)
+        clusters = clustering.labels_
+    elif clusteringMethod == "spectralClustering":
+        clustering = SpectralClustering(n_clusters=2, assign_labels='discretize', random_state=0).fit(X)
+        clusters = clustering.labels_
+    print("clusters", clusters)
+    return clusters
+
+
 app = Flask(__name__, static_url_path='', static_folder='')
 
 @app.route("/ping")
 def hello_world():
     return jsonify("pong")
-
 
 # @app.route('/login.html')
 # def login():
@@ -50,10 +66,6 @@ def hello_world():
 @app.route('/index.html')
 def index():
     return render_template('index.html', title="Home", header="Home")
-
-
-@app.route('/view2.html')
-
 
 # @app.route("/participants", methods=["GET", "POST"])
 # def participants():
@@ -103,7 +115,6 @@ def index():
 def circle_packing():
     return render_template('circle_packing.html', title="Jeni", header="Home")
 
-
 @app.route("/test")
 def test():
     return render_template('test.html')
@@ -122,7 +133,6 @@ def test2():
     df_brightness = None
     return render_template('test2.html')
 
- 
 @app.route('/test3/')
 def test3():
      return render_template('test3.html')
@@ -133,25 +143,29 @@ def dimReduceParticipants():
     global personalityData
 
     featurefilename = os.path.join("data", featureDataFile)
-    featureData = pd.read_csv(featurefilename)
-    personalityfilename = os.path.join("data", personalityDataFile)
+    featureData = pd.read_csv(featurefilename).groupby("participantId").mean().reset_index()
+    personalityfilename = os.path.join("data/processedData", personalityDataFile)
     personalityData = pd.read_csv(personalityfilename)
-        
+
+    columns = featureData.columns.values[2:]    #get all the feature columns
+
     if request.method == 'POST':
         content = request.get_json()
-        columns = content['featureColumns']
-        if len(columns) > 1:
-             x , y = getPCA(featureData, columns)
-             message = "status1:file updated"
+        if len(columns) > 1:   #in case of feature columns are selected in dropdown, consider only those
+            columns = content['featureColumns']    
+            message = "status1:file updated"
         else:
-            x, y = getPCA(featureData, featureData.columns.values[2:])
             message = "status2:single column"
     else:
-        x, y = getPCA(featureData, featureData.columns.values[2:])
         message = "status3:file reset"
-    personalityData["x"], personalityData["y"] = x, y
-    personalityData.to_csv(personalityfilename, index=False, header=True)
     
+    x, y = getPCA(featureData, columns)     #dim reduction
+    clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #clustering
+    # clusters = getClusters(featureData, columns, clusteringMethod="spectralClustering")    #clustering
+
+    personalityData["x"], personalityData["y"] = x, y
+    personalityData["clusters"] = clusters
+    personalityData.to_csv(personalityfilename, index=False, header=True)
     return jsonify(message)
 
 @app.route('/fetchPersonalityScores', methods=['GET'])
@@ -161,7 +175,7 @@ def fetchPersonalityScores():
     """
     if request.method == 'GET':
         print("Request recieved for fetching Personality scores")
-        filename = os.path.join("data", "dummyPersonalityScores")
+        filename = os.path.join("data/processedData", "dummyPersonalityScores")
         data = pd.read_csv(filename)
 
         resp = make_response(data.to_csv(index=False))
@@ -206,9 +220,6 @@ def filterParticipants():
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
         resp.headers["Content-Type"] = "text/csv"
-
-        print("d3.js in Action",data)
-
         print(time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} participant:{participantId}")
@@ -226,6 +237,12 @@ def fetchAggFeatures():
     data = pd.read_csv(filename)
     # Aggregating based on participantId
     data = data.groupby("participantId").mean().reset_index()
+
+    #getting cluster id for participants form personality file
+    filename = os.path.join("data/processedData", "dummyPersonalityScores")
+    df = pd.read_csv(filename).loc[:, ["participantId", "clusters"]]
+    print(data.info(), df.info())
+    data = data.join(df, how="left", lsuffix="participantId", rsuffix="participantId")
 
     resp = make_response(data.to_csv(index=False))
     resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
@@ -252,7 +269,6 @@ def fetchIndividualFeatures():
         resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
         resp.headers["Content-Type"] = "text/csv"
         return resp
-
 
 if __name__ == "__main__":
     app.run(port=5003, debug=True)

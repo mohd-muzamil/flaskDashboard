@@ -1,6 +1,5 @@
 // ****Importatnt file****
 //This script is used to plot radial glyphs in first svg
-
 function glyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,
@@ -65,6 +64,7 @@ function glyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius,
         // var colorInterpolatorInv = d3.quantize(d3.interpolateHcl("green", "orange"), 11);
         var colorInterpolator = d3.quantize(d3.interpolateRgb("brown", "green"), 11);
         var colorInterpolatorInv = d3.quantize(d3.interpolateRgb("green", "brown"), 11);
+        var colorClusters = d3.scaleOrdinal(d3.schemeCategory10);
 
         // x & y scales for both radial and flower glyphs
         const xScale = d3.scaleLinear()
@@ -142,7 +142,8 @@ function glyphs(chart, dependendChart1, dependendChart2, glyph, feature, radius,
                         .attr('stroke', 'black')
                         .attr('stroke-width', config.strokeWidthHigh)
                         // .attr('fill', d => ["PROSITC0003", "PROSITC0007", "PROSITC0008"].indexOf(d.participantId) > -1 ? 'red' : 'blue')
-                        .attr('fill', d => d.device == "ios" ? "red" : "black") //use this coloring for showing device type ios or android, can also show cluster
+                        // .attr('fill', d => d.device == "ios" ? "red" : "black") //use this coloring for showing device type ios or android, can also show cluster
+                        .attr('fill', d => colorClusters(d.clusters)) //use this coloring for showing device type ios or android, can also show cluster
                         .attr('opacity', config.opacityHigh)
                 });
         }

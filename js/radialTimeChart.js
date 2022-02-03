@@ -2,7 +2,7 @@ function plotAreaChart(chart, participantId, attributes) {
     var chart = chart
     var participantId = participantId
     var attributes = attributes
-    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}   //dark green/Orange/Purple: colorblind safe
+    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}
     var gridPlotted = false
 
     var postForm = { //Fetch form data
@@ -16,6 +16,7 @@ function plotAreaChart(chart, participantId, attributes) {
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
+                d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
                 data.forEach(function(d) {
                     // d.date = parseDate(d.date);
                     d.minuteOfTheDay = +d.minuteOfTheDay;
@@ -24,7 +25,7 @@ function plotAreaChart(chart, participantId, attributes) {
                     d.gyr = +d.gyr;
                 });
 
-                dates = Array.from(new Set(data.map(x => x.date)).values()).sort();
+                dates = Array.from(new Set(data.map(d => d.date)).values()).sort();
                 d2i = {};
                 dates.forEach((d, i) => d2i[d] = i+1);
                 numDates = Object.keys(dates).length
@@ -35,9 +36,9 @@ function plotAreaChart(chart, participantId, attributes) {
                 var starting_max = numDates
 
                 plotRadial(starting_min, starting_max)
-                if (true){
                     brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max+1);
-                }
+                // sliderMin = sliderValues[0]
+                // sliderMax = sliderValues[1]
                 
                 // plotRadier function here
                 function plotRadial(starting_min, starting_max){
@@ -50,16 +51,14 @@ function plotAreaChart(chart, participantId, attributes) {
                         hourLabelYOffset = 7;
                 
                     // Set the dimensions of the canvas / graph
-                    var margin = { top: 25, right: 30, bottom: 75, left: 30 },
+                    var margin = { top: 25, right: 25, bottom: 75, left: 25 },
                         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
                         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
                     // Parse the date / time
                     var parseDate = d3.timeFormat("%Y-%m-%d");
                 
                     // var arcGenerator = d3.arc();
-                    
-                    d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
-                    
+                
                     // Select the svg
                     var svg = d3.select("#" + chart)
                         .attr("width", width)
@@ -125,20 +124,21 @@ function plotAreaChart(chart, participantId, attributes) {
                     if (gridPlotted === false) {
                         // Creating a grid for reference
                         radius = Math.min(width, height) / 2 + 15;
-                        
+                
                         // var grad = svg.append("defs")
                         //     .append("linearGradient").attr("id", "grad")
                         //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
                 
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
-                        
+                
                         svg.append("text")
-                        .attr("x", 0)
+                        // .attr("x", -width/5)
                         .attr("y", -margin.top - height/2)
                         .attr("dy", "-0.1em")
+                        .style("font-size", "12px")
+                        .style("font-weight", "normal")
                         .style("text-anchor", "middle")
-                        .style("font-size", "20px")
                         .text("Participant: "+participantId)
                 
                         svg.selectAll(".gridCircles")
@@ -173,7 +173,7 @@ function plotAreaChart(chart, participantId, attributes) {
                             .append('text')
                             .attr('class', 'hourLabel')
                             .attr('text-anchor', 'middle')
-                            .style('font-size', '0.8em')
+                            .style('font-size', '10px')
                             .attr('x', function(d) {
                                 return radius * Math.sin(hourScale(d) * radians);
                             })
@@ -211,7 +211,8 @@ function plotAreaChart(chart, participantId, attributes) {
                             });
                     }       
                         //remove the loading symbol
-                        d3.select("#" + chart).selectAll('.buffer').remove();        
+                        d3.select("#" + chart).selectAll('.buffer').remove();
+                        
                 }
 
                 // Code for brush
@@ -248,12 +249,18 @@ function plotAreaChart(chart, participantId, attributes) {
                     .attr('id', 'labelleft')
                     .attr('x', -10)
                     .attr('y', -5)
+                    .style("font-size", "12px")
+                    .style("font-weight", "normal")
+                    .style("text-anchor", "middle")
                     .text(range[0])
             
                 var labelR = g.append('text')
                     .attr('id', 'labelright')
                     .attr('x', -10)
                     .attr('y', -5)
+                    .style("font-size", "12px")
+                    .style("font-weight", "normal")
+                    .style("text-anchor", "middle")
                     .text(range[1])
             
                 // define brush
@@ -265,7 +272,7 @@ function plotAreaChart(chart, participantId, attributes) {
                     .on('brush', function() {
                         var s = d3.event.selection;
                         // update and move labels
-                        labelL.attr('x', s[0]-15)
+                        labelL.attr('x', s[0]-5)
                             .text(Math.round(x.invert(s[0])))
                         labelR.attr('x', s[1])
                             .text(Math.round(x.invert(s[1])) - 1)
@@ -341,14 +348,66 @@ function plotAreaChart(chart, participantId, attributes) {
                 // return svg.node()
                 return [range[0], range[1]]
             }
+
             })
+
+            
+
+    return true, true;
 }
 
 
+
+
+// function createGrid(chart) {
+//     // Set the dimensions of the canvas / graph
+//     var margin = { top: 25, right: 25, bottom: 25, left: 25 },
+//         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
+//         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
+
+//     // Select the svg
+//     var svg = d3.select("#" + chart)
+//         .attr("width", width)
+//         .attr("height", height)
+//         .append('g')
+//         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
+// }
+
 function updatePlotAreaChart(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
+
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
+
+    // gridPlotted = false;
+    // brushPlotted = false;
     attributes = {"brt":brtChecked, "acc":accChecked, "gyr":gyrChecked}
+
+    // brightnessData
+    // filename = "dummyBrightness";
+    // attr = "brt";
+    // pathColor = "green";
+    
     plotAreaChart(chart, participantId, attributes)
+
+    // //accelerometerData
+    // if (accChecked == true) {
+    //     filename = "dummyAccelerometer";
+    //     attr = "acc";
+    //     pathColor = "red";
+    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    // }
+    // //gyroscopeData
+    // if (gyrChecked == true) {
+    //     filename = "dummyGyroscope";
+    //     attr = "gyr";
+    //     pathColor = "blue";
+    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    // }
+    // //lockstateData
+    // if (lckChecked == true) {
+    //     pathColor = "purple";
+    //     datapath = "../../data/lockstate_d3";
+    //     attr = "lck";
+    // }
 }
