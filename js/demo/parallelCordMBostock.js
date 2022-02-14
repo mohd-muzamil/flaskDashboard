@@ -5,15 +5,18 @@
 // https://gist.github.com/titipignataro/47135818bad65a439174038227e0eb20
 
 
-function parallelCord( chart, participantId, feature ){
+function parallelCord( chart, participantId, feature, featurelist, starting_min_date, starting_max_date ){
     // var featuresNames = ["Number of Screen Locks", "first Screen Unlock Event", "last Screen Lock event", "max Screen usage Time", "total Screen usage Time", "no of Missed calls", "no of Dialled calls", "no of Incoming calls", "min Duration of Incoming calls",  "max Duration of Incoming calls", "total Duration of Incoming calls", "no of Outgoing calls",  "min Duration Outgoing calls", "max Durtaion of Outgoing calls", "total Duration Outgoing calls", "total No of Calls", "total Duration of Calls", "step Count", "total Distance travelled" , "no of Stay Points", "location Variance", "location Entropy", "sleep Start Time1", "sleep End Time1", "sleep Duration1", "sleep Start Time2", "sleep End Time2", "sleep Duration2", "total Sleep Duration", "no Sleep Interruptions"],//, "participant"],
-    var featuresNames = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
-    "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
-    "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"],
+    // var featuresNames = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
+    // "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
+    // "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"],
     
-    featuresCodes = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
-    "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
-    "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"];
+    // featuresCodes = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
+    // "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
+    // "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"];
+
+    var featuresNames = featurelist
+    var featuresCodes = featurelist
 
     var margin = { left: 30, top: 25, right: 20, bottom: 50 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
@@ -70,7 +73,15 @@ function parallelCord( chart, participantId, feature ){
     d3.csv(serverRoute)
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
-            function(data) {
+        function(data) {
+        filteredData = data
+        if(feature == "individualFeatures" & (starting_min_date!="" | starting_max_date!="")){ 
+            var filteredData = data.filter((d)=>{ 
+            if(d.date>=starting_min_date & d.date<=starting_max_date)
+                return d
+            }   
+        )}
+        
         // Create a scale and brush for each trait.
         featuresCodes.forEach(function(d) {
             // Coerce values to numbers.
@@ -149,7 +160,7 @@ function parallelCord( chart, participantId, feature ){
         foreground = svg.append("svg:g")
             .attr("class", "foreground")
             .selectAll("path")
-            .data(data)
+            .data(filteredData)
             .enter().append("svg:path")
             .attr("d", path)
             .attr("stroke", function(d){ 
@@ -241,67 +252,67 @@ function parallelCord( chart, participantId, feature ){
         function position(d) {
             var v = dragging[d];
             return v == null ? x(d) : v;
-            }
-            function transition(g) {
+        }
+        function transition(g) {
             return g.transition().duration(500);``
-            }
+        }
             // Returns the path for a given data point.
-            function path(d) {
+        function path(d) {
             return line(featuresCodes.map(function(p) { return [position(p), y[p](d[p])]; }));
-            }
+        }
 
 
-            function dragstart(d) {
-                i = featuresCodes.indexOf(d);
-            }
+        function dragstart(d) {
+            i = featuresCodes.indexOf(d);
+        }
 
-            function drag(d) {
-                x.range()[i] = d3.event.x; //unsovled issue
-                featuresCodes.sort(function(a, b) { return x(a) - x(b); });
-                g.attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-                foreground.attr("d", path);
-            }
+        function drag(d) {
+            x.range()[i] = d3.event.x; //unsovled issue
+            featuresCodes.sort(function(a, b) { return x(a) - x(b); });
+            g.attr("transform", function(d) { return "translate(" + x(d) + ")"; });
+            foreground.attr("d", path);
+        }
 
-            function dragend(d) {
-    //            x.domain(featuresCodes).rangePoints([0, w]);
-                var t = d3.transition().duration(500);
-                t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
-                t.selectAll(".foreground path").attr("d", path);
-            }
+        function dragend(d) {
+//            x.domain(featuresCodes).rangePoints([0, w]);
+            var t = d3.transition().duration(500);
+            t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
+            t.selectAll(".foreground path").attr("d", path);
+        }
 
 
-            function brushstart() {
-                d3.event.sourceEvent.stopPropagation();
-            }
-            // Handles a brush event, toggling the display of foreground lines.
-            function brush() {
-                var actives = [];
-                //filter brushed extents
-                svg.selectAll(".brush")
-                    .filter(function(d) {
-                        return d3.brushSelection(this);
-                    })
-                    .each(function(d) {
-                        actives.push({
-                            dimension: d,
-                            extent: d3.brushSelection(this)
-                        });
-                    });
-                //set un-brushed foreground line disappear
-                foreground.classed("fade", function(d,i) {
-                    return !actives.every(function(active) {
-                        var dim = active.dimension;
-                        return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim])  <= active.extent[1];
+        function brushstart() {
+            d3.event.sourceEvent.stopPropagation();
+        }
+        // Handles a brush event, toggling the display of foreground lines.
+        function brush() {
+            var actives = [];
+            //filter brushed extents
+            svg.selectAll(".brush")
+                .filter(function(d) {
+                    return d3.brushSelection(this);
+                })
+                .each(function(d) {
+                    actives.push({
+                        dimension: d,
+                        extent: d3.brushSelection(this)
                     });
                 });
-            }
+            //set un-brushed foreground line disappear
+            foreground.classed("fade", function(d,i) {
+                return !actives.every(function(active) {
+                    var dim = active.dimension;
+                    return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim])  <= active.extent[1];
+                });
+            });
+        }
 
     d3.select("#" + chart).selectAll('.buffer').remove();
     });
 }
 
-function updateParallelCord(chart, participantId, feature){
+function updateParallelCord(chart, participantId, feature, featurelist, starting_min_date="", starting_max_date=""){
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
-    parallelCord(chart, participantId, feature)
+    parallelCord(chart, participantId, feature, featurelist, starting_min_date, starting_max_date)
 }

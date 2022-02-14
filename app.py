@@ -43,7 +43,7 @@ def getClusters(df, columns, clusteringMethod="kmeans"):
     clusters = []
     # kmeans clustering
     if clusteringMethod == "kmeans":
-        clustering = KMeans(n_clusters=3, random_state=0).fit(X)
+        clustering = KMeans(n_clusters=2, random_state=0).fit(X)
         clusters = clustering.labels_
     elif clusteringMethod == "spectralClustering":
         clustering = SpectralClustering(n_clusters=2, assign_labels='discretize', random_state=0).fit(X)
@@ -160,7 +160,7 @@ def dimReduceParticipants():
         message = "status3:file reset"
     
     x, y = getPCA(featureData, columns)     #dim reduction
-    clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #clustering
+    clusters = getClusters(featureData, columns, clusteringMethod="spectralClustering")    #clustering
     # clusters = getClusters(featureData, columns, clusteringMethod="spectralClustering")    #clustering
 
     personalityData["x"], personalityData["y"] = x, y

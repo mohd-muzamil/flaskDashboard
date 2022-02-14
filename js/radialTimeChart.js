@@ -1,10 +1,7 @@
-function plotAreaChart(chart, participantId, attributes) {
-    var chart = chart
-    var participantId = participantId
-    var attributes = attributes
+function plotAreaChart(chart, dependendChart, participantId, attributes, feature, featurelist) {
     var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}
     var gridPlotted = false
-
+    
     var postForm = { //Fetch form data
         // 'filename': filename, //Store name fields value
         'participantId': participantId, //Store name fields value
@@ -289,7 +286,9 @@ function plotAreaChart(chart, participantId, attributes) {
 
                         var d0 = d3.event.selection.map(x.invert);
                         var d1 = d0.map(Math.round)
-                        if (d1[0]<d1[1]){
+                        var starting_min = d1[0]
+                        var starting_max = d1[1] - 1
+                        if (starting_min < starting_max){
                             d3.select(this).transition().call(d3.event.target.move, d1.map(x))
                             
                             d3.select("#" + chart).selectAll('.areaPath').remove();
@@ -298,7 +297,14 @@ function plotAreaChart(chart, participantId, attributes) {
                             d3.select("#" + chart).selectAll('.hourLabel').remove();
                             d3.select("#" + chart).selectAll('.dayLabel').remove();
                             
-                            plotRadial(d1[0], d1[1]-1)
+
+                            plotRadial(starting_min, starting_max)
+                            starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
+                            starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
+                            
+                            if (feature=="individualFeatures"){
+                                updateParallelCord(dependendChart, participantId, feature, featurelist, starting_min_date, starting_max_date)
+                            }
                         }
 
                     })
@@ -373,7 +379,7 @@ function plotAreaChart(chart, participantId, attributes) {
 //         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
 // }
 
-function updatePlotAreaChart(chart, participantId, brtChecked, accChecked, gyrChecked, lckChecked) {
+function updatePlotAreaChart(chart, dependendChart, participantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
 
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
@@ -388,7 +394,10 @@ function updatePlotAreaChart(chart, participantId, brtChecked, accChecked, gyrCh
     // attr = "brt";
     // pathColor = "green";
     
-    plotAreaChart(chart, participantId, attributes)
+    plotAreaChart(chart, dependendChart, participantId, attributes, feature, featurelist)
+    if (feature=="individualFeatures"){
+        updateParallelCord(dependendChart, participantId, feature, featurelist)
+    }
 
     // //accelerometerData
     // if (accChecked == true) {

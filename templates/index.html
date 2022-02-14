@@ -32,7 +32,7 @@
     <div class="container-fluid" style="height:100%">
         <div class="row flex-nowrap" style="height:100%">
             <div class="col-auto px-0">
-                <div id="sidebar" class="collapse collapse-horizontal">
+                <div id="sidebar" class="collapse collapse-horizontal show">
                 <!-- show is used here to hide or show the sidebar by default-->
                 <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end">  -->
                     <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
@@ -118,7 +118,7 @@
                                 <input type="range" min="5" max="20" value="10" steps='1' class="slider" id="myRange">
                             </div>
                         </div>
-
+`
                         <hr class="line">
 
                         <!-- Toggle glyph switch -->
@@ -134,11 +134,11 @@
 
                         <!-- Toggle parallel cord chart switch -->
                         <div style="text-align: center;">
-                            <label class="form-check-label selectedLabel" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
+                            <label class="form-check-label" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="toggleFeature"/>
                             </div>
-                            <label class="form-check-label" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
+                            <label class="form-check-label selectedLabel" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
                         </div>
 
                         <hr class="line">
@@ -275,6 +275,7 @@
         var accChecked = false;
         var gyrChecked = false;
         var lckChecked = false;
+        var featurelist = $('#featureSelect').val()
         
         // plotting glyphs
         // updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, radius=8, brtChecked, accChecked, gyrChecked, lckChecked);
@@ -324,10 +325,8 @@
         
         // Refresh after sidebar close
         function outputsize() {
-            console.log(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, radius, brtChecked, accChecked, gyrChecked, lckChecked)
-            console.log("resize")
             radius = document.getElementById("myRange").value
-            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }    
         new ResizeObserver(outputsize).observe(bottom)
 
@@ -452,11 +451,9 @@
 
         // submit button
         $("#Submit").click(function(){
-            console.log("submitted")
-            var data = {
-                "featureColumns": $('#featureSelect').val()
-            };
-            
+            featurelist = $('#featureSelect').val()
+            var data = { "featureColumns": featurelist };
+        
             $.ajax({
                 type: "POST",
                 contentType: 'application/json',
@@ -482,9 +479,10 @@
             setTimeout(function() {
                 //your code to be executed after 1 second
                 radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }, delayInMilliseconds);
 
+            $("#sidebar").removeClass("show");
         })
 
     </script>
