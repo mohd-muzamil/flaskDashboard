@@ -18,8 +18,12 @@ from sklearn.decomposition import PCA
 import time
 # import * from generate_data_circle_packing
 
-featureDataFile = "dummyFeatureData"
-personalityDataFile = "dummyPersonalityScores"
+featureFile = "dummyFeatureData"
+personalityFile = "dummyPersonalityScores"
+brightnessFile = "dummyBrightness"
+accelerometerFile = "dummyAccelerometer"
+gyroscopeFIle = "dummyGyroscope"
+
 
 def getPCA(df, columns):
     df = df.groupby("participantId").mean().reset_index()
@@ -45,7 +49,7 @@ def getClusters(df, columns, clusteringMethod="kmeans"):
     if clusteringMethod == "kmeans":
         clustering = KMeans(n_clusters=2, random_state=0).fit(X)
         clusters = clustering.labels_
-    elif clusteringMethod == "spectralClustering":
+    elif clusteringMethod == "spectral":
         clustering = SpectralClustering(n_clusters=2, assign_labels='discretize', random_state=0).fit(X)
         clusters = clustering.labels_
     print("clusters", clusters)
@@ -142,10 +146,8 @@ def dimReduceParticipants():
     global featureData
     global personalityData
 
-    featurefilename = os.path.join("data", featureDataFile)
-    featureData = pd.read_csv(featurefilename).groupby("participantId").mean().reset_index()
-    personalityfilename = os.path.join("data/processedData", personalityDataFile)
-    personalityData = pd.read_csv(personalityfilename)
+    featureData = pd.read_csv(os.path.join("data", featureFile)).groupby("participantId").mean().reset_index()
+    personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
 
     columns = featureData.columns.values[2:]    #get all the feature columns
 
@@ -160,12 +162,12 @@ def dimReduceParticipants():
         message = "status3:file reset"
     
     x, y = getPCA(featureData, columns)     #dim reduction
-    clusters = getClusters(featureData, columns, clusteringMethod="spectralClustering")    #clustering
-    # clusters = getClusters(featureData, columns, clusteringMethod="spectralClustering")    #clustering
+    # clusters = getClusters(featureData, columns, clusteringMethod="spectral")    #spectralClustering
+    clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #k-means clustering
 
     personalityData["x"], personalityData["y"] = x, y
     personalityData["clusters"] = clusters
-    personalityData.to_csv(personalityfilename, index=False, header=True)
+    personalityData.to_csv(os.path.join("data/processedData", personalityFile), index=False, header=True)
     return jsonify(message)
 
 @app.route('/fetchPersonalityScores', methods=['GET'])
@@ -175,8 +177,7 @@ def fetchPersonalityScores():
     """
     if request.method == 'GET':
         print("Request recieved for fetching Personality scores")
-        filename = os.path.join("data/processedData", "dummyPersonalityScores")
-        data = pd.read_csv(filename)
+        data = pd.read_csv(os.path.join("data/processedData", personalityFile))
 
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
@@ -184,10 +185,11 @@ def fetchPersonalityScores():
         return resp
 
 @app.route('/filterParticipants', methods=['POST'])
-def filterParticipants():
+def filterParticipantsDummy():
     """
     Returns Data for Chart2: Radial chart to visualize sleep/awake activity using 
     brightness, accelerometer and gyroscope data
+    dummy data
     """
     if request.method == 'POST':
         content = request.get_json()
@@ -198,13 +200,12 @@ def filterParticipants():
         print("request recieved", content)  #print statement
         
         strt = time.time()
-        filenames = {"brt":"dummyBrightness", "acc":"dummyAccelerometer", "gyr":"dummyGyroscope"}
+        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFIle}
         data = pd.DataFrame()
         for attr,checkState in attributes.items():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
-                filename = os.path.join("data", filenames[attr])
-                df = pd.read_csv(filename)
+                df = pd.read_csv(os.path.join("data", filenames[attr]))
                 df = df[df["participantId"]==participantId]#.sample(frac=0.001)
 
                 #Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
@@ -227,20 +228,68 @@ def filterParticipants():
     else:
         return jsonify("no post requests")
 
+@app.route('/filterParticipantsNew', methods=['POST'])
+def filterParticipantsNew():
+    """
+    Returns Data for Chart2: Radial chart to visualize sleep/awake activity using 
+    brightness, accelerometer and gyroscope data
+    Real data
+    """
+    if request.method == 'POST':
+        content = request.get_json()
+        # filename = content['filename']
+        participantId = content['participantId']
+        attributes = content["attributes"]
+
+        print("request recieved", content)  #print statement
+        
+        strt = time.time()
+        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFIle}
+        data = pd.DataFrame()
+        for attr,checkState in attributes.items():
+            print("attr:", attr, "checkState:", checkState)
+            if checkState:
+                df = pd.read_csv(os.path.join("data", filenames[attr]))
+                df = df[df["participantId"]==participantId]#.sample(frac=0.001)
+                dfImputed = pd.DataFrame()
+                
+                #addind -1 values for minutesOfTheDay where data is not present
+                #creating df with all mins to impute missing values
+                mins = [i for i in range(0,1440)]
+                allMinutes = pd.DataFrame({"minuteOfTheDay":mins})
+                
+                for date in df.date.unique():
+                    dfDate = df[df.date == date].copy()
+                    dfDate = pd.merge(dfDate, allMinutes, how="right", on="minuteOfTheDay")
+                    dfDate.brightnessLevel.fillna(-1, inplace=True)
+                    dfDate.ffill(inplace=True)
+                    dfDate.bfill(inplace=True)
+                    dfImputed = pd.concat([dfImputed, dfDate], axis=0)
+
+                data = pd.concat([data, dfImputed])
+    
+        resp = make_response(data.to_csv(index=False))
+        resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
+        resp.headers["Content-Type"] = "text/csv"
+        print(time.time()-strt)
+        return resp
+        # return jsonify(f"post works filename:{filename} participant:{participantId}")
+
+    else:
+        return jsonify("no post requests")
+
 @app.route('/fetchAggFeatures', methods=['GET', 'POST'])
 def fetchAggFeatures():
     """
     Returns Data for Chart3: Parallel cordinate chart to visualize extracted features
     """
     print("Request recieved for fetching Aggregated feature data")
-    filename = os.path.join("data", "dummyFeatureData")
-    data = pd.read_csv(filename)
+    data = pd.read_csv(os.path.join("data", featureFile))
     # Aggregating based on participantId
     data = data.groupby("participantId").mean().reset_index()
 
     #getting cluster id for participants form personality file
-    filename = os.path.join("data/processedData", "dummyPersonalityScores")
-    df = pd.read_csv(filename).loc[:, ["participantId", "clusters"]]
+    df = pd.read_csv(os.path.join("data/processedData", personalityFile)).loc[:, ["participantId", "clusters"]]
     print(data.info(), df.info())
     data = data.join(df, how="left", lsuffix="participantId", rsuffix="participantId")
 
@@ -260,8 +309,7 @@ def fetchIndividualFeatures():
         participantId = content['participantId']
 
         print("Request recieved for fetching individual feature data")
-        filename = os.path.join("data", "dummyFeatureData")
-        data = pd.read_csv(filename)
+        data = pd.read_csv(os.path.join("data", featureFile))
         # Fetching data for selected participant
         data = data[data["participantId"]==participantId]#.sample(frac=0.001)
 

@@ -288,7 +288,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                         var d1 = d0.map(Math.round)
                         var starting_min = d1[0]
                         var starting_max = d1[1] - 1
-                        if (starting_min < starting_max){
+                        if (starting_min <= starting_max){
                             d3.select(this).transition().call(d3.event.target.move, d1.map(x))
                             
                             d3.select("#" + chart).selectAll('.areaPath').remove();
