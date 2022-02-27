@@ -22,8 +22,6 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
         "attributes" : attributes
     };
 
-    // if (!Object.values(attributes).every((v) => v === false)){
-    if (true){
     //fetcing filtered participant data from flask server
     d3.csv("/filterParticipantsNew")
     // d3.csv("/filterParticipants")
@@ -443,7 +441,6 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
             }
 
             })
-    }
 
             
 
