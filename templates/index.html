@@ -37,7 +37,7 @@
                 <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end">  -->
                     <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
 
-                        <h4 id="dashboardHeader">Filters</h4>
+                        <h4 id="dashboardHeader" style="color:rgb(18, 113, 249)">Filters</h4>
                         <hr class="line">
 
                         <div style="padding-left:10px; padding-right:10px;">
@@ -118,7 +118,6 @@
                                 <input type="range" min="5" max="20" value="10" steps='1' class="slider" id="myRange">
                             </div>
                         </div>
-`
                         <hr class="line">
 
                         <!-- Toggle glyph switch -->
@@ -132,16 +131,28 @@
 
                         <hr class="line">
 
-                        <!-- Toggle parallel cord chart switch -->
+                        <!-- Show tooltip switch -->
                         <div style="text-align: center;">
-                            <label class="form-check-label" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
+                            <label class="form-check-label" id="hideLabels"  for="toggleLabels" style="text-align: center;">Hide Labels</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="toggleFeature"/>
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleLabels"/>
                             </div>
-                            <label class="form-check-label selectedLabel" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
+                            <label class="form-check-label selectedLabel" id="showLables" for="toggleLabels" style="text-align: center;">Show Lables</label>
                         </div>
 
                         <hr class="line">
+
+                        <!-- Toggle parallel cord chart switch -->
+                        <div style="text-align: center;">
+                            <label class="form-check-label selectedLabel" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleFeature"/>
+                            </div>
+                            <label class="form-check-label" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
+                        </div>
+
+                        <hr class="line">
+
 
                         <!-- Toggle polar chart switch  -->
                         <!-- Decided not to implement this feature -->
@@ -157,26 +168,25 @@
                             <table style="width:100%;">
                                 <tr>
                                     <td class="filterCheckbox">
+                                        <input type="checkbox" id="lckCheckBox" checked>
+                                        <br>
+                                        <label>LCK</label>
+                                    </td>
+                                    <td class="filterCheckbox">
                                         <input type="checkbox" id="brtCheckBox" checked>
                                         <br>
                                         <label>BRT</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" id="accCheckBox">
+                                        <input type="checkbox" id="accCheckBox" checked>
                                         <br>
                                         <label>ACC</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" id="gyrCheckBox">
+                                        <input type="checkbox" id="gyrCheckBox" checked>
                                         <br>
                                         <label>GYR</label>
                                     </td>
-                                    <!-- Decided not to implement this feature -->
-                                    <!-- <td class="filterCheckbox">
-                                        <input type="checkbox" id="lckCheckBox">
-                                        <br>
-                                        <label>LCK</label>
-                                    </td> -->
                                 </tr>
                             </table>
 
@@ -199,7 +209,7 @@
                         </a>
                     </div>
                     <div class="col-11" style="text-align:left;">
-                        <h4 id="dashboardHeader">PROSIT Dashboard</h4>
+                        <h4 id="dashboardHeader" style="color:rgb(18, 113, 249)">PROSIT Dashboard</h4>
                     </div>
                 </div>
                 <div class="pa-1" id="bottom">
@@ -228,11 +238,34 @@
     })
 
     // Calling server route to find dim reduce for all columns
+    featurelist = $('#featureSelect').val()
+    w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
+    h = Math.floor($('.svg1')[0].getBoundingClientRect().height);
+    var data = { "featureColumns": featurelist, "width":w, "height":h };
+    // $.ajax({
+    //     type: "POST",
+    //     contentType: 'application/json',
+    //     url: "/dimReduceParticipants"
+    // });
     $.ajax({
-        type: "GET",
-        contentType: 'application/json',
-        url: "/dimReduceParticipants"
-    });
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                url: "/dimReduceParticipants",
+                success: function(status) {
+                    if (status === "status1: file updated") {
+                        // console.log("FeatureData file updated")
+                    }
+                    if (status === "status2:single column") {
+                        alert("Please select more than one column in Feature selection drop down!!!")
+                        // console.log("FeatureData file reset: single column selected")
+                    }
+                    if (status === "status3:file reset") {
+                        // console.log("FeatureData file reset: all columns selected")
+                    }
+                }
+            });
+
     </script>
     
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
@@ -270,11 +303,12 @@
         var barChart ="chart5"
         var radius = 10    //default value of 10, if u change this, change it in html slider element as well
         var toggleGlyph = "radialGlyph" //toggleGlyph switch values: "radialGlyph"/"flowerGlyph"
-        var toggleFeature = "individualFeatures" //ParallelCordFeatures switch values: "aggregatedFeatures"/"individualFeatures"
+        var toggleLabels = true //toggleLabels switch values: true/false
+        var toggleFeature = "aggregatedFeatures" //ParallelCordFeatures switch values: "aggregatedFeatures"/"individualFeatures"
         var brtChecked = true;
-        var accChecked = false;
-        var gyrChecked = false;
-        var lckChecked = false;
+        var accChecked = true;
+        var gyrChecked = true;
+        var lckChecked = true;
         var featurelist = $('#featureSelect').val()
         
         // plotting glyphs
@@ -326,7 +360,7 @@
         // Refresh after sidebar close
         function outputsize() {
             radius = document.getElementById("myRange").value
-            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }    
         new ResizeObserver(outputsize).observe(bottom)
 
@@ -351,23 +385,36 @@
                 $("#radialSwitch").addClass("selectedLabel")
                 $("#flowerSwitch").removeClass("selectedLabel")
             }
-            console.log("toggle glyph switch")
+            // console.log("toggle glyph switch")
             // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
+
+        // switch to show or hide labels
+        $("#toggleLabels").on('change', function() {
+            if (!($(this).is(':checked'))) {
+                toggleLabels = true;
+                $("#showLables").addClass("selectedLabel")
+                $("#hideLabels").removeClass("selectedLabel")
+            } else {
+                toggleLabels = false;
+                $("#hideLabels").addClass("selectedLabel")
+                $("#showLables").removeClass("selectedLabel")
+            }
+            // console.log("toggle show label switch")
         });
 
         // switch to select Parallel cord Features
         $("#toggleFeature").on('change', function() {
             if ($(this).is(':checked')) {
-                toggleFeature = "aggregatedFeatures";
-                $("#aggregatedFeatures").addClass("selectedLabel")
-                $("#individualFeatures").removeClass("selectedLabel")
-            } else {
                 toggleFeature = "individualFeatures";
                 $("#individualFeatures").addClass("selectedLabel")
                 $("#aggregatedFeatures").removeClass("selectedLabel")
-                
+            } else {
+                toggleFeature = "aggregatedFeatures";
+                $("#aggregatedFeatures").addClass("selectedLabel")
+                $("#individualFeatures").removeClass("selectedLabel")
             }
-            console.log("toggle feature switch")
+            // console.log("toggle feature switch")
             // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
@@ -378,7 +425,6 @@
             } else {
                 brtChecked = false
             }
-            console.log("btr checkbox")
             // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
@@ -389,7 +435,6 @@
             } else {
                 accChecked = false
             }
-            console.log("acc checkbox")
             // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
@@ -400,20 +445,19 @@
             } else {
                 gyrChecked = false
             }
-            console.log("gyr checkbox")
             // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
 
         // // checkbox to select gyroscope lockstate:  Decided not to implement this feature
-        // $("#lckCheckBox").on('change', function() {
-        //     if ($(this).is(':checked')) {
-        //         lckChecked = true
-        //     } else {
-        //         lckChecked = false
-        //     }
-        //     plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
-        // });
+        $("#lckCheckBox").on('change', function() {
+            if ($(this).is(':checked')) {
+                lckChecked = true
+            } else {
+                lckChecked = false
+            }
+            // plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
+        });
 
         // //togglePolarChart switch:  Decided not to implement this feature
         // var togglePolarChart = "circular"
@@ -442,7 +486,6 @@
             var data = {
                 "featureColumns": $('#featureSelect').val()
             };
-            console.log(data, )
         });
 
         // $("#featureSelect").onchange = function() {
@@ -452,7 +495,9 @@
         // submit button
         $("#Submit").click(function(){
             featurelist = $('#featureSelect').val()
-            var data = { "featureColumns": featurelist };
+            w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
+            h = Math.floor($('.svg1')[0].getBoundingClientRect().height);
+            var data = { "featureColumns": featurelist, "width":w, "height":h };
         
             $.ajax({
                 type: "POST",
@@ -460,16 +505,15 @@
                 data: JSON.stringify(data),
                 url: "/dimReduceParticipants",
                 success: function(status) {
-                    console.log("Dropdown")
                     if (status === "status1: file updated") {
-                        console.log("FeatureData file updated")
+                        // console.log("FeatureData file updated")
                     }
                     if (status === "status2:single column") {
                         alert("Please select more than one column in Feature selection drop down!!!")
-                        console.log("FeatureData file reset: single column selected")
+                        // console.log("FeatureData file reset: single column selected")
                     }
                     if (status === "status3:file reset") {
-                        console.log("FeatureData file reset: all columns selected")
+                        // console.log("FeatureData file reset: all columns selected")
                     }
                 }
             });
@@ -479,10 +523,11 @@
             setTimeout(function() {
                 //your code to be executed after 1 second
                 radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }, delayInMilliseconds);
 
-            $("#sidebar").removeClass("show");
+            //uncomment this like to hide the sidebar after submit button
+            // $("#sidebar").removeClass("show");
         })
 
     </script>

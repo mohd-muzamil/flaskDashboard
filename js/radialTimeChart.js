@@ -1,15 +1,32 @@
 function plotAreaChart(chart, dependendChart, participantId, attributes, feature, featurelist) {
-    var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3"}
+    // var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3", "lck": "#a6bddb"}
+    // var pathColor = {"brt": "#1f78b4", "acc": "#33a02c", "gyr": "#b2df8a", "lck": "#dadaeb"}    //darkBlue, darkgreen, lightgreen, lightpurple
+    // var pathColor = {"brt": "#377eb8", "acc": "#e41a1c", "gyr": "#fb8072", "lck": "#d0d1e6"}    //darkBlue, darkRed, lightRed, lightBlue
+    // var pathColor = {"brt": "#e41a1c", "acc": "#4daf4a", "gyr": "#b2df8a", "lck": "#d9d9d9"}    //darkRed, darkGreen, lightgreen, lightGray
+    var pathColor = {"checkbox":"#f7f7f7", "lck": "#fdcdac", "acc": "#1b9e77", "gyr": "#7570b3", "brt": "#d95f02"}    //{"lck": "lgray", "acc": "dred", "gyr": "orange", "brt": "41ab5d"}
     var gridPlotted = false
-    
+    var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style('font-size', '1em')
+    .style("border-width", "2px")
+    .style("padding", "5px")
+    .style('background-color', 'white')
+    .style('border-radius', '10% 10% 10% 10%');
+
     var postForm = { //Fetch form data
         // 'filename': filename, //Store name fields value
         'participantId': participantId, //Store name fields value
         "attributes" : attributes
     };
 
+    // if (!Object.values(attributes).every((v) => v === false)){
+    if (true){
     //fetcing filtered participant data from flask server
-    d3.csv("/filterParticipants")
+    d3.csv("/filterParticipantsNew")
+    // d3.csv("/filterParticipants")
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
@@ -20,6 +37,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                     d.brt = +d.brt;
                     d.acc = +d.acc;
                     d.gyr = +d.gyr;
+                    d.lck = +d.lck;
                 });
 
                 dates = Array.from(new Set(data.map(d => d.date)).values()).sort();
@@ -32,8 +50,14 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                 var starting_min = 1
                 var starting_max = numDates
 
-                plotRadial(starting_min, starting_max)
+                plotRadial(starting_min, starting_max)  //for plotting the sensor measurements in the form of circular area chart
+                
+                attributesTemp = attributes
+                delete attributesTemp["checkbox"]
+
+                if (!(Object.keys(attributesTemp).every((k) => attributesTemp[k] == false & k!="checkbox"))){ 
                     brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max+1);
+                }
                 // sliderMin = sliderValues[0]
                 // sliderMax = sliderValues[1]
                 
@@ -72,29 +96,43 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                         .domain([0, 24])
                         .range([0, 360]);
                 
-                    x = d3.scaleLinear()
+                    var x = d3.scaleLinear()
                         .domain([0, 1440])
                         .range([0, 2 * Math.PI]);
                     
+                    attributes = Object.assign({}, {"checkbox":true}, attributes)   //this will be used to draw a checkbox over the grid
+
                     for (let i=0; i<Object.keys(attributes).length; i++){
                         attr = Object.keys(attributes)[i]
                         if (attributes[attr]){
                             // d3.range(starting_min, starting_max)((d, i) =>
                             for (let d=starting_min; d<=starting_max; d++){
                                 currDate = d;
-                        
-                                datum = data.filter(function(row, i) {
-                                    return d2i[row['date']] == currDate && row[attr] != NaN;
-                                })
-                        
+                                
+                                
+                                if (attr == "checkbox"){
+                                    if (d%2==0){
+                                        datum = Array.from(Array(1440).keys())
+                                        // datum = datum.map(e => ({"minuteOfTheDay":e, "checkbox":e%9==0?0:1}))
+                                        datum = datum.map(e => ({"minuteOfTheDay":e, "checkbox":e%60==0?0:1}))
+                                    }
+                                    else
+                                        continue
+                                }
+                                else {
+                                    datum = data.filter(function(row, i) {
+                                        return d2i[row['date']] == currDate && row[attr] != NaN;
+                                    })
+                                }
+
                                 y = d3.scaleLinear()
                                     .domain(d3.extent(datum, function(d) { return d[attr]; }))
                                     .range([find_radius(currDate-1), find_radius(currDate)]);
                         
                                 const area = d3.areaRadial()
-                                    .angle(d => x(d.minuteOfTheDay))
+                                    .angle(d => x(+d.minuteOfTheDay))
                                     .innerRadius(d => y(0))
-                                    .outerRadius(d => y(d[attr]));
+                                    .outerRadius(d => y(+d[attr]));
                                 
                                 var xScale = d3.scaleLinear()
                                     .domain([0, 6])
@@ -103,17 +141,24 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                                 var yScale = d3.scaleLinear()
                                     .domain([0, 20])
                                     .range([width/2, height/2]);
-                        
+                                
                                 // Add the line
                                 svg.append("path")
                                 .attr("class", "areaPath")
                                 .attr("fill", pathColor[attr])
+                                // .attr("stroke", pathColor[attr])
+                                // .attr("stroke", "black")
                                 .attr('opacity', 1)
-                                .attr("stroke", "black")
-                                .attr("stroke-width", 1 / 20)
+                                // .attr("stroke-width", function(){return attr=="lck"?0:1/20})
                                 .attr("d", area(datum))
                         
                                 d3.select("#" + chart).selectAll('.buffer').remove();
+                            }
+                            
+                            rect_size = 8
+                            if (attr != "checkbox"){
+                                svg.append("rect").attr("x",(width - margin.left)/2).attr("y",-(height-(-2+i)*margin.top)/2).attr('width', rect_size).attr('height', rect_size).style("fill", pathColor[attr]).attr('class', 'legend')
+                                svg.append("text").attr("x", (width + 3*rect_size - margin.left)/2).attr("y",-(height - 2*rect_size -(-2+i)*margin.top)/2).text(attr).style("font-size", "10px").style("fill", pathColor[attr]).attr('class', 'legend')
                             }
                         }
                     }
@@ -128,16 +173,20 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                 
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
                         // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
-                
+                        
+                        // title
                         svg.append("text")
                         // .attr("x", -width/5)
+                        .attr("class", "title")
                         .attr("y", -margin.top - height/2)
                         .attr("dy", "-0.1em")
-                        .style("font-size", "12px")
+                        .style("fill", "rgb(18, 113, 249)")
+                        .style("font-size", "15px")
                         .style("font-weight", "normal")
                         .style("text-anchor", "middle")
                         .text("Participant: "+participantId)
-                
+                        
+                        // girdcircle for days of study
                         svg.selectAll(".gridCircles")
                             .data(d3.range(starting_min-1, starting_max+1, 1))
                             .enter()
@@ -145,13 +194,14 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                             .attr("class", "gridCircles")
                             .attr("fill", "none")
                             // .style("fill", "url(#grad)")
-                            .attr("stroke", "black")
+                            .attr("stroke", "gray")
                             .attr("opacity", config.opacity)
-                            .attr("stroke-width", 1 / 10)
+                            .attr("stroke-width", 1 / 5)
                             .attr("r", function(d) {
                                 return find_radius(d)
                             })
-                
+                        
+                        // grid lines for hours of the day
                         svg.selectAll(".gridLines")
                             .data(d3.range(0, 24, 1))
                             .enter()
@@ -160,17 +210,18 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                             .attr("x1", find_radius(starting_min-1))
                             .attr("x2", find_radius(starting_max))
                             .attr("opacity", config.opacity)
-                            .attr("stroke", "black")
-                            .attr("stroke-width", 1 / 10)
+                            .attr("stroke", "gray")
+                            .attr("stroke-width", 1 / 5)
                             .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
-                
+                        
+                        // labels for the hours of the day
                         svg.selectAll('.hourLabel')
                             .data(d3.range(0, 24, 1))
                             .enter()
                             .append('text')
                             .attr('class', 'hourLabel')
                             .attr('text-anchor', 'middle')
-                            .style('font-size', '10px')
+                            .style('font-size', '12px')
                             .attr('x', function(d) {
                                 return radius * Math.sin(hourScale(d) * radians);
                             })
@@ -178,41 +229,76 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                                 return -radius * Math.cos(hourScale(d) * radians) + 7;
                             })
                             .text(function(d) {
-                                return d + "hr";
+                                if (d  == 0)
+                                return "Midnight";
+                                else if (d < 12)
+                                return d + " am";
+                                else if (d  == 12)
+                                return "Noon";
+                                else if (d > 12)
+                                return d-12 + " pm";
                             });
                 
-                
+                        
+                        // lables for day number
+                        var noDays = starting_max-starting_min
+                        var inc = 1
+                        if (noDays>15 & noDays<30)
+                            inc = 2
+                        else if (noDays>30 & noDays<50)
+                            inc = 3
+                        else if (noDays>50)
+                            inc = 5
+                        daynumberdata = d3.range(starting_min, starting_max+1, inc)
+
                         svg.selectAll('.dayLabel')
-                            .data(d3.range(starting_min, starting_max+1, 1))
+                            .data(daynumberdata)
                             .enter()
                             .append('text')
+                            .attr("opacity", 0.8)
                             .attr('class', 'dayLabel')
                             .attr('text-anchor', 'middle')
-                            .style('font-size', '0.5em')
+                            .style('font-size', '8px')
                             .attr('x', 0)
                             .attr('y', function(d) {return find_radius(d)})
                             .text(function(d) {
                                 return d;
                             })
+                            .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px") })
                             .on('mouseover', function(d) {
-                                d3.select(this)
-                                    // .attr('y', "-3em")
-                                    .style('font-size', '2em')
-                                    .style("cursor", "default")
+                                tooltip.text(`${Object.keys(d2i).find(key => d2i[key] === d)}`);
+                                return tooltip.style("visibility", "visible");
                             })
-                            .on('mouseout', function(d) {
-                                d3.select(this)
-                                    // .attr('y', "1em")
-                                    .style('font-size', '0.5em')
-                                    .style("fill", "black");
-                            });
+                            .on('mouseout', function() {
+                                tooltip.style("visibility", "hidden")
+                            })
+
+                            // .on('mouseover', function(d) {
+                            //     d3.select(this)
+                            //         // .attr('y', "-3em")
+                            //         // .style('font-size', '2em')
+                                    
+                            //         .style("cursor", "default")
+                            // })
+                            // .on('mouseout', function(d) {
+                            //     d3.select(this)
+                            //         // .attr('y', "1em")
+                            //         .style('font-size', '0.5em')
+                            //         .style("fill", "black");
+                            // });
+
+                        
+                        // svg.append("circle").attr("cx",200).attr("cy",160).attr("r", 6).style("fill", "#404080")
+                        
+                        // svg.append("text").attr("x", 220).attr("y", 160).text("variable B").style("font-size", "15px").attr("alignment-baseline","middle")
                     }       
                         //remove the loading symbol
                         d3.select("#" + chart).selectAll('.buffer').remove();
                         
                 }
 
-                // Code for brush
+
+            // Code for brush
             function brushSlider(min, max, starting_min = min, starting_max = max) {
 
                 var range = [min, max+1]
@@ -292,6 +378,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                             d3.select(this).transition().call(d3.event.target.move, d1.map(x))
                             
                             d3.select("#" + chart).selectAll('.areaPath').remove();
+                            d3.select("#" + chart).selectAll('.title').remove();
                             d3.select("#" + chart).selectAll('.gridCircles').remove();
                             d3.select("#" + chart).selectAll('.gridLines').remove();
                             d3.select("#" + chart).selectAll('.hourLabel').remove();
@@ -356,6 +443,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
             }
 
             })
+    }
 
             
 
@@ -387,7 +475,7 @@ function updatePlotAreaChart(chart, dependendChart, participantId, feature, feat
 
     // gridPlotted = false;
     // brushPlotted = false;
-    attributes = {"brt":brtChecked, "acc":accChecked, "gyr":gyrChecked}
+    attributes = {"lck":lckChecked, "acc":accChecked, "gyr":gyrChecked, "brt":brtChecked}
 
     // brightnessData
     // filename = "dummyBrightness";

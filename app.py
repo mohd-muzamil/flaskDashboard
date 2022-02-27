@@ -15,34 +15,70 @@ from sklearn.cluster import KMeans
 from sklearn.cluster import SpectralClustering
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
+from sklearn import preprocessing
 import time
+from Dgrid import *
 # import * from generate_data_circle_packing
 
+# featureFile = "dummyFeatureData"
+# personalityFile = "dummyPersonalityScores"
+# brightnessFile = "dummyBrightness"
+# accelerometerFile = "dummyAccelerometer"
+# gyroscopeFIle = "dummyGyroscope"
+
 featureFile = "dummyFeatureData"
-personalityFile = "dummyPersonalityScores"
-brightnessFile = "dummyBrightness"
-accelerometerFile = "dummyAccelerometer"
-gyroscopeFIle = "dummyGyroscope"
+personalityFile = "participant_scores_temp"
+brightnessFile = "brightness"
+accelerometerFile = "accelerometer"
+gyroscopeFile = "gyroscope"
+lockStateFile = "lockstate"
 
 
-def getPCA(df, columns):
+def getPCA(df, columns, width, height):
     df = df.groupby("participantId").mean().reset_index()
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(df.loc[:,columns])
-    pca_x = pca_result[:,0]
-    pca_y = pca_result[:,1]
+
+    x = np.expand_dims(pca_result[:,0], axis=1)
+    y = np.expand_dims(pca_result[:,1], axis=1)
+
+    if width is not None and height is not None:
+        x = np.interp(x, (x.min(), x.max()), (20, width-20))
+        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+        cords = np.concatenate((x,y), axis=1)
+        pca_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    else:
+        pca_result_overlap_removed = pca_result
+
+    pca_x = pca_result_overlap_removed[:,0]
+    pca_y = pca_result_overlap_removed[:,1]
     return pca_x, pca_y
 
-def getTSNE(df, columns):
+def getTSNE(df, columns, width, height):
     df = df.groupby("participantId").mean().reset_index()
-    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300)
+    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, init='pca')
     tsne_result = tsne.fit_transform(df.loc[:,columns])
-    tsne_x = tsne_result[:,0]
-    tsne_y = tsne_result[:,1]
+
+    # x = np.expand_dims(tsne_result[:,0], axis=1)
+    # y = np.expand_dims(tsne_result[:,1], axis=1)
+
+    # if width is not None and height is not None:
+    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
+    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+    #     cords = np.concatenate((x,y), axis=1)
+    #     cords = preprocessing.StandardScaler().fit_transform(cords)
+    #     cords = ForceScheme().fit_transform(cords)
+    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    # else:
+    #     tsne_result_overlap_removed = tsne_result
+    tsne_result_overlap_removed = tsne_result
+
+    tsne_x = tsne_result_overlap_removed[:,0]
+    tsne_y = tsne_result_overlap_removed[:,1]
     return tsne_x, tsne_y
 
 def getClusters(df, columns, clusteringMethod="kmeans"):
-    print("clustering befin" + '*'*100)
+    print("clustering begin" + '*'*100)
     X = df.loc[:, columns]
     clusters = []
     # kmeans clustering
@@ -150,9 +186,14 @@ def dimReduceParticipants():
     personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
 
     columns = featureData.columns.values[2:]    #get all the feature columns
+    width = None
+    height = None
 
     if request.method == 'POST':
         content = request.get_json()
+        width = content['width']
+        height = content['height']
+
         if len(columns) > 1:   #in case of feature columns are selected in dropdown, consider only those
             columns = content['featureColumns']    
             message = "status1:file updated"
@@ -161,12 +202,12 @@ def dimReduceParticipants():
     else:
         message = "status3:file reset"
     
-    x, y = getPCA(featureData, columns)     #dim reduction
+    x, y = getTSNE(featureData, columns, width, height)     #dim reduction
     # clusters = getClusters(featureData, columns, clusteringMethod="spectral")    #spectralClustering
-    clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #k-means clustering
+    # clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #k-means clustering
 
     personalityData["x"], personalityData["y"] = x, y
-    personalityData["clusters"] = clusters
+    # personalityData["clusters"] = clusters
     personalityData.to_csv(os.path.join("data/processedData", personalityFile), index=False, header=True)
     return jsonify(message)
 
@@ -193,20 +234,19 @@ def filterParticipantsDummy():
     """
     if request.method == 'POST':
         content = request.get_json()
+        
         # filename = content['filename']
         participantId = content['participantId']
         attributes = content["attributes"]
-
         print("request recieved", content)  #print statement
         
         strt = time.time()
         filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFIle}
         data = pd.DataFrame()
         for attr,checkState in attributes.items():
-            print("attr:", attr, "checkState:", checkState)
             if checkState:
                 df = pd.read_csv(os.path.join("data", filenames[attr]))
-                df = df[df["participantId"]==participantId]#.sample(frac=0.001)
+                df = df[df["participantId"] == participantId]#.sample(frac=0.001)
 
                 #Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
                 for i in range(ceil(df.shape[0]/1440)):
@@ -244,11 +284,12 @@ def filterParticipantsNew():
         print("request recieved", content)  #print statement
         
         strt = time.time()
-        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFIle}
+        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFile, "lck":lockStateFile}
         data = pd.DataFrame()
         for attr,checkState in attributes.items():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
+                print(participantId)
                 df = pd.read_csv(os.path.join("data", filenames[attr]))
                 df = df[df["participantId"]==participantId]#.sample(frac=0.001)
                 dfImputed = pd.DataFrame()
@@ -261,17 +302,28 @@ def filterParticipantsNew():
                 for date in df.date.unique():
                     dfDate = df[df.date == date].copy()
                     dfDate = pd.merge(dfDate, allMinutes, how="right", on="minuteOfTheDay")
-                    dfDate.brightnessLevel.fillna(-1, inplace=True)
+                    
+                    if attr == "lck":
+                        dfDate.loc[0,attr]=0
+                    else:
+                        # dfDate.loc[0,attr]=0
+                        dfDate[attr].fillna(0, inplace=True)
                     dfDate.ffill(inplace=True)
                     dfDate.bfill(inplace=True)
                     dfImputed = pd.concat([dfImputed, dfDate], axis=0)
 
+                    # if attr=="brt":
+                    #     temp = pd.read_csv(os.path.join("data", filenames['lck']))
+                    #     temp = temp[(temp["participantId"]==participantId) & (temp.date == date)].copy()
+                    #     temp = temp.merge(dfImputed, on=["participantId", "device", "date", "minuteOfTheDay"], how="inner")
+                    #     dfImputed = temp[temp.lck==1]
+                    #     dfImputed.drop("lck", axis=1, inplace=True)
+
                 data = pd.concat([data, dfImputed])
-    
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredParticipants.csv"
         resp.headers["Content-Type"] = "text/csv"
-        print(time.time()-strt)
+        print("Execution Time", time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} participant:{participantId}")
 

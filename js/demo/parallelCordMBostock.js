@@ -121,6 +121,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         var title = svg.append("text")
             .attr("x", width/2 )
             .attr("y", -2*margin.top/5)
+            .style("fill", "rgb(18, 113, 249)")
             .style("font-size", "12px")
             .style("font-weight", "normal")
             .style("text-anchor", "middle")
