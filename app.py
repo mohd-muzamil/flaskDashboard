@@ -17,7 +17,8 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
 import time
-from Dgrid import *
+from removeOverlap.dgrid import *
+from removeOverlap.force_scheme import *
 # import * from generate_data_circle_packing
 
 # featureFile = "dummyFeatureData"
@@ -59,19 +60,19 @@ def getTSNE(df, columns, width, height):
     tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, init='pca')
     tsne_result = tsne.fit_transform(df.loc[:,columns])
 
-    # x = np.expand_dims(tsne_result[:,0], axis=1)
-    # y = np.expand_dims(tsne_result[:,1], axis=1)
+    x = np.expand_dims(tsne_result[:,0], axis=1)
+    y = np.expand_dims(tsne_result[:,1], axis=1)
 
-    # if width is not None and height is not None:
-    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
-    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-    #     cords = np.concatenate((x,y), axis=1)
-    #     cords = preprocessing.StandardScaler().fit_transform(cords)
-    #     cords = ForceScheme().fit_transform(cords)
-    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    # else:
-    #     tsne_result_overlap_removed = tsne_result
-    tsne_result_overlap_removed = tsne_result
+    if width is not None and height is not None:
+        x = np.interp(x, (x.min(), x.max()), (20, width-20))
+        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+        cords = np.concatenate((x,y), axis=1)
+        cords = preprocessing.StandardScaler().fit_transform(cords)
+        cords = ForceScheme().fit_transform(cords)
+        tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    else:
+        tsne_result_overlap_removed = tsne_result
+    # tsne_result_overlap_removed = tsne_result
 
     tsne_x = tsne_result_overlap_removed[:,0]
     tsne_y = tsne_result_overlap_removed[:,1]

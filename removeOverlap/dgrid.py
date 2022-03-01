@@ -1,8 +1,9 @@
 import math
 import numpy as np
+import os
 
 from sklearn.neighbors import KDTree
-from force_scheme import ForceScheme
+from removeOverlap.force_scheme import *
 
 
 class DGrid:
