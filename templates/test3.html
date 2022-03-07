@@ -1,66 +1,149 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>JavaScript example</title>
+		<meta charSet="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<!-- <style media="only screen">
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                box-sizing: border-box;
+                -webkit-overflow-scrolling: touch;
+            }
 
-<head>
-    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/d3-dsv@3"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script> -->
-    <!-- <script src="js/muzz.js"></script> -->
-    <!-- <script src="js/linear_chart.js"></script> -->
-    <link rel="shortcut icon" href="#">
-</head>
+            html {
+                position: absolute;
+                top: 0;
+                left: 0;
+                padding: 0;
+                overflow: auto;
+            }
 
-<style>
-    svg {
-        border: solid 1px blue;
+            body {
+                padding: 1rem;
+                overflow: auto;
+            }
+        </style> -->
+	</head>
+	<body>
+        <div style="display: flex; flex-direction: column; height: 100%">
+			<div style="margin: 10px 0">
+                <button onclick="onBtnImport()">Show CSV</button>
+				<button onclick="onBtnUpdate()">Update CSV</button>
+				<button onclick="onBtnExport()">Download CSV export file</button>
+			</div>
+			<div style="flex: 1 1 0; position: relative">
+				<div id="gridContainer">
+                    <!-- <div id="myGrid" style="width: 100%; height: 100%; display: block" class="ag-theme-alpine"></div> -->
+                    <div id="myGrid" class="ag-theme-alpine" style="height: 600px; width:1500px;"></div>
+				</div>
+			</div>
+		</div>
+
+		
+		</div>
+		<script>var __basePath = './';</script>
+        <!-- <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js"></script> -->
+        <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <!-- <script src="../js/numericCellEditor.js"></script> -->
+	</body>
+
+<script type="text/javascript" charset="utf-8">
+    // specify the columns
+
+    // var columnDefs = [];
+    var columnDefs = [
+        {   headerName: "",
+            children:[{field: 'participantId', columnGroupShow: 'closed'}, {field: 'date', columnGroupShow: 'closed'}]
+        },
+        {
+            headerName: 'screenFeatures',
+            children: [{field: 'noScreenLocks', columnGroupShow: 'open', filter: 'agNumberColumnFilter',}, {field: 'firstScreenUnlock', columnGroupShow: 'closed', filter: 'agNumberColumnFilter',}, {field: 'lastScreenLock', columnGroupShow: 'closed', filter: 'agNumberColumnFilter',}, {field: 'maxScreenTime', columnGroupShow: 'closed', filter: 'agNumberColumnFilter',}, {field: 'totalScreenTime', columnGroupShow: 'closed', filter: 'agNumberColumnFilter',}]
+        },
+        {
+            headerName: 'callingFeatures',
+            children: [{field: 'noMissed'}, {field: 'noDialled'}, {field: 'noIncoming'}, {field: 'minDurationIncoming'}, {field: 'maxDurationIncoming'}, {field: 'totalDurationIncoming'}, {field: 'noOutgoing'}, {field: 'minDurationOutgoing'}, {field: 'maxDurtaionOutgoing'}, {field: 'totalDurationOutgoing'}, {field: 'totalNoCalls'}, {field: 'totalDurationCalls'}]
+        },
+        {
+            headerName: 'mobilityFeatures',
+            children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
+        },
+        {
+            headerName: 'sleepFeatures',
+            children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}, {field: 'sleepStartTime2'}, {field: 'sleepEndTime2'}, {field: 'sleepDuration2'}, {field: 'totalSleepDuration'}, {field: 'noSleepInterruptions'}]
+        }
+    ];
+
+    // fields = ['participantId', 'date', 'depressionScore', 'firstScreenUnlock', 'lastScreenLock', 'locationEntropy', 'locationVariance', 'maxDurationIncoming', 'maxDurtaionOutgoing', 'maxScreenTime', 'minDurationIncoming', 'minDurationOutgoing', 'noDialled', 'noIncoming', 'noMissed', 'noOutgoing', 'noScreenLocks', 'noSleepInterruptions', 'noStayPoints', 'sleepDuration1', 'sleepDuration2', 'sleepEndTime1', 'sleepEndTime2', 'sleepStartTime1', 'sleepStartTime2', 'stepCount', 'totalDistance', 'totalDurationCalls', 'totalDurationIncoming', 'totalDurationOutgoing', 'totalNoCalls', 'totalScreenTime', 'totalSleepDuration']
+    // for (var i=0; i<fields.length; i++ ){
+    //     columnDefs.push({"field": fields[i]})
+    // }
+
+    // let the grid know which columns to use
+    const gridOptions = {
+    // Group columns
+    groupHeaderHeight: 40,
+    // Label columns
+    headerHeight: 40,
+
+    defaultColDef: {
+    flex: 1,
+    minWidth: 100,
+    sortable: true,
+    filter: true,
+    resizable: true,
+    editable: true,
+    },
+
+    debug: false,
+    columnDefs: columnDefs,
+    rowData: null,
+    sideBar: true,
+    enableCellChangeFlash: true,
+    rowDragManaged: true,
+    enterMovesDownAfterEdit: true,
+    enterMovesDown: true,
+    };
+
+
+    // setup the grid after the page has finished loading
+    // document.addEventListener('DOMContentLoaded', function () {
+    // var gridDiv = document.querySelector('#myGrid');
+    // new agGrid.Grid(gridDiv, gridOptions);
+    //     $.ajax({
+    //         type: "GET",
+    //         url: '/dataTable',
+    //         async: false,
+    //         success : function(data) {
+    //             gridOptions.api.setRowData(data)
+    //         }
+    //     });
+    // });
+
+    function onBtnImport() {
+    var gridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+        $.ajax({
+            type: "GET",
+            url: '/dataTable',
+            async: false,
+            success : function(data) {
+                gridOptions.api.setRowData(data)
+            }
+        });
     }
-    
-    .container {
-        float: left;
+
+    function onBtnUpdate() {
+    // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
+    console.log("Update the CSV on server")
     }
-</style>
 
-<body>
-    <h2 id="myadd">Test workspace3...</h2>
-    <p> Test charts for building conventrig line charts</p>
+    function onBtnExport() {
+    gridOptions.api.exportDataAsCsv();
+    }
 
-    <!-- <div class="container" id="chart"> -->
-    <!-- <svg id="chart1"></svg> -->
-    <!-- </div> -->
-
-    <!-- <div class="container" id="chart"> -->
-    <!-- <svg id="chart2"></svg> -->
-    <!-- </div> -->
-
-    <!-- <div id="mydiv"></div> -->
-
-
-    <!-- <svg id="myViz3"></svg> -->
-
-
-    <script src="../js/glyph.js"></script>
-    <script src="../js/glyph_test.js"></script>
-    <script src="../js/glyph_scatter_plot.js"></script>
-    <!-- <script src="js/polar_chart.js"></script>
-    <script src="js/bubble_chart.js"></script>
-    <script src="js/bubble_chart1.js"></script>
-    <script src="js/d3_table_example.js"></script> -->
-    <!-- <script src="js/glyph.js"></script> -->
-    <!-- <script src="js/circle_packing.js"></script> -->
-</body>
-<script>
-    //add your function call here
-    // glyph()
-    /*['PROSITC000154', 'PROSITC000185', 'PROSITC000188', 'PROSITC000189',
-        'PROSITC000219', 'PROSITC000226', 'PROSITC000229', 'PROSITC000234',
-       'PROSITC000235', 'PROSITC000237', 'PROSITC0003', 'PROSITC0006',
-       'PROSITC0007', 'PROSITC0008']*/
-    // participant = glyph_scatter_plot('chart1', 'chart2')
-    //    console.log("rendering data for participant: ", participant)
-    //    if (participant != null ){
-    //     glyph_test(participant=participant)
-    //    }
-</script>
-
+  </script>
 </html>

@@ -1,3 +1,4 @@
+from crypt import methods
 from importlib.machinery import DEBUG_BYTECODE_SUFFIXES
 from math import ceil
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
@@ -8,6 +9,7 @@ from bson import json_util
 from bson.json_util import dumps
 from sshtunnel import SSHTunnelForwarder
 import pandas as pd
+import csv
 # from templates.Preprocessing_Scripts.fetch_data import *
 import os
 import numpy as np
@@ -22,7 +24,7 @@ from removeOverlap.force_scheme import *
 # import * from generate_data_circle_packing
 
 # featureFile = "dummyFeatureData"
-# personalityFile = "dummyPersonalityScores"
+# personalityFile = "dummyPersonalityScores"``
 # brightnessFile = "dummyBrightness"
 # accelerometerFile = "dummyAccelerometer"
 # gyroscopeFIle = "dummyGyroscope"
@@ -63,16 +65,16 @@ def getTSNE(df, columns, width, height):
     x = np.expand_dims(tsne_result[:,0], axis=1)
     y = np.expand_dims(tsne_result[:,1], axis=1)
 
-    if width is not None and height is not None:
-        x = np.interp(x, (x.min(), x.max()), (20, width-20))
-        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-        cords = np.concatenate((x,y), axis=1)
-        cords = preprocessing.StandardScaler().fit_transform(cords)
-        cords = ForceScheme().fit_transform(cords)
-        tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    else:
-        tsne_result_overlap_removed = tsne_result
-    # tsne_result_overlap_removed = tsne_result
+    # if width is not None and height is not None:
+    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
+    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+    #     cords = np.concatenate((x,y), axis=1)
+    #     cords = preprocessing.StandardScaler().fit_transform(cords)
+    #     cords = ForceScheme().fit_transform(cords)
+    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    # else:
+    #     tsne_result_overlap_removed = tsne_result
+    tsne_result_overlap_removed = tsne_result
 
     tsne_x = tsne_result_overlap_removed[:,0]
     tsne_y = tsne_result_overlap_removed[:,1]
@@ -97,7 +99,7 @@ app = Flask(__name__, static_url_path='', static_folder='')
 
 @app.route("/ping")
 def hello_world():
-    return jsonify("pong")
+    return jsonify("Apple")
 
 # @app.route('/login.html')
 # def login():
@@ -242,7 +244,7 @@ def filterParticipantsDummy():
         print("request recieved", content)  #print statement
         
         strt = time.time()
-        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFIle}
+        filenames = {"brt":brightnessFile, "acc":accelerometerFile, "gyr":gyroscopeFile}
         data = pd.DataFrame()
         for attr,checkState in attributes.items():
             if checkState:
@@ -370,6 +372,38 @@ def fetchIndividualFeatures():
         resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
         resp.headers["Content-Type"] = "text/csv"
         return resp
+
+# test code
+@app.route('/dataTable', methods=['GET', 'POST'])
+def dataTable(): 
+    print("from route dataTable", request.method)
+    if request.method == 'GET':
+        df = pd.read_csv(os.path.join("data", featureFile))
+        fieldnames = df.columns
+        # len = df.shape[0]
+        # resp = make_response(df.to_csv())
+        # resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
+        # resp.headers["Content-Type"] = "text/csv"
+
+        results = df.to_dict('records')
+        # results = []
+        # user_csv = request.form.get('user_csv').split('\n')
+        # reader = csv.DictReader(user_csv)
+        
+        # for row in reader:
+        #     results.append(dict(row))
+
+        # fieldnames = [key for key in results[0].keys()]
+        # print(list(results))
+        # return render_template('test3.html', results=results, fieldnames=fieldnames, len=len)
+        return jsonify(results)
+    
+    if request.method == 'POST':
+        pass
+
+
+
+# test code ends
 
 if __name__ == "__main__":
     app.run(port=5003, debug=True)

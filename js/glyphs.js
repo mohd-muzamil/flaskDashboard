@@ -116,6 +116,19 @@ function glyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature,
         // adding circles that will help hover and hightlight selected glyphs
         addHoverCircle()
 
+        // adding title
+        svg.append("text")
+            // .attr("x", -width/5)
+            .attr("class", "title")
+            .attr("x", width/2 + margin.left    )
+            .attr("y", 1.5*margin.top)
+            .attr("dy", "-0.1em")
+            .style("fill", "rgb(18, 113, 249)")
+            .style("font-size", "15px")
+            .style("font-weight", "normal")
+            .style("text-anchor", "middle")
+            .text("Instance View")
+
         function plotRadialGlyph(){
             // RadialGlyph
             svg.selectAll('circle')

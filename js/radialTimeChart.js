@@ -176,7 +176,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                         svg.append("text")
                         // .attr("x", -width/5)
                         .attr("class", "title")
-                        .attr("y", -margin.top - height/2)
+                        .attr("y", -1.15*margin.top - height/2)
                         .attr("dy", "-0.1em")
                         .style("fill", "rgb(18, 113, 249)")
                         .style("font-size", "15px")
@@ -224,15 +224,17 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                                 return radius * Math.sin(hourScale(d) * radians);
                             })
                             .attr('y', function(d) {
-                                return -radius * Math.cos(hourScale(d) * radians) + 7;
+                                if (d == 0) return  -radius * Math.cos(hourScale(d) * radians) + 0;
+                                else if (d == 12) return  -radius * Math.cos(hourScale(d) * radians) + 14;
+                                else return -radius * Math.cos(hourScale(d) * radians) + 7;
                             })
                             .text(function(d) {
                                 if (d  == 0)
-                                return "Midnight";
+                                return "MidNight";
                                 else if (d < 12)
                                 return d + " am";
                                 else if (d  == 12)
-                                return "Noon";
+                                return "MidDay";
                                 else if (d > 12)
                                 return d-12 + " pm";
                             });
