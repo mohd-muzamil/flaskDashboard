@@ -1,5 +1,6 @@
-// ****Importatnt file****
-//This script is used to plot radial glyphs in first svg
+/****Importatnt file****/
+// This script is used to plot glyphs in first svg
+
 function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,

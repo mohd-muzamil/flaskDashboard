@@ -1,7 +1,9 @@
+/****Importatnt file****/
+// This script is used to plot parallel cord charts in third and fourth svg
+
 // d3V4 implementation of code similar to that by Mike Bostock
 // https://bl.ocks.org/mbostock/1341021
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
-
 // https://gist.github.com/titipignataro/47135818bad65a439174038227e0eb20
 
 

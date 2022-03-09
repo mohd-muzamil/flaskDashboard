@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,9 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="../css/style.css" rel="stylesheet">
     <link href="../css/parallelCord.css" rel="stylesheet">
-    <link href="../css/parallelCordMBostock.css" rel="stylesheet"> 
-
-    
+    <link href="../css/parallelCordMBostock.css" rel="stylesheet">     
 </head>
 
 <body>
@@ -44,7 +41,8 @@
                 <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end">  -->
                     <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
 
-                        <h4 id="dashboardHeader" style="color:rgb(18, 113, 249)">Filters</h4>
+                        <img src="../img/PROSIT.PNG" alt="PROSIT" style="display: block; margin-left:auto; margin-right: auto; width: 50%;">
+                        <h5 id="dashboardHeader" style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249)">PROSIT</h5>
                         <hr class="line">
 
                         <div style="padding-left:10px; padding-right:10px;">
@@ -210,16 +208,9 @@
                 </div>
             </div>
             <main class="col ps-md-2 pb-10">
-                <div class="row py-2" id="header">
-                    <div class="col-1">
-                        <a data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false">Menu</a>
-                        <!-- <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse" class="border rounded-3 p-1 text-decoration-none"> -->
-                        </a>
-                    </div>
-                    <div class="col-11" style="text-align:left;">
-                        <h4 id="dashboardHeader" style="color:rgb(18, 113, 249)">PROSIT Dashboard</h4>
-                    </div>
-                </div>
+                <!-- Dashboard title -->
+                <!-- <h5 id="dashboardHeader" style="color:rgb(18, 113, 249)">PROSIT Dashboard</h5> -->
+
                 <div class="pa-1" id="bottom">
                     <svg class="svg1" id="chart1"></svg>
                     <svg class="svg2" id="chart2"></svg>
@@ -227,29 +218,20 @@
                     <svg class="svg3" id="chart4"></svg>
                     <!-- <svg class="svg3" id="chart5"></svg> -->
                 </div>
-                    <div style="margin-top: 10px; margin-bottom: 5px;">
-                        <table style="width:100%; table-layout: auto;">
-                            <td id="showcsv" style="width:10%">
-                                <button type="button" class="btn btn-primary" onclick="onBtnImport()">Show CSV</button>
-                                <!-- <button onclick="onBtnImport()">Show CSV</button> -->
-                            </td>
-                            <td id="hidecsv" style="width:10%; visibility:hidden">
-                                <!-- <button onclick="onBtnRemove()">Hide CSV</button> -->
-                                <button type="button" class="btn btn-warning" onclick="onBtnRemove()">Hide CSV</button>
-                            </td>
-                            <td id="updatecsv" style="width:10%; visibility: hidden;">
-                                <!-- <button onclick="onBtnUpdate()">Update CSV</button> -->
-                                <button type="button" class="btn btn-danger" onclick="onBtnUpdate()">Update CSV</button>
-                            </td>
-                            <td id="downloadcsv" style="width:10%; visibility: hidden;">
-                                <!-- <button onclick="onBtnExport()">Download CSV</button> -->
-                                <button type="button" class="btn btn-success" onclick="onBtnExport()">Download CSV</button>
-                            </td>
-                        </table>
+
+                <div class="row py-2" id="header">
+                    <div class="col-4 py-1">
+                        <a data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false">Menu</a>
                     </div>
-                    <div id="csvGrid" class="ag-theme-alpine"></div>
+                    <div class="btn-toolbar col-8 justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                          <button type="button" class="btn btn-light" onclick="onBtnImport()">show features</button>
+                          <button type="button" class="btn btn-light" onclick="onBtnRemove()">hide features</button>
+                          <button type="button" class="btn btn-light" onclick="onBtnUpdate()">update features</button>
+                          <button type="button" class="btn btn-light" onclick="onBtnExport()">download featrues</button>
+                        </div>
                     </div>
-                </div>
+                <div id="csvGrid" class="grid ag-theme-balham" style="display: none;"></div>
                 <br>
             </main>
         </div>
@@ -300,20 +282,10 @@
 
     </script>
     
+    <!-- Imports -->
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
     <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
     <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
-    <!-- <script src="https://unpkg.com/d3-fetch"></script> -->
-    <!-- <script src="https://d3js.org/d3.v3.min.js"></script> -->
-    
-    <!-- Demo d3.js charts -->
-    <!-- <script src="../js/demo/chart1.js"></script> -->
-    <script src="../js/demo/barchart.js"></script>
-    <!-- demo forceSimulation -->
-    <script src="../js/demo/forceSimulation.js"></script>
-    <!-- paralled cord chart -->
-    <!-- <script src="../js/demo/parallelCord.js"></script> -->
-    <script src="../js/demo/parallelCordMBostock.js"></script>
 
     <!-- PROSIT Charts -->
     <!-- glyphs scatter plot : svg1 -->
@@ -322,18 +294,15 @@
     <script src="../js/radialTimeChart.js"></script>
     <!-- loading symbol during buffer : svg2 -->
     <script src="../js/buffering.js"></script>
-    <!-- parallel cordinate chart : svg3 -->
-    <!-- <script src="../js/parallelCordChart.js"></script> -->
-    <!-- renderQueue -->
-    <script src="../js/renderQueue.js"></script>
+    <!-- parallel cordinate chart : svg3 & svg4 -->
+    <script src="../js/parallelCordMBostock.js"></script>
+
     <script>
         // parameters
         var glyphsChart ="chart1";
         var radialTimeChart ="chart2";
         var parallerCordChart1 ="chart3";
         var parallerCordChart2 ="chart4";
-        // var forcedSimulationChart ="chart4"
-        // var barChart ="chart5"
         var radius = 10    //default value of 10, if u change this, change it in html slider element as well
         var toggleGlyph = "radialGlyph" //toggleGlyph switch values: "radialGlyph"/"flowerGlyph"
         var toggleLabels = true //toggleLabels switch values: true/false
@@ -506,22 +475,13 @@
 
         // });
 
-        //feature select filter
-//         document.getElementsByTagName('select')[0].onchange = function() {
-//   var index = this.selectedIndex;
-//   var inputText = this.children[index].innerHTML.trim();
-//   console.log(inputText);
-// }    
+
         // Refresh after sidebar close
         $('#featureSelect').on('change', function() {
             var data = {
                 "featureColumns": $('#featureSelect').val()
             };
         });
-
-        // $("#featureSelect").onchange = function() {
-        //     
-        // };
 
         // submit button
         $("#Submit").click(function(){
@@ -561,111 +521,115 @@
             // $("#sidebar").removeClass("show");
         })
 
-    // test code
-    // code for rendering csv data on the screen
-    var columnDefs = [
-            {   headerName: "",
-                children:[{field: 'participantId'}, {field: 'date'}]
+        // test code
+        // code for rendering csv data on the screen
+        var columnDefs = [
+                {   headerName: "",
+                    children:[{field: 'participantId'}, {field: 'date'}]
+                },
+                {
+                    headerName: 'screenFeatures',
+                    children: [{field: 'noScreenLocks', filter: 'agNumberColumnFilter'}, {field: 'firstScreenUnlock', filter: 'agNumberColumnFilter'}, {field: 'lastScreenLock', filter: 'agNumberColumnFilter'}, {field: 'maxScreenTime', filter: 'agNumberColumnFilter'}, {field: 'totalScreenTime', filter: 'agNumberColumnFilter'}]
+                },
+                {
+                    headerName: 'callingFeatures',
+                    children: [{field: 'noMissed'}, {field: 'noDialled'}, {field: 'noIncoming'}, {field: 'minDurationIncoming'}, {field: 'maxDurationIncoming'}, {field: 'totalDurationIncoming'}, {field: 'noOutgoing'}, {field: 'minDurationOutgoing'}, {field: 'maxDurtaionOutgoing'}, {field: 'totalDurationOutgoing'}, {field: 'totalNoCalls'}, {field: 'totalDurationCalls'}]
+                },
+                {
+                    headerName: 'mobilityFeatures',
+                    children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
+                },
+                {
+                    headerName: 'sleepFeatures',
+                    children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}, {field: 'sleepStartTime2'}, {field: 'sleepEndTime2'}, {field: 'sleepDuration2'}, {field: 'totalSleepDuration'}, {field: 'noSleepInterruptions'}, {field: 'depressionScore'}]
+                }
+            ];
+
+            // fields = ['participantId', 'date', 'depressionScore', 'firstScreenUnlock', 'lastScreenLock', 'locationEntropy', 'locationVariance', 'maxDurationIncoming', 'maxDurtaionOutgoing', 'maxScreenTime', 'minDurationIncoming', 'minDurationOutgoing', 'noDialled', 'noIncoming', 'noMissed', 'noOutgoing', 'noScreenLocks', 'noSleepInterruptions', 'noStayPoints', 'sleepDuration1', 'sleepDuration2', 'sleepEndTime1', 'sleepEndTime2', 'sleepStartTime1', 'sleepStartTime2', 'stepCount', 'totalDistance', 'totalDurationCalls', 'totalDurationIncoming', 'totalDurationOutgoing', 'totalNoCalls', 'totalScreenTime', 'totalSleepDuration']
+            // for (var i=0; i<fields.length; i++ ){
+            //     columnDefs.push({"field": fields[i]})
+            // }
+
+            // let the grid know which columns to use
+            const gridOptions = {
+            // Group columns
+            groupHeaderHeight: 40,
+            // Label columns
+            headerHeight: 40,
+
+            defaultColDef: {
+            // flex: 1,
+            minWidth: 100,
+            sortable: true,
+            filter: true,
+            resizable: true,
+            editable: true,
             },
-            {
-                headerName: 'screenFeatures',
-                children: [{field: 'noScreenLocks', filter: 'agNumberColumnFilter'}, {field: 'firstScreenUnlock', filter: 'agNumberColumnFilter'}, {field: 'lastScreenLock', filter: 'agNumberColumnFilter'}, {field: 'maxScreenTime', filter: 'agNumberColumnFilter'}, {field: 'totalScreenTime', filter: 'agNumberColumnFilter'}]
-            },
-            {
-                headerName: 'callingFeatures',
-                children: [{field: 'noMissed'}, {field: 'noDialled'}, {field: 'noIncoming'}, {field: 'minDurationIncoming'}, {field: 'maxDurationIncoming'}, {field: 'totalDurationIncoming'}, {field: 'noOutgoing'}, {field: 'minDurationOutgoing'}, {field: 'maxDurtaionOutgoing'}, {field: 'totalDurationOutgoing'}, {field: 'totalNoCalls'}, {field: 'totalDurationCalls'}]
-            },
-            {
-                headerName: 'mobilityFeatures',
-                children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
-            },
-            {
-                headerName: 'sleepFeatures',
-                children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}, {field: 'sleepStartTime2'}, {field: 'sleepEndTime2'}, {field: 'sleepDuration2'}, {field: 'totalSleepDuration'}, {field: 'noSleepInterruptions'}, {field: 'depressionScore'}]
-            }
-        ];
 
-        // fields = ['participantId', 'date', 'depressionScore', 'firstScreenUnlock', 'lastScreenLock', 'locationEntropy', 'locationVariance', 'maxDurationIncoming', 'maxDurtaionOutgoing', 'maxScreenTime', 'minDurationIncoming', 'minDurationOutgoing', 'noDialled', 'noIncoming', 'noMissed', 'noOutgoing', 'noScreenLocks', 'noSleepInterruptions', 'noStayPoints', 'sleepDuration1', 'sleepDuration2', 'sleepEndTime1', 'sleepEndTime2', 'sleepStartTime1', 'sleepStartTime2', 'stepCount', 'totalDistance', 'totalDurationCalls', 'totalDurationIncoming', 'totalDurationOutgoing', 'totalNoCalls', 'totalScreenTime', 'totalSleepDuration']
-        // for (var i=0; i<fields.length; i++ ){
-        //     columnDefs.push({"field": fields[i]})
-        // }
-
-        // let the grid know which columns to use
-        const gridOptions = {
-        // Group columns
-        groupHeaderHeight: 40,
-        // Label columns
-        headerHeight: 40,
-
-        defaultColDef: {
-        // flex: 1,
-        minWidth: 100,
-        sortable: true,
-        filter: true,
-        resizable: true,
-        editable: true,
-        },
-
-        debug: false,
-        columnDefs: columnDefs,
-        rowData: null,
-        sideBar: true,
-        enableCellChangeFlash: true,
-        rowDragManaged: true,
-        enterMovesDownAfterEdit: true,
-        enterMovesDown: true,
-        };
-    
-    function onBtnImport() {
-        var el   = document.getElementById("chart4"); // or other selector like querySelector()
-        var rect = el.getBoundingClientRect(); // get the bounding rectangle
-        $("#csvGrid").width(rect.width)
-        $("#csvGrid").height(rect.width / 2)
-        $("#showcsv").css("visibility", "hidden")
-        $("#hidecsv").css("visibility", "visible")
-        $("#downloadcsv").css("visibility", "visible")
-        $("#updatecsv").css("visibility", "visible")
-
-        var gridDiv = document.querySelector('#csvGrid');
+            debug: false,
+            columnDefs: columnDefs,
+            rowData: null,
+            sideBar: true,
+            enableCellChangeFlash: true,
+            rowDragManaged: true,
+            enterMovesDownAfterEdit: true,
+            enterMovesDown: true,
+            };
         
-        new agGrid.Grid(gridDiv, gridOptions);
-            $.ajax({
-                type: "GET",
-                url: '/dataTable',
-                async: false,
-                success : function(data) {
-                    gridOptions.api.setRowData(data)
-                }
-            });
-    }
+        function onBtnImport() {
+            if ($('div.grid').is(':empty')) {
+                var el   = document.getElementById("chart4"); // or other selector like querySelector()
+                var rect = el.getBoundingClientRect(); // get the bounding rectangle
+                $("#csvGrid").css("display", "block")
+                $("#csvGrid").width(rect.width)
+                $("#csvGrid").height(rect.width / 2)
 
-    function onBtnRemove(){
-        $("#showcsv").css("visibility", "visible")
-        $("#hidecsv").css("visibility", "hidden")
-        $("#downloadcsv").css("visibility", "hidden")
-        $("#updatecsv").css("visibility", "hidden")
-        $("#csvGrid").children("div").eq(0).remove();
-    }
+                var gridDiv = document.querySelector('#csvGrid');
+                
+                new agGrid.Grid(gridDiv, gridOptions);
+                    $.ajax({
+                        type: "GET",
+                        url: '/dataTable',
+                        async: false,
+                        success : function(data) {
+                            gridOptions.api.setRowData(data)
+                        }
+                    });
+            }
+            else {
+                alert('Table already loaded');
+            }
+        }
 
-    function onBtnUpdate() {
-    // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
-    data = gridOptions.api.getDataAsCsv();
-    $.ajax({
-                type: "POST",
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                url: "/dataTable",
-                success: function(status) {
-                    console.log(status)
-                }
-            });
-    }
+        function onBtnRemove(){
+            $("#csvGrid").css("display", "none")
+            $("#showcsv").css("visibility", "visible")
+            $("#hidecsv").css("visibility", "hidden")
+            $("#downloadcsv").css("visibility", "hidden")
+            $("#updatecsv").css("visibility", "hidden")
+            $("#csvGrid").children("div").eq(0).remove();
+            location.reload();
+        }
 
-    function onBtnExport() {
-        $("#downloadcsv").css("visibility", "hidden")
-        gridOptions.api.exportDataAsCsv();
-    }
-    // test code ends
+        function onBtnUpdate() {
+        // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
+        data = gridOptions.api.getDataAsCsv();
+        $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    url: "/dataTable",
+                    success: function(status) {
+                        console.log(status)
+                    }
+                });
+        }
+
+        function onBtnExport() {
+            $("#downloadcsv").css("visibility", "hidden")
+            gridOptions.api.exportDataAsCsv();
+        }
+        // test code ends
 
     </script>
 </body>

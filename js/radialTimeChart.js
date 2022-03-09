@@ -1,3 +1,6 @@
+/****Importatnt file****/
+// This script is used to plot radial chart in second svg
+
 function plotAreaChart(chart, dependendChart, participantId, attributes, feature, featurelist) {
     // var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyr": "#7570b3", "lck": "#a6bddb"}
     // var pathColor = {"brt": "#1f78b4", "acc": "#33a02c", "gyr": "#b2df8a", "lck": "#dadaeb"}    //darkBlue, darkgreen, lightgreen, lightpurple

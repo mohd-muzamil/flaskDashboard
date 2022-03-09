@@ -1,3 +1,6 @@
+/****Importatnt file****/
+// This script is used to render buffering icon while loading data
+
 function buffering(chart, participantId) {
     'use strict';
     var margin = { top: 25, right: 25, bottom: 75, left: 25 },
