@@ -24,6 +24,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
 
     <!-- older version of bootstrap with working multiselect dropdown -->
+    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <!-- <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js"> -->
+
+    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
@@ -145,8 +149,9 @@
 
                         <hr class="line">
 
+                        <!-- decided not to implement this -->
                         <!-- Toggle parallel cord chart switch -->
-                        <div style="text-align: center;">
+                        <!-- <div style="text-align: center;">
                             <label class="form-check-label selectedLabel" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="toggleFeature"/>
@@ -154,7 +159,7 @@
                             <label class="form-check-label" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
                         </div>
 
-                        <hr class="line">
+                        <hr class="line"> -->
 
 
                         <!-- Toggle polar chart switch  -->
@@ -222,12 +227,33 @@
                     <svg class="svg3" id="chart4"></svg>
                     <!-- <svg class="svg3" id="chart5"></svg> -->
                 </div>
-                <br><br>
+                    <div style="margin-top: 10px; margin-bottom: 5px;">
+                        <table style="width:100%; table-layout: auto;">
+                            <td id="showcsv" style="width:10%">
+                                <button type="button" class="btn btn-primary" onclick="onBtnImport()">Show CSV</button>
+                                <!-- <button onclick="onBtnImport()">Show CSV</button> -->
+                            </td>
+                            <td id="hidecsv" style="width:10%; visibility:hidden">
+                                <!-- <button onclick="onBtnRemove()">Hide CSV</button> -->
+                                <button type="button" class="btn btn-warning" onclick="onBtnRemove()">Hide CSV</button>
+                            </td>
+                            <td id="updatecsv" style="width:10%; visibility: hidden;">
+                                <!-- <button onclick="onBtnUpdate()">Update CSV</button> -->
+                                <button type="button" class="btn btn-danger" onclick="onBtnUpdate()">Update CSV</button>
+                            </td>
+                            <td id="downloadcsv" style="width:10%; visibility: hidden;">
+                                <!-- <button onclick="onBtnExport()">Download CSV</button> -->
+                                <button type="button" class="btn btn-success" onclick="onBtnExport()">Download CSV</button>
+                            </td>
+                        </table>
+                    </div>
+                    <div id="csvGrid" class="ag-theme-alpine"></div>
+                    </div>
+                </div>
+                <br>
             </main>
         </div>
     </div>
-
-    
 
     <script> 
     //settings for multiselect dropdown
@@ -304,9 +330,10 @@
         // parameters
         var glyphsChart ="chart1";
         var radialTimeChart ="chart2";
-        var parallerCordChart ="chart3";
-        var forcedSimulationChart ="chart4"
-        var barChart ="chart5"
+        var parallerCordChart1 ="chart3";
+        var parallerCordChart2 ="chart4";
+        // var forcedSimulationChart ="chart4"
+        // var barChart ="chart5"
         var radius = 10    //default value of 10, if u change this, change it in html slider element as well
         var toggleGlyph = "radialGlyph" //toggleGlyph switch values: "radialGlyph"/"flowerGlyph"
         var toggleLabels = true //toggleLabels switch values: true/false
@@ -366,7 +393,7 @@
         // Refresh after sidebar close
         function outputsize() {
             radius = document.getElementById("myRange").value
-            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+            updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart1, parallerCordChart2, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }    
         new ResizeObserver(outputsize).observe(bottom)
 
@@ -409,20 +436,21 @@
             // console.log("toggle show label switch")
         });
 
+        // decided not to implement this
         // switch to select Parallel cord Features
-        $("#toggleFeature").on('change', function() {
-            if ($(this).is(':checked')) {
-                toggleFeature = "individualFeatures";
-                $("#individualFeatures").addClass("selectedLabel")
-                $("#aggregatedFeatures").removeClass("selectedLabel")
-            } else {
-                toggleFeature = "aggregatedFeatures";
-                $("#aggregatedFeatures").addClass("selectedLabel")
-                $("#individualFeatures").removeClass("selectedLabel")
-            }
-            // console.log("toggle feature switch")
-            // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
-        });
+        // $("#toggleFeature").on('change', function() {
+        //     if ($(this).is(':checked')) {
+        //         toggleFeature = "individualFeatures";
+        //         $("#individualFeatures").addClass("selectedLabel")
+        //         $("#aggregatedFeatures").removeClass("selectedLabel")
+        //     } else {
+        //         toggleFeature = "aggregatedFeatures";
+        //         $("#aggregatedFeatures").addClass("selectedLabel")
+        //         $("#individualFeatures").removeClass("selectedLabel")
+        //     }
+        //     // console.log("toggle feature switch")
+        //     // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
+        // });
 
         // checkbox to select brightness
         $("#brtCheckBox").on('change', function() {
@@ -478,9 +506,6 @@
 
         // });
 
-
-
-
         //feature select filter
 //         document.getElementsByTagName('select')[0].onchange = function() {
 //   var index = this.selectedIndex;
@@ -529,275 +554,117 @@
             setTimeout(function() {
                 //your code to be executed after 1 second
                 radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
+                updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart1, parallerCordChart2, toggleGlyph, toggleLabels, toggleFeature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked);
             }, delayInMilliseconds);
 
             //uncomment this like to hide the sidebar after submit button
             // $("#sidebar").removeClass("show");
         })
 
-
-        // test code
-        $(document).ready(function($)
-        {
-        //ajax row data
-    //     $.ajax({
-    //         type: 'GET',
-    //         url: "/dataTable",
-    //         // dataType: "text/csv",
-    //         success: function(data){
-    //             ajax_data = data
-    //             console.log(ajax_data)
-    //     //         }
-    //     // });
-    //     // var ajax_data =
-    //     // [
-    //     //     {fname:"Code", lname:"With Mark", email:"mark@codewithmark.com"}, 
-    //     //     {fname:"Mary", lname:"Moe", email:"mary@gmail.com"},
-    //     //     {fname:"John", lname:"Doe", email:"john@yahoo.com"},
-    //     //     {fname:"Julie", lname:"Dooley", email:"julie@gmail.com"},
-    //     // ]
-
-
-
-    //     var random_id = function  () 
-    //     {
-    //         var id_num = Math.random().toString(9).substr(2,3);
-    //         var id_str = Math.random().toString(36).substr(2);
-            
-    //         return id_num + id_str;
-    //     }
-
-
-    //     //--->create data table > start
-    //     var tbl = '';
-    //     tbl +='<table class="table table-hover">'
-
-    //         //--->create table header > start
-    //         tbl +='<thead>';
-    //             tbl +='<tr>';
-    //             tbl +='<th>First Name</th>';
-    //             tbl +='<th>Last Name</th>';
-    //             tbl +='<th>Email</th>';
-    //             tbl +='<th>Options</th>';
-    //             tbl +='</tr>';
-    //         tbl +='</thead>';
-    //         //--->create table header > end
-
-            
-    //         //--->create table body > start
-    //         tbl +='<tbody>';
-
-    //             //--->create table body rows > start
-    //             $.each(ajax_data, function(index, val) 
-    //             {
-    //                 //you can replace with your database row id
-    //                 var row_id = random_id();
-
-    //                 //loop through ajax row data
-    //                 tbl +='<tr row_id="'+row_id+'">';
-    //                     tbl +='<td ><div class="row_data" edit_type="click" col_name="fname">'+val['fname']+'</div></td>';
-    //                     tbl +='<td ><div class="row_data" edit_type="click" col_name="lname">'+val['lname']+'</div></td>';
-    //                     tbl +='<td ><div class="row_data" edit_type="click" col_name="email">'+val['email']+'</div></td>';
-
-    //                     //--->edit options > start
-    //                     tbl +='<td>';
-                        
-    //                         tbl +='<span class="btn_edit" > <a href="#" class="btn btn-link " row_id="'+row_id+'" > Edit</a> </span>';
-
-    //                         //only show this button if edit button is clicked
-    //                         tbl +='<span class="btn_save"> <a href="#" class="btn btn-link"  row_id="'+row_id+'"> Save</a> | </span>';
-    //                         tbl +='<span class="btn_cancel"> <a href="#" class="btn btn-link" row_id="'+row_id+'"> Cancel</a> | </span>';
-
-    //                     tbl +='</td>';
-    //                     //--->edit options > end
-                        
-    //                 tbl +='</tr>';
-    //             });
-
-    //             //--->create table body rows > end
-
-    //         tbl +='</tbody>';
-    //         //--->create table body > end
-
-    //     tbl +='</table>'	
-    //     //--->create data table > end
-    //     }
-    
-
-        //out put table data
-        // $(document).find('.tbl_user_data').html(tbl);
-
-        $(document).find('.btn_save').hide();
-        $(document).find('.btn_cancel').hide(); 
-
-
-        //--->make div editable > start
-        $(document).on('click', '.row_data', function(event) 
-        {
-            event.preventDefault(); 
-
-            if($(this).attr('edit_type') == 'button')
-            {
-                return false; 
-            }
-
-            //make div editable
-            $(this).closest('div').attr('contenteditable', 'true');
-            //add bg css
-            $(this).addClass('bg-warning').css('padding','5px');
-
-            $(this).focus();
-        })	
-        //--->make div editable > end
-
-
-        //--->save single field data > start
-        $(document).on('focusout', '.row_data', function(event) 
-        {
-            event.preventDefault();
-
-            if($(this).attr('edit_type') == 'button')
-            {
-                return false; 
-            }
-
-            var row_id = $(this).closest('tr').attr('row_id'); 
-            
-            var row_div = $(this)				
-            .removeClass('bg-warning') //add bg css
-            .css('padding','')
-
-            var col_name = row_div.attr('col_name'); 
-            var col_val = row_div.html(); 
-
-            var arr = {};
-            arr[col_name] = col_val;
-
-            //use the "arr"	object for your ajax call
-            $.extend(arr, {row_id:row_id});
-
-            //out put to show
-            $('.post_msg').html( '<pre class="bg-success">'+JSON.stringify(arr, null, 2) +'</pre>');
-            
-        })	
-        //--->save single field data > end
-
-    
-        //--->button > edit > start	
-        $(document).on('click', '.btn_edit', function(event) 
-        {
-            event.preventDefault();
-            var tbl_row = $(this).closest('tr');
-
-            var row_id = tbl_row.attr('row_id');
-
-            tbl_row.find('.btn_save').show();
-            tbl_row.find('.btn_cancel').show();
-
-            //hide edit button
-            tbl_row.find('.btn_edit').hide(); 
-
-            //make the whole row editable
-            tbl_row.find('.row_data')
-            .attr('contenteditable', 'true')
-            .attr('edit_type', 'button')
-            .addClass('bg-warning')
-            .css('padding','3px')
-
-            //--->add the original entry > start
-            tbl_row.find('.row_data').each(function(index, val) 
-            {  
-                //this will help in case user decided to click on cancel button
-                $(this).attr('original_entry', $(this).html());
-            }); 		
-            //--->add the original entry > end
-
-        });
-        //--->button > edit > end
-
-
-        //--->button > cancel > start	
-        $(document).on('click', '.btn_cancel', function(event) 
-        {
-            event.preventDefault();
-
-            var tbl_row = $(this).closest('tr');
-
-            var row_id = tbl_row.attr('row_id');
-
-            //hide save and cacel buttons
-            tbl_row.find('.btn_save').hide();
-            tbl_row.find('.btn_cancel').hide();
-
-            //show edit button
-            tbl_row.find('.btn_edit').show();
-
-            //make the whole row editable
-            tbl_row.find('.row_data')
-            .attr('edit_type', 'click')
-            .removeClass('bg-warning')
-            .css('padding','') 
-
-            tbl_row.find('.row_data').each(function(index, val) 
-            {   
-                $(this).html( $(this).attr('original_entry') ); 
-            });  
-        });
-        //--->button > cancel > end
-
-        
-        //--->save whole row entery > start	
-        $(document).on('click', '.btn_save', function(event) 
-        {
-            event.preventDefault();
-            var tbl_row = $(this).closest('tr');
-
-            var row_id = tbl_row.attr('row_id');
-
-            
-            //hide save and cacel buttons
-            tbl_row.find('.btn_save').hide();
-            tbl_row.find('.btn_cancel').hide();
-
-            //show edit button
-            tbl_row.find('.btn_edit').show();
-
-
-            //make the whole row editable
-            tbl_row.find('.row_data')
-            .attr('edit_type', 'click')
-            .removeClass('bg-warning')
-            .css('padding','') 
-
-            //--->get row data > start
-            var arr = {}; 
-            tbl_row.find('.row_data').each(function(index, val) 
-            {   
-                var col_name = $(this).attr('col_name');  
-                var col_val  =  $(this).html();
-                arr[col_name] = col_val;
-            });
-            //--->get row data > end
-
-            //use the "arr"	object for your ajax call
-            $.extend(arr, {row_id:row_id});
-
-            //out put to show
-            $('.post_msg').html( '<pre class="bg-success">'+JSON.stringify(arr, null, 2) +'</pre>')
-            
-
-        });
-        //--->save whole row entery > end
-    
-
-    });
-     
-
-    // test code ends
-
     // test code
-    $('#proxies').DataTable();
+    // code for rendering csv data on the screen
+    var columnDefs = [
+            {   headerName: "",
+                children:[{field: 'participantId'}, {field: 'date'}]
+            },
+            {
+                headerName: 'screenFeatures',
+                children: [{field: 'noScreenLocks', filter: 'agNumberColumnFilter'}, {field: 'firstScreenUnlock', filter: 'agNumberColumnFilter'}, {field: 'lastScreenLock', filter: 'agNumberColumnFilter'}, {field: 'maxScreenTime', filter: 'agNumberColumnFilter'}, {field: 'totalScreenTime', filter: 'agNumberColumnFilter'}]
+            },
+            {
+                headerName: 'callingFeatures',
+                children: [{field: 'noMissed'}, {field: 'noDialled'}, {field: 'noIncoming'}, {field: 'minDurationIncoming'}, {field: 'maxDurationIncoming'}, {field: 'totalDurationIncoming'}, {field: 'noOutgoing'}, {field: 'minDurationOutgoing'}, {field: 'maxDurtaionOutgoing'}, {field: 'totalDurationOutgoing'}, {field: 'totalNoCalls'}, {field: 'totalDurationCalls'}]
+            },
+            {
+                headerName: 'mobilityFeatures',
+                children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
+            },
+            {
+                headerName: 'sleepFeatures',
+                children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}, {field: 'sleepStartTime2'}, {field: 'sleepEndTime2'}, {field: 'sleepDuration2'}, {field: 'totalSleepDuration'}, {field: 'noSleepInterruptions'}, {field: 'depressionScore'}]
+            }
+        ];
+
+        // fields = ['participantId', 'date', 'depressionScore', 'firstScreenUnlock', 'lastScreenLock', 'locationEntropy', 'locationVariance', 'maxDurationIncoming', 'maxDurtaionOutgoing', 'maxScreenTime', 'minDurationIncoming', 'minDurationOutgoing', 'noDialled', 'noIncoming', 'noMissed', 'noOutgoing', 'noScreenLocks', 'noSleepInterruptions', 'noStayPoints', 'sleepDuration1', 'sleepDuration2', 'sleepEndTime1', 'sleepEndTime2', 'sleepStartTime1', 'sleepStartTime2', 'stepCount', 'totalDistance', 'totalDurationCalls', 'totalDurationIncoming', 'totalDurationOutgoing', 'totalNoCalls', 'totalScreenTime', 'totalSleepDuration']
+        // for (var i=0; i<fields.length; i++ ){
+        //     columnDefs.push({"field": fields[i]})
+        // }
+
+        // let the grid know which columns to use
+        const gridOptions = {
+        // Group columns
+        groupHeaderHeight: 40,
+        // Label columns
+        headerHeight: 40,
+
+        defaultColDef: {
+        // flex: 1,
+        minWidth: 100,
+        sortable: true,
+        filter: true,
+        resizable: true,
+        editable: true,
+        },
+
+        debug: false,
+        columnDefs: columnDefs,
+        rowData: null,
+        sideBar: true,
+        enableCellChangeFlash: true,
+        rowDragManaged: true,
+        enterMovesDownAfterEdit: true,
+        enterMovesDown: true,
+        };
+    
+    function onBtnImport() {
+        var el   = document.getElementById("chart4"); // or other selector like querySelector()
+        var rect = el.getBoundingClientRect(); // get the bounding rectangle
+        $("#csvGrid").width(rect.width)
+        $("#csvGrid").height(rect.width / 2)
+        $("#showcsv").css("visibility", "hidden")
+        $("#hidecsv").css("visibility", "visible")
+        $("#downloadcsv").css("visibility", "visible")
+        $("#updatecsv").css("visibility", "visible")
+
+        var gridDiv = document.querySelector('#csvGrid');
+        
+        new agGrid.Grid(gridDiv, gridOptions);
+            $.ajax({
+                type: "GET",
+                url: '/dataTable',
+                async: false,
+                success : function(data) {
+                    gridOptions.api.setRowData(data)
+                }
+            });
+    }
+
+    function onBtnRemove(){
+        $("#showcsv").css("visibility", "visible")
+        $("#hidecsv").css("visibility", "hidden")
+        $("#downloadcsv").css("visibility", "hidden")
+        $("#updatecsv").css("visibility", "hidden")
+        $("#csvGrid").children("div").eq(0).remove();
+    }
+
+    function onBtnUpdate() {
+    // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
+    data = gridOptions.api.getDataAsCsv();
+    $.ajax({
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                url: "/dataTable",
+                success: function(status) {
+                    console.log(status)
+                }
+            });
+    }
+
+    function onBtnExport() {
+        $("#downloadcsv").css("visibility", "hidden")
+        gridOptions.api.exportDataAsCsv();
+    }
     // test code ends
 
     </script>

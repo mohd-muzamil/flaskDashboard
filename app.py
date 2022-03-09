@@ -1,4 +1,5 @@
 from crypt import methods
+from email.header import Header
 from importlib.machinery import DEBUG_BYTECODE_SUFFIXES
 from math import ceil
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
@@ -185,7 +186,7 @@ def dimReduceParticipants():
     global featureData
     global personalityData
 
-    featureData = pd.read_csv(os.path.join("data", featureFile)).groupby("participantId").mean().reset_index()
+    featureData = pd.read_csv(os.path.join("data/processedData", featureFile)).groupby("participantId").mean().reset_index()
     personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
 
     columns = featureData.columns.values[2:]    #get all the feature columns
@@ -248,7 +249,7 @@ def filterParticipantsDummy():
         data = pd.DataFrame()
         for attr,checkState in attributes.items():
             if checkState:
-                df = pd.read_csv(os.path.join("data", filenames[attr]))
+                df = pd.read_csv(os.path.join("data/processedData", filenames[attr]))
                 df = df[df["participantId"] == participantId]#.sample(frac=0.001)
 
                 #Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
@@ -339,7 +340,7 @@ def fetchAggFeatures():
     Returns Data for Chart3: Parallel cordinate chart to visualize extracted features
     """
     print("Request recieved for fetching Aggregated feature data")
-    data = pd.read_csv(os.path.join("data", featureFile))
+    data = pd.read_csv(os.path.join("data/processedData", featureFile))
     # Aggregating based on participantId
     data = data.groupby("participantId").mean().reset_index()
 
@@ -364,7 +365,7 @@ def fetchIndividualFeatures():
         participantId = content['participantId']
 
         print("Request recieved for fetching individual feature data")
-        data = pd.read_csv(os.path.join("data", featureFile))
+        data = pd.read_csv(os.path.join("data/processedData", featureFile))
         # Fetching data for selected participant
         data = data[data["participantId"]==participantId]#.sample(frac=0.001)
 
@@ -378,7 +379,7 @@ def fetchIndividualFeatures():
 def dataTable(): 
     print("from route dataTable", request.method)
     if request.method == 'GET':
-        df = pd.read_csv(os.path.join("data", featureFile))
+        df = pd.read_csv(os.path.join("data/processedData", featureFile))
         fieldnames = df.columns
         # len = df.shape[0]
         # resp = make_response(df.to_csv())
@@ -399,11 +400,23 @@ def dataTable():
         return jsonify(results)
     
     if request.method == 'POST':
-        pass
+        content = request.get_json()
 
+        data = content.split("\r\n")[1:]
+        data1 = []
+        [data1.append(d.replace("\"", "").split(",")) for d in data]
+        df = pd.read_csv(os.path.join("data/processedData", featureFile))
+        df.drop(df.index, inplace=True)
+        df = pd.DataFrame(data1[1:], columns=df.columns)
+        os.remove(os.path.join("data/processedData", featureFile))
+        df.to_csv(os.path.join("data/processedData", featureFile), index=False, header=True)
 
+        print("File updated")
 
-# test code ends
+        message = "Feature file updated by the user"
+        return jsonify(message)
+        # test code ends
+
 
 if __name__ == "__main__":
     app.run(port=5003, debug=True)

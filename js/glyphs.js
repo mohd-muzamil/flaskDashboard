@@ -1,6 +1,6 @@
 // ****Importatnt file****
 //This script is used to plot radial glyphs in first svg
-function glyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -256,8 +256,10 @@ function glyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature,
                 }
 
                 selectedParticipantId = d.participantId
-                updatePlotAreaChart(dependendChart1, dependendChart2, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
-                updateParallelCord(dependendChart2, selectedParticipantId, feature, featurelist)
+                updatePlotAreaChart(dependendChart1, dependendChart3, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
+                updateParallelCord(dependendChart2, selectedParticipantId, feature="aggregatedFeatures", featurelist)
+                updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
+
                 return selectedParticipantId
             });
         }
@@ -326,14 +328,15 @@ function glyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature,
         }
     
     // Plotting chart2 and chart3 with randomly selected participant 
-    updatePlotAreaChart(dependendChart1, dependendChart2, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
-    updateParallelCord(dependendChart2, selectedParticipantId, feature, featurelist)
+    updatePlotAreaChart(dependendChart1, dependendChart3, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
+    updateParallelCord(dependendChart2, selectedParticipantId, feature="aggregatedFeatures", featurelist)
+    // updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
     })
 }
 
-function updateGlyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+function updateGlyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
     d3.select("#" + chart).selectAll('g').remove();
     d3.select("#" + dependendChart1).selectAll('g').remove();
     d3.select("#" + dependendChart2).selectAll('g').remove();
-    glyphs(chart, dependendChart1, dependendChart2, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked)
+    glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked)
 }

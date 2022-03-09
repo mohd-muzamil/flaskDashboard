@@ -386,5 +386,6 @@ function parallelCord(chart) {
 }
 
 function updateParallelCord(chart) {
+    console.log("parallel cord chart called")
     parallelCord(chart)
 }

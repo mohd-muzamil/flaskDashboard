@@ -389,9 +389,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
                             starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
                             starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
                             
-                            if (feature=="individualFeatures"){
-                                updateParallelCord(dependendChart, participantId, feature, featurelist, starting_min_date, starting_max_date)
-                            }
+                            updateParallelCord(dependendChart, participantId, feature="individualFeatures", featurelist, starting_min_date, starting_max_date)
                         }
 
                     })
@@ -482,9 +480,7 @@ function updatePlotAreaChart(chart, dependendChart, participantId, feature, feat
     // pathColor = "green";
     
     plotAreaChart(chart, dependendChart, participantId, attributes, feature, featurelist)
-    if (feature=="individualFeatures"){
-        updateParallelCord(dependendChart, participantId, feature, featurelist)
-    }
+    updateParallelCord(dependendChart, participantId, feature="individualFeatures", featurelist)
 
     // //accelerometerData
     // if (accChecked == true) {

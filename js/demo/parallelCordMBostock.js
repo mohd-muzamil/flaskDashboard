@@ -17,6 +17,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
 
     var featuresNames = featurelist
     var featuresCodes = featurelist
+    var titleText
 
     var margin = { left: 30, top: 25, right: 20, bottom: 50 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
@@ -312,7 +313,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
     });
 }
 
-function updateParallelCord(chart, participantId, feature, featurelist, starting_min_date="", starting_max_date=""){
+function updateParallelCord(chart, participantId, feature, featurelist, starting_min_date="", starting_max_date=""){   
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
     parallelCord(chart, participantId, feature, featurelist, starting_min_date, starting_max_date)
