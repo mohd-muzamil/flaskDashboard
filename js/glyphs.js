@@ -1,7 +1,7 @@
 /****Importatnt file****/
 // This script is used to plot glyphs in first svg
 
-function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, selectedParticipants, featurelist, radius, glyph, labels, brtChecked, accChecked, gyrChecked, lckChecked) {
     const config = {
         r: +radius,
         opacityLow: 0,
@@ -34,10 +34,10 @@ function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph,
         .style("z-index", "10")
         .style("visibility", "hidden")
         .style('font-size', '1em')
-        .style("border-width", "2px")
         .style("padding", "5px")
         .style('background-color', 'white')
-        .style('border-radius', '10% 10% 10% 10%');
+        .style('border-radius', '5px')
+        .style("border-width", "2px");
 
     // reading data directly
     //d3.csv("../../data/participant_scores", function(error, data) {
@@ -257,10 +257,17 @@ function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph,
                 }
 
                 selectedParticipantId = d.participantId
-                updatePlotAreaChart(dependendChart1, dependendChart3, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
+                // updatePlotAreaChart(dependendChart1, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
                 updateParallelCord(dependendChart2, selectedParticipantId, feature="aggregatedFeatures", featurelist)
-                updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
 
+                var delayInMilliseconds = 10000; //1 second
+                setTimeout(function() {
+                    //your code to be executed after 1 second
+                    // updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
+                    console.log("have to call the individual cart")
+                }, delayInMilliseconds);
+
+                updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
                 return selectedParticipantId
             });
         }
@@ -327,17 +334,15 @@ function glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph,
             // if (labels == true)
             //         addSelectedText()
         }
-    
     // Plotting chart2 and chart3 with randomly selected participant 
-    updatePlotAreaChart(dependendChart1, dependendChart3, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
-    updateParallelCord(dependendChart2, selectedParticipantId, feature="aggregatedFeatures", featurelist)
-    // updateParallelCord(dependendChart3, selectedParticipantId, feature="individualFeatures", featurelist)
+    // updatePlotAreaChart(dependendChart1, selectedParticipantId, feature, featurelist, brtChecked, accChecked, gyrChecked, lckChecked)
     })
 }
 
-function updateGlyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked) {
+
+function updateGlyphs(chart, dependendChart1, dependendChart2, dependendChart3, selectedParticipants, featurelist, radius, glyph, labels, brtChecked, accChecked, gyrChecked, lckChecked) {
+    console.log("glyphs called")
     d3.select("#" + chart).selectAll('g').remove();
     d3.select("#" + dependendChart1).selectAll('g').remove();
-    d3.select("#" + dependendChart2).selectAll('g').remove();
-    glyphs(chart, dependendChart1, dependendChart2, dependendChart3, glyph, labels, feature, featurelist, radius, brtChecked, accChecked, gyrChecked, lckChecked)
+    glyphs(chart, dependendChart1, dependendChart2, dependendChart3, selectedParticipants, featurelist, radius, glyph, labels, brtChecked, accChecked, gyrChecked, lckChecked)
 }

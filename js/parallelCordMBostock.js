@@ -21,6 +21,23 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
     var featuresCodes = featurelist
     var titleText
 
+    // if (feature == "aggregatedFeatures"){
+    //     if (!featuresNames.includes("participantId")){
+    //         console.log("before")
+    //     }
+    //     console.log('adding extra column')
+    //     featuresNames.push("participantId")
+    //     if (featuresNames.includes("participantId")){
+    //         console.log("after")
+    //     }
+    // }
+    // else {
+    //     featuresNames.pop("participantId")
+    //     featuresNames.push("date")
+    // }
+
+    var featuresCodes = featuresNames
+
     var margin = { left: 30, top: 25, right: 20, bottom: 50 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom,
@@ -77,28 +94,35 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
         function(data) {
-        filteredData = data
+        var filteredData = data
+        console.log(filteredData)
         if(feature == "individualFeatures" & (starting_min_date!="" | starting_max_date!="")){ 
             var filteredData = data.filter((d)=>{ 
             if(d.date>=starting_min_date & d.date<=starting_max_date)
                 return d
             }   
         )}
+
+        
+
+        var prtcpnts = [...new Set(filteredData.map(d => d["participantId"]))]
+        
         
         // Create a scale and brush for each trait.
         featuresCodes.forEach(function(d) {
             // Coerce values to numbers.
-            data.forEach(function(p) {p[d] = +p[d]; });
-
+            
+            filteredData.forEach(function(p) {p[d] = +p[d]; });            
             if( d == "participantId" ) {
-                console.log('participantId')
-                // y[d] = d3.scaleBand()
-                //     .domain(participants)
-                //     .range([0, height]);
+                y[d] = d3.scaleOrdinal()
+                    .domain(prtcpnts)
+                    .range(d3.range(height, 0, -height/prtcpnts.length));
             }
-            else if (d == "date") {
-                console.log('date')
-            }
+            // else if (d == "date") {
+            //     y[d] = d3.scateTime()
+            //         .domain(p[d])
+            //         .range([0, height]);
+            // }
             else {
             y[d] = d3.scaleLinear()
                 .domain(d3.extent(data, function(p) { return +p[d]; }))
@@ -111,6 +135,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
                 .on("start", brushstart)
                 .on("end", brush);
         });
+
 
         // Add grey background lines for context.
         background = svg.append("svg:g")
@@ -167,8 +192,20 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             .data(filteredData)
             .enter().append("svg:path")
             .attr("d", path)
+            .attr("stroke", "red")
+            // .attr("stroke-width", 2)
             .attr("stroke", function(d){ 
                 return (feature == "aggregatedFeatures") ? colorClusters(d.clusters) : line_color;
+            })
+            // .attr("stroke-width", 5)
+            .attr("opacity", function(d){ 
+                if(feature == "aggregatedFeatures"){
+                return d.participantId==participantId ? 1 : 0.8;
+                }
+                else{
+                    return 1
+                }
+            // //     return (feature == "aggregatedFeatures") ? 2 : 1;
             })
             // .attr("class", function(d) { return d.featuresNames; });     can use cluster label to color code the lines
 
@@ -262,7 +299,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         }
             // Returns the path for a given data point.
         function path(d) {
-            return line(featuresCodes.map(function(p) { return [position(p), y[p](d[p])]; }));
+            return line(featuresCodes.map(function(p) { if (p=="participantId"){console.log(d);} return [position(p), y[p](d[p])]; }));
         }
 
 
@@ -316,6 +353,10 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
 }
 
 function updateParallelCord(chart, participantId, feature, featurelist, starting_min_date="", starting_max_date=""){   
+    console.log("parallel cord called")
+    if(Array.isArray(participantId)){
+        participantId = participantId[0]
+    }
     d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
     parallelCord(chart, participantId, feature, featurelist, starting_min_date, starting_max_date)

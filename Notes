@@ -73,7 +73,7 @@ Feature2: Location variance
 Feature3: Number of Clusters
 Feature4: Location Entropy
 Feature5: Normalized Location Entropy
-Feature6: Circadian Movement`
+Feature6: Circadian Movement
 Feature7: Transition Time
 Feature8: Total Distance
 

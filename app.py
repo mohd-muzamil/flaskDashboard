@@ -2,6 +2,7 @@ from crypt import methods
 from email.header import Header
 from importlib.machinery import DEBUG_BYTECODE_SUFFIXES
 from math import ceil
+from timeit import repeat
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 from matplotlib.pyplot import connect
 from pymongo import MongoClient
@@ -21,7 +22,7 @@ from sklearn.decomposition import PCA
 from sklearn import preprocessing
 import time
 from removeOverlap.dgrid import *
-from removeOverlap.force_scheme import *
+# from removeOverlap.force_scheme import *
 # import * from generate_data_circle_packing
 
 # featureFile = "dummyFeatureData"
@@ -62,20 +63,22 @@ def getTSNE(df, columns, width, height):
     df = df.groupby("participantId").mean().reset_index()
     tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, init='pca')
     tsne_result = tsne.fit_transform(df.loc[:,columns])
+    
+    tsne_result_overlap_removed = tsne_result
 
+    # comment this section to remove Dgrid
     x = np.expand_dims(tsne_result[:,0], axis=1)
     y = np.expand_dims(tsne_result[:,1], axis=1)
 
-    # if width is not None and height is not None:
-    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
-    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-    #     cords = np.concatenate((x,y), axis=1)
-    #     cords = preprocessing.StandardScaler().fit_transform(cords)
-    #     cords = ForceScheme().fit_transform(cords)
-    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    # else:
-    #     tsne_result_overlap_removed = tsne_result
-    tsne_result_overlap_removed = tsne_result
+    if width is not None and height is not None:
+        x = np.interp(x, (x.min(), x.max()), (20, width-20))
+        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+        cords = np.concatenate((x,y), axis=1)
+        cords = preprocessing.StandardScaler().fit_transform(cords)
+        cords = ForceScheme().fit_transform(cords)
+        tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    else:
+        tsne_result_overlap_removed = tsne_result
 
     tsne_x = tsne_result_overlap_removed[:,0]
     tsne_y = tsne_result_overlap_removed[:,1]
@@ -306,6 +309,8 @@ def filterParticipantsNew():
                 for date in df.date.unique():
                     dfDate = df[df.date == date].copy()
                     dfDate = pd.merge(dfDate, allMinutes, how="right", on="minuteOfTheDay")
+                
+                # df_call["MinuteOfTheDay"] = (df_call.timestamp - df_call.timestamp.dt.floor('d')).astype('timedelta64[m]')
                     
                     if attr == "lck":
                         dfDate.loc[0,attr]=0
@@ -343,12 +348,9 @@ def fetchAggFeatures():
     data = pd.read_csv(os.path.join("data/processedData", featureFile))
     # Aggregating based on participantId
     data = data.groupby("participantId").mean().reset_index()
-
     #getting cluster id for participants form personality file
     df = pd.read_csv(os.path.join("data/processedData", personalityFile)).loc[:, ["participantId", "clusters"]]
-    print(data.info(), df.info())
-    data = data.join(df, how="left", lsuffix="participantId", rsuffix="participantId")
-
+    data = pd.merge(data, df, how="left")
     resp = make_response(data.to_csv(index=False))
     resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
     resp.headers["Content-Type"] = "text/csv"
@@ -367,7 +369,8 @@ def fetchIndividualFeatures():
         print("Request recieved for fetching individual feature data")
         data = pd.read_csv(os.path.join("data/processedData", featureFile))
         # Fetching data for selected participant
-        data = data[data["participantId"]==participantId]#.sample(frac=0.001)
+        data = data[data["participantId"]==participantId].copy()
+        print('INDIVIDUAL'*10,"\n", data.info(memory_usage='deep'))
 
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
@@ -377,7 +380,6 @@ def fetchIndividualFeatures():
 # test code
 @app.route('/dataTable', methods=['GET', 'POST'])
 def dataTable(): 
-    print("from route dataTable", request.method)
     if request.method == 'GET':
         df = pd.read_csv(os.path.join("data/processedData", featureFile))
         fieldnames = df.columns
@@ -417,6 +419,14 @@ def dataTable():
         return jsonify(message)
         # test code ends
 
+
+# Get a random patritipant that can be used to have a selection when page is refreshed
+@app.route('/getRandomParticipant', methods=['GET'])
+def getRandomParticipant():
+    df = pd.read_csv(os.path.join("data/processedData", personalityFile))
+    participants = df.participantId.unique()
+    participant = [(np.random.choice(participants, replace=False))]
+    return jsonify(participant)
 
 if __name__ == "__main__":
     app.run(port=5003, debug=True)
