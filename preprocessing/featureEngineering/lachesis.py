@@ -1,3 +1,7 @@
+"""
+Code implementaion from https://github.com/sebastianbertoli/Github-internship_human_mobility.git
+"""
+
 import pandas as pd
 from datetime import timedelta
 from sklearn.metrics.pairwise import euclidean_distances, pairwise_distances
