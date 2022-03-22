@@ -44,16 +44,18 @@ def getPCA(df, columns, width, height):
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(df.loc[:,columns])
 
+    pca_result_overlap_removed = pca_result
+
     x = np.expand_dims(pca_result[:,0], axis=1)
     y = np.expand_dims(pca_result[:,1], axis=1)
 
-    if width is not None and height is not None:
-        x = np.interp(x, (x.min(), x.max()), (20, width-20))
-        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-        cords = np.concatenate((x,y), axis=1)
-        pca_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    else:
-        pca_result_overlap_removed = pca_result
+    # if width is not None and height is not None:
+    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
+    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+    #     cords = np.concatenate((x,y), axis=1)
+    #     pca_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    # else:
+    #     pca_result_overlap_removed = pca_result
 
     pca_x = pca_result_overlap_removed[:,0]
     pca_y = pca_result_overlap_removed[:,1]
@@ -70,15 +72,15 @@ def getTSNE(df, columns, width, height):
     x = np.expand_dims(tsne_result[:,0], axis=1)
     y = np.expand_dims(tsne_result[:,1], axis=1)
 
-    if width is not None and height is not None:
-        x = np.interp(x, (x.min(), x.max()), (20, width-20))
-        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-        cords = np.concatenate((x,y), axis=1)
-        cords = preprocessing.StandardScaler().fit_transform(cords)
-        cords = ForceScheme().fit_transform(cords)
-        tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    else:
-        tsne_result_overlap_removed = tsne_result
+    # if width is not None and height is not None:
+    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
+    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+    #     cords = np.concatenate((x,y), axis=1)
+    #     cords = preprocessing.StandardScaler().fit_transform(cords)
+    #     cords = ForceScheme().fit_transform(cords)
+    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    # else:
+    #     tsne_result_overlap_removed = tsne_result
 
     tsne_x = tsne_result_overlap_removed[:,0]
     tsne_y = tsne_result_overlap_removed[:,1]
@@ -209,7 +211,8 @@ def dimReduceParticipants():
     else:
         message = "status3:file reset"
     
-    x, y = getTSNE(featureData, columns, width, height)     #dim reduction
+    # x, y = getTSNE(featureData, columns, width, height)     #dim reduction
+    x, y = getPCA(featureData, columns, width, height)     #dim reduction
     # clusters = getClusters(featureData, columns, clusteringMethod="spectral")    #spectralClustering
     # clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #k-means clustering
 

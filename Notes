@@ -69,12 +69,16 @@ Feature12: Total duration of any calls in a daily section
 
 Mobility Features--------
 Feature1: Step Count in a daily section
+
 Feature2: Location variance
+No of stay points
+
 Feature3: Number of Clusters
 Feature4: Location Entropy
 Feature5: Normalized Location Entropy
-Feature6: Circadian Movement
+<!-- Feature6: Circadian Movement -->
 Feature7: Transition Time
+
 Feature8: Total Distance
 
 Estimated Sleep Features--------
