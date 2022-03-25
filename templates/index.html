@@ -51,7 +51,7 @@
                         <hr class="line">
 
                         <div style="padding-left:10px; text-align: center;">
-                            <label> Feature selection</label>
+                            <label>Feature selection</label>
                             <select id="featureSelect" multiple>
                             <optgroup label="Screen">
                                 <option value="noScreenLocks" selected="selected">No of Unlocks</option>
@@ -76,23 +76,19 @@
                                 <option value="totalDurationCalls" selected="selected">Total dur of all calls</option>
                             </optgroup>
 
-                            <optgroup label="Mobility">
-                                <option value="stepCount" selected="selected">No of steps</option>
-                                <option value="totalDistance" selected="selected">Total Distance</option>
-                                <option value="noStayPoints" selected="selected">No of Stay Points</option>
+                            <!-- <optgroup label="Mobility">
+                                <option value="noOfStayPoints" selected="selected">No of stay points</option>
                                 <option value="locationVariance" selected="selected">Location Variance</option>
-                                <option value="locationEntropy" selected="selected">Location Entropy</option>
-                            </optgroup>
+                                <option value="entropy" selected="selected">Entropy</option>
+                                <option value="normalizedEntropy" selected="selected">Normalized Entropy</option>
+                                <option value="homeStay" selected="selected">Home stay</option>
+                                <option value="radiusOfGyration" selected="selected">Radius of Gyration</option>
+                            </optgroup> -->
 
                             <optgroup label="Sleep">
-                                <option value="sleepStartTime1" selected="selected">Sleep start time 1</option>
-                                <option value="sleepEndTime1" selected="selected">Sleep end time 1</option>
-                                <option value="sleepDuration1" selected="selected">Sleep duration 1</option>
-                                <option value="sleepStartTime2" selected="selected">Sleep start time 2</option>
-                                <option value="sleepEndTime2" selected="selected">Sleep end time 2</option>
-                                <option value="sleepDuration2" selected="selected">Sleep duration 2</option>
-                                <option value="totalSleepDuration" selected="selected">Total Sleep duration</option>
-                                <option value="noSleepInterruptions" selected="selected">No of sleep Interruptions</option>
+                                <option value="sleepStartTime" selected="selected">Sleep start Time</option>
+                                <option value="sleepEndTime" selected="selected">Sleep end Time</option>
+                                <option value="sleepDuration" selected="selected">Sleep duration</option>
                             </optgroup>
                         </select>
                         </div>
@@ -557,13 +553,13 @@
                     headerName: 'callingFeatures',
                     children: [{field: 'noMissed'}, {field: 'noDialled'}, {field: 'noIncoming'}, {field: 'minDurationIncoming'}, {field: 'maxDurationIncoming'}, {field: 'totalDurationIncoming'}, {field: 'noOutgoing'}, {field: 'minDurationOutgoing'}, {field: 'maxDurtaionOutgoing'}, {field: 'totalDurationOutgoing'}, {field: 'totalNoCalls'}, {field: 'totalDurationCalls'}]
                 },
-                {
-                    headerName: 'mobilityFeatures',
-                    children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
-                },
+                // {
+                //     headerName: 'mobilityFeatures',
+                //     children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
+                // },
                 {
                     headerName: 'sleepFeatures',
-                    children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}, {field: 'sleepStartTime2'}, {field: 'sleepEndTime2'}, {field: 'sleepDuration2'}, {field: 'totalSleepDuration'}, {field: 'noSleepInterruptions'}, {field: 'depressionScore'}]
+                    children: [{field: 'sleepStartTime1'}, {field: 'sleepEndTime1'}, {field: 'sleepDuration1'}]
                 }
             ];
 

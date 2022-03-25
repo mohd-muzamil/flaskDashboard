@@ -1,3 +1,13 @@
+"""
+Script for extracting below sleep related features using IOS lockstate, brightness, accelerometer and gyroscope data
+
+Feature1(sleepStartTime): Estimated start time of the sleep
+Feature2(sleepEndTime): Estimated end time of the sleep
+Feature3(sleepDuration): Estimated sleep duration
+
+input/output file names need to be specifed in the code below #config
+"""
+
 from imports import *
 
 
@@ -46,34 +56,35 @@ def getIosSleepFeatures(dataPath, featurePath):
     '''
     print("Begin extraction - Sleep features")
 
+    # config
     # screen state data
-    # dataFilename1 = "Lock_state.csv"
-    dataFilename1 = "Lock_state_temp.csv"
+    dataFilename1 = "Lock_state.csv"
+    # dataFilename1 = "Lock_state_temp.csv"
     # brightness data
-    # dataFilename2 = "Brightness.csv"
-    dataFilename2 = "Brightness_temp.csv"
+    dataFilename2 = "Brightness.csv"
+    # dataFilename2 = "Brightness_temp.csv"
     # accelerometer data
-    # dataFilename3 = "Accelerometer.csv"
-    dataFilename3 = "Accelerometer_temp.csv"
+    dataFilename3 = "Accelerometer.csv"
+    # dataFilename3 = "Accelerometer_temp.csv"
     # gyroscope data
-    # dataFilename4 = "Gyroscope.csv"
-    dataFilename4 = "Gyroscope_temp.csv"
+    dataFilename4 = "Gyroscope.csv"
+    # dataFilename4 = "Gyroscope_temp.csv"
 
 
     date = datetime.now().strftime("%Y%m%d_%I%M%S%p")
     featureFilename = "ios_sleep_features_" + dataPath.split("/")[-1] + "_" + date + ".csv"
 
     if not (os.path.exists(os.path.join(dataPath, dataFilename1))):
-        sys.exit(f"{dataFilename1} file does not exist in {dataPath} folder")
+        sys.exit(f"{dataFilename1} file does not exist in {dataPath} folder \nscript aborted")
     
     if not (os.path.exists(os.path.join(dataPath, dataFilename2))):
-        sys.exit(f"{dataFilename2} file does not exist in {dataPath} folder")
+        sys.exit(f"{dataFilename2} file does not exist in {dataPath} folder \nscript aborted")
     
     if not (os.path.exists(os.path.join(dataPath, dataFilename3))):
-        sys.exit(f"{dataFilename3} file does not exist in {dataPath} folder")
+        sys.exit(f"{dataFilename3} file does not exist in {dataPath} folder \nscript aborted")
 
     if not (os.path.exists(os.path.join(dataPath, dataFilename4))):
-        sys.exit(f"{dataFilename4} file does not exist in {dataPath} folder")
+        sys.exit(f"{dataFilename4} file does not exist in {dataPath} folder \nscript aborted")
 
 
     ##################################################################
@@ -266,10 +277,12 @@ def getIosSleepFeatures(dataPath, featurePath):
     
     #saving the file
     sleepFeatures.to_csv(os.path.join(featurePath, featureFilename), header=True, index=False)
-    print("End")
+
+    print("Extraction of Sleep features compelted")
 
 
 if __name__ == "__main__":
+    # config
     dataPath1 = "/csv/backup_frigg1"
     dataPath2 = "/csv/backup"
     featurePath = "/csv/features"

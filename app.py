@@ -25,18 +25,18 @@ from removeOverlap.dgrid import *
 # from removeOverlap.force_scheme import *
 # import * from generate_data_circle_packing
 
+# personalityFile = "dummyPersonalityScores"
 # featureFile = "dummyFeatureData"
-# personalityFile = "dummyPersonalityScores"``
 # brightnessFile = "dummyBrightness"
 # accelerometerFile = "dummyAccelerometer"
 # gyroscopeFIle = "dummyGyroscope"
 
-featureFile = "dummyFeatureData"
-personalityFile = "participant_scores_temp"
-brightnessFile = "brightness"
-accelerometerFile = "accelerometer"
-gyroscopeFile = "gyroscope"
-lockStateFile = "lockstate"
+personalityFile = "PersonalityScores.csv"
+featureFile = "featureData.csv"
+brightnessFile = "brightness_processed.csv"
+accelerometerFile = "accelerometer_processed.csv"
+gyroscopeFile = "gyroscope_processed.csv"
+lockStateFile = "lockstate_processed.csv"
 
 
 def getPCA(df, columns, width, height):
@@ -49,20 +49,20 @@ def getPCA(df, columns, width, height):
     x = np.expand_dims(pca_result[:,0], axis=1)
     y = np.expand_dims(pca_result[:,1], axis=1)
 
-    # if width is not None and height is not None:
-    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
-    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-    #     cords = np.concatenate((x,y), axis=1)
-    #     pca_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    # else:
-    #     pca_result_overlap_removed = pca_result
+    if width is not None and height is not None:
+        x = np.interp(x, (x.min(), x.max()), (20, width-20))
+        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+        cords = np.concatenate((x,y), axis=1)
+        pca_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
+    else:
+        pca_result_overlap_removed = pca_result
 
     pca_x = pca_result_overlap_removed[:,0]
     pca_y = pca_result_overlap_removed[:,1]
     return pca_x, pca_y
 
 def getTSNE(df, columns, width, height):
-    df = df.groupby("participantId").mean().reset_index()
+    # df = df.groupby("participantId").mean().reset_index()
     tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, init='pca')
     tsne_result = tsne.fit_transform(df.loc[:,columns])
     
@@ -72,15 +72,15 @@ def getTSNE(df, columns, width, height):
     x = np.expand_dims(tsne_result[:,0], axis=1)
     y = np.expand_dims(tsne_result[:,1], axis=1)
 
-    # if width is not None and height is not None:
-    #     x = np.interp(x, (x.min(), x.max()), (20, width-20))
-    #     y = np.interp(y, (y.min(), y.max()), (height-20, 20))
-    #     cords = np.concatenate((x,y), axis=1)
-    #     cords = preprocessing.StandardScaler().fit_transform(cords)
-    #     cords = ForceScheme().fit_transform(cords)
-    #     tsne_result_overlap_removed = DGrid(icon_width=1, icon_height=1, delta=2).fit_transform(cords)
-    # else:
-    #     tsne_result_overlap_removed = tsne_result
+    if width is not None and height is not None:
+        x = np.interp(x, (x.min(), x.max()), (20, width-20))
+        y = np.interp(y, (y.min(), y.max()), (height-20, 20))
+        cords = np.concatenate((x,y), axis=1)
+        cords = preprocessing.StandardScaler().fit_transform(cords)
+        cords = ForceScheme().fit_transform(cords)
+        tsne_result_overlap_removed = DGrid(icon_width=1/3, icon_height=1/3, delta=10).fit_transform(cords)
+    else:
+        tsne_result_overlap_removed = tsne_result
 
     tsne_x = tsne_result_overlap_removed[:,0]
     tsne_y = tsne_result_overlap_removed[:,1]
@@ -193,6 +193,10 @@ def dimReduceParticipants():
 
     featureData = pd.read_csv(os.path.join("data/processedData", featureFile)).groupby("participantId").mean().reset_index()
     personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
+    # print("featureData:", featureData.shape, "personalityData", personalityData.shape)
+    # print("featureData['participantId']", featureData["participantId"].tolist())
+    # personalityData = personalityData[personalityData['participantId'].isin(featureData["participantId"].tolist())]
+    # personalityData.to_csv(os.path.join("data/processedData", personalityFile), header=True, index=False)
 
     columns = featureData.columns.values[2:]    #get all the feature columns
     width = None
@@ -211,13 +215,13 @@ def dimReduceParticipants():
     else:
         message = "status3:file reset"
     
-    # x, y = getTSNE(featureData, columns, width, height)     #dim reduction
-    x, y = getPCA(featureData, columns, width, height)     #dim reduction
+    x, y = getTSNE(featureData, columns, width, height)     #dim reduction
+    # x, y = getPCA(featureData, columns, width, height)     #dim reduction
     # clusters = getClusters(featureData, columns, clusteringMethod="spectral")    #spectralClustering
     # clusters = getClusters(featureData, columns, clusteringMethod="kmeans")    #k-means clustering
-
     personalityData["x"], personalityData["y"] = x, y
     # personalityData["clusters"] = clusters
+    
     personalityData.to_csv(os.path.join("data/processedData", personalityFile), index=False, header=True)
     return jsonify(message)
 
