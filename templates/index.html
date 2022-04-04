@@ -9,6 +9,7 @@
 
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>
     <link href="../css/style.css" rel="stylesheet">
     <link href="../css/parallelCordMBostock.css" rel="stylesheet">     
 </head>
@@ -24,15 +25,19 @@
     <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js">
 
     </script>
+    <!-- ✅ load bootstrap ✅ -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <!-- ✅ load jQuery ✅ -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!-- ✅ load jQuery UI ✅ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- ✅ load libraries for multiselect dropdown ✅ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css">
     
     <!--[if lt IE 7]><p class="browsehappy">You are using an <strong>outdated</strong>browser. Please <a href="#">upgrade your browser</a>to improve your experience.</p><![endif]-->
-    <div class="container-fluid" style="height:100%">
+    <div class="container-fluid p-10" style="height:100%">
         <div class="row flex-nowrap" style="height:100%">
             <div class="col-auto px-0">
                 <div id="sidebar" class="collapse collapse-horizontal show">
@@ -45,7 +50,7 @@
                         <hr class="line">
 
                         <div style="margin: 0; padding-left: 10px; padding-right: auto;" class="input-group input-group-sm">
-                            <input type="search" id="form1" class="form-control" placeholder="Search participant" aria-label="Search" stlye="text-align: center;"/>
+                            <input type="text" id="searchSelector" class="form-control" placeholder="Search participantId" aria-label="Search" stlye="text-align: center;"/>
                         </div>
 
                         <hr class="line">
@@ -115,7 +120,7 @@
                             <span style="font-size: 15px;" id="sliderVal"></span>
                             <br>
                             <div>
-                                <input type="range" min="5" max="20" value="10" steps='1' class="slider" id="myRange">
+                                <input type="range" min="2" max="15" value="8" steps='1' class="slider" id="myRange">
                             </div>
                         </div>
                         <hr class="line">
@@ -165,11 +170,42 @@
                         </div>
                         <hr class="line"> -->
 
+                        <!-- checkboxes for coloring glyphs -->
+                        <div>
+                            <table style="width:100%;" id="colorCheckbox">
+                                <tr>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" class="radio" value="age"  name="colorCheckbox" checked/>
+                                        <br>
+                                        <label>Age</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" class="radio" value="gender" name="colorCheckbox" />
+                                        <br>
+                                        <label>Gender</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" class="radio" value="dass" name="colorCheckbox" />
+                                        <br>
+                                        <label>D1</label>
+                                    </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" class="radio" value="current_diagnosis" name="colorCheckbox" />
+                                        <br>
+                                        <label>D2</label>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+
+                        <hr class="line">
+
                         <div>
                             <table style="width:100%;">
                                 <tr>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" id="lckCheckBox" checked>
+                                        <input type="checkbox" id="lckCheckBox">
                                         <br>
                                         <label>LCK</label>
                                     </td>
@@ -179,12 +215,12 @@
                                         <label>BRT</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" id="accCheckBox" checked>
+                                        <input type="checkbox" id="accCheckBox">
                                         <br>
                                         <label>ACC</label>
                                     </td>
                                     <td class="filterCheckbox">
-                                        <input type="checkbox" id="gyrCheckBox" checked>
+                                        <input type="checkbox" id="gyrCheckBox">
                                         <br>
                                         <label>GYR</label>
                                     </td>
@@ -194,6 +230,8 @@
                         </div>
 
                         <hr class="line">
+                        
+                        
 
                         <div style="display:flex; justify-content: center; align-items: center;">
                             <button type="button" class="btn btn-outline-primary btn-sm" id="Submit">Submit</button>
@@ -206,7 +244,8 @@
                 <!-- Dashboard title -->
                 <!-- <h5 id="dashboardHeader" style="color:rgb(18, 113, 249)">PROSIT Dashboard</h5> -->
 
-                <div class="pa-1" id="bottom">
+                <div class="ma-5" id="dashboard">
+                    <hline>
                     <svg class="svg1" id="chart1"></svg>
                     <svg class="svg2" id="chart2"></svg>
                     <svg class="svg3" id="chart3"></svg>
@@ -219,14 +258,14 @@
                         <a data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false">Menu</a>
                     </div>
                     <div class="btn-toolbar col-8 justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
-                        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                        <div class="btn-group btn-group-sm mt-2 mr-2" role="group" aria-label="First group">
                           <button type="button" class="btn btn-light" onclick="onBtnImport()">show csv</button>
                           <button type="button" class="btn btn-light" onclick="onBtnRemove()">hide csv</button>
                           <button type="button" class="btn btn-light" onclick="onBtnUpdate()"> update csv</button>
                           <button type="button" class="btn btn-light" onclick="onBtnExport()">download csv</button>
                         </div>
                     </div>
-                <div id="csvGrid" class="grid ag-theme-balham" style="display: none;"></div>
+                <div id="csvGrid" class="grid ag-theme-balham mt-2" style="display: none;"></div>
                 <br>
             </main>
         </div>
@@ -246,34 +285,41 @@
         numberDisplayed: 1
     })
 
+    $.ajax({
+            type: "GET",
+            contentType: 'application/json',
+            url: "/getParticipantIds",
+            success: function(participantIds) {
+                $("#searchSelector").autocomplete({
+                    source: participantIds
+                });
+            }
+        });
+    
+
     // Calling server route to find dim reduce for all columns
     featurelist = $('#featureSelect').val()
     w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
     h = Math.floor($('.svg1')[0].getBoundingClientRect().height);
     var data = { "featureColumns": featurelist, "width":w, "height":h };
-    // $.ajax({
-    //     type: "POST",
-    //     contentType: 'application/json',
-    //     url: "/dimReduceParticipants"
-    // });
     $.ajax({
-                type: "POST",
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                url: "/dimReduceParticipants",
-                success: function(status) {
-                    if (status === "status1: file updated") {
-                        // console.log("FeatureData file updated")
-                    }
-                    if (status === "status2:single column") {
-                        alert("Please select more than one column in Feature selection drop down!!!")
-                        // console.log("FeatureData file reset: single column selected")
-                    }
-                    if (status === "status3:file reset") {
-                        // console.log("FeatureData file reset: all columns selected")
-                    }
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            url: "/dimReduceparticipantIds",
+            success: function(status) {
+                if (status === "status1: file updated") {
+                    // console.log("FeatureData file updated")
                 }
-            });
+                if (status === "status2:single column") {
+                    alert("Please select more than one column in Feature selection drop down!!!")
+                    // console.log("FeatureData file reset: single column selected")
+                }
+                if (status === "status3:file reset") {
+                    // console.log("FeatureData file reset: all columns selected")
+                }
+            }
+        });
 
     </script>
     
@@ -290,45 +336,74 @@
     <!-- loading symbol during buffer : svg2 -->
     <script src="../js/buffering.js"></script>
     <!-- parallel cordinate chart : svg3 & svg4 -->
-    <script src="../js/parallelCordMBostock.js"></script>
+    <script src="../js/parallelCoordinateChart.js"></script>
 
     <script>
         // parameters
+        var firstLoad = true
         var glyphsChart ="chart1";
         var radialTimeChart ="chart2";
         var parallelCordChart1 ="chart3";
         var parallelCordChart2 ="chart4";
-        var radius = 10    //default value of 10, if u change this, change it in html slider element as well
-        var toggleGlyph = "radialGlyph" //toggleGlyph switch values: "radialGlyph"/"flowerGlyph"
-        var toggleLabels = true //toggleLabels switch values: true/false
-        var brtChecked = true;
-        var accChecked = true;
-        var gyrChecked = true;
-        var lckChecked = true;
-        var featurelist = $('#featureSelect').val()
-        var selectedParticipants
+        var radius  = document.getElementById("myRange").value;
+        var toggleGlyph 
+        var toggleLabels
+        var glyphColor
+        var lckChecked
+        var brtChecked
+        var accChecked
+        var gyrChecked
+        var featurelist = $('#featureSelect').val();
+        var selectedparticipantId;
+    
+        // jquery handlers for setting the values of variables
+    {        
+        if ($("#toggleGlyph").is(':checked')) {
+                toggleGlyph = "flowerGlyph";
+        } else {
+            toggleGlyph = "radialGlyph";
+        }
 
-        // set a  ramdom value to 
-        $.ajax({
-                type: "GET",
-                async: false,
-                url: "/getRandomParticipant",
-                success: function(participant) {
-                    selectedParticipants = participant
-                }
-            })
-        // plotting glyphs
-        // updateGlyphs(glyphsChart, radialTimeChart, parallerCordChart, toggleGlyph, radius=8, brtChecked, accChecked, gyrChecked, lckChecked);
+        if ($("#toggleLabels").is(':checked')) {
+            toggleLabels = false;
+        } else {
+            toggleLabels = true;
+        }
 
-        // plotting paraller cordinates
-        // updateParallelCord(parallerCordChart);
+        glyphColor = $("input:checkbox[name=colorCheckbox]").attr("value")
 
-        // plotting dummy forced network chart
-        // updateForceSimulation(forcedSimulationChart);
+        if ($("#lckCheckBox").is(':checked')){
+            lckChecked = true
+        }
+        else {
+            lckChecked = false
+        }
 
-        // plotting dummuy bar chart
-        // updateBarChart(barChart);
+        if ($("#brtCheckBox").is(':checked')){
+            brtChecked = true
+        }
+        else {
+            brtChecked = false
+        }
 
+        if ($("#accCheckBox").is(':checked')){
+            accChecked = true
+        }
+        else {
+            accChecked = false
+        }
+
+        if ($("#gyrCheckBox").is(':checked')){
+            gyrChecked = true
+        }
+        else {
+            gyrChecked = false
+        }
+    }
+
+
+    // jquery handlers for regreshing charts after resizing
+    {
         // auto refresh after window resizing
         jQuery(function($) {
             var windowWidth = $(window).width();
@@ -348,8 +423,8 @@
 
         // auto refresh after window resizing
         jQuery(function($) {
-            var windowWidth = $("#bottom").width();
-            var windowHeight = $("#bottom").height();
+            var windowWidth = $("#dashboard").width();
+            var windowHeight = $("#dashboard").height();
             var id;
             $(window).resize(function() {
                 clearTimeout(id)
@@ -362,25 +437,24 @@
                 }
             }
         });
-        
-        var running = false;
+
         // Refresh after sidebar close
-        function outputsize() {
-            if (running == false){
-                radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedParticipants, featurelist, radius, toggleGlyph, toggleLabels, brtChecked, accChecked, gyrChecked, lckChecked);
-                updateParallelCord(parallelCordChart1, selectedParticipants, feature="aggregatedFeatures", featurelist)
-                updateParallelCord(parallelCordChart2, selectedParticipants, feature="individualFeatures", featurelist)
-                running = true
+        new ResizeObserver(checkFirstLoad).observe(dashboard)
+        function checkFirstLoad(){
+            if (firstLoad == true){
+                firstLoad = false
             }
-            
-            var delayInMilliseconds = 1000; //1 second
-            setTimeout(function() {
-                //your code to be executed after 1 second
-                running = false
-            }, delayInMilliseconds);
-            }    
-        new ResizeObserver(outputsize).observe(bottom)
+            else{
+                renderCharts()
+            }
+        }
+    }
+
+    // jquery handlers for the input types in the Menu
+    {   
+        $('#searchSelector').change(function () {
+            selectedparticipantId = $('#searchSelector').val()
+        });
 
         //range slider 
         var slider = document.getElementById("myRange");
@@ -418,7 +492,6 @@
                 $("#hideLabels").addClass("selectedLabel")
                 $("#showLables").removeClass("selectedLabel")
             }
-            // console.log("toggle show label switch")
         });
 
         // decided not to implement this
@@ -437,6 +510,20 @@
         //     // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         // });
 
+        // checkboxes to select glyph coloring column
+        $("input:checkbox[name=colorCheckbox]").on('click', function() {
+            var $box = $(this);
+            if ($box.is(":checked")) {
+                var group = "input:checkbox[name=colorCheckbox]";
+                $(group).prop("checked", false);
+                $box.prop("checked", true);
+                glyphColor = $box.attr("value")
+            }
+        else {
+            $box.prop("checked", true);
+            }
+        });
+
         // checkbox to select brightness
         $("#brtCheckBox").on('change', function() {
             if ($(this).is(':checked')) {
@@ -444,7 +531,6 @@
             } else {
                 brtChecked = false
             }
-            // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
         // checkbox to select accelerometer
@@ -454,7 +540,6 @@
             } else {
                 accChecked = false
             }
-            // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
         // checkbox to select gyroscope
@@ -464,7 +549,6 @@
             } else {
                 gyrChecked = false
             }
-            // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
 
@@ -475,7 +559,6 @@
             } else {
                 lckChecked = false
             }
-            // plotCharts(slider.value, toggleGlyph, brtChecked, accChecked, gyrChecked, lckChecked)
         });
 
         // //togglePolarChart switch:  Decided not to implement this feature
@@ -491,14 +574,6 @@
 
         // });
 
-
-        // Refresh after sidebar close
-        $('#featureSelect').on('change', function() {
-            var data = {
-                "featureColumns": $('#featureSelect').val()
-            };
-        });
-
         // submit button
         $("#Submit").click(function(){
             featurelist = $('#featureSelect').val()
@@ -510,7 +585,7 @@
                 type: "POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                url: "/dimReduceParticipants",
+                url: "/dimReduceparticipantIds",
                 success: function(status) {
                     if (status === "status1: file updated") {
                         // console.log("FeatureData file updated")
@@ -524,22 +599,23 @@
                     }
                 }
             });
-
-            var delayInMilliseconds = 1000; //1 second
-
+            
+            var delayInMilliseconds = 2000;
             setTimeout(function() {
-                //your code to be executed after 1 second
+                //your code to be executed after delay
                 radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedParticipants, featurelist, radius, toggleGlyph, toggleLabels, brtChecked, accChecked, gyrChecked, lckChecked);
-                updateParallelCord(parallelCordChart1, selectedParticipants, feature="aggregatedFeatures", featurelist)
-                updateParallelCord(parallelCordChart2, selectedParticipants, feature="individualFeatures", featurelist)
+                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedparticipantId, featurelist, radius, toggleGlyph, toggleLabels, glyphColor, brtChecked, accChecked, gyrChecked, lckChecked);
+                // updateParallelCord(parallelCordChart1, selectedparticipantId, feature="aggregatedFeatures", featurelist)
             }, delayInMilliseconds);
 
             //uncomment this like to hide the sidebar after submit button
             // $("#sidebar").removeClass("show");
         })
+    }
 
-        // test code
+    // jquery handlers for showing the raw data in a tabluar form below all the charts
+    // Table for showing raw data
+    { 
         // code for rendering csv data on the screen
         var columnDefs = [
                 {   headerName: "",
@@ -647,7 +723,30 @@
             $("#downloadcsv").css("visibility", "hidden")
             gridOptions.api.exportDataAsCsv();
         }
-        // test code ends
+    }
+
+    // jquery handlers for showing chart for random data on screen
+    {
+        // set a  ramdom value to 
+        $.ajax({
+                type: "GET",
+                async: false,
+                url: "/getRandomparticipantId",
+                success: function(participantId) {
+                    selectedparticipantId = participantId
+                }
+            })
+        
+        renderCharts()
+    } 
+    
+    // Funtion to plot the charts
+    function renderCharts() {
+            radius = document.getElementById("myRange").value
+            updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedparticipantId, featurelist, radius, toggleGlyph, toggleLabels, glyphColor, brtChecked, accChecked, gyrChecked, lckChecked);
+            // updateParallelCord(parallelCordChart1, selectedparticipantId, feature="aggregatedFeatures", featurelist)
+        }
+    
     </script>
 </body>
 </html>

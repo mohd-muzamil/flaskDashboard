@@ -14,9 +14,9 @@ body {
     height: 40px;
 }
 
-#bottom {
+#dashboard {
     height: calc(100% - 50px);
-    /* background-color: green; */
+    /* background-color: gray; */
 }
 
 .line {
@@ -32,7 +32,7 @@ p {
 
 svg {
     border: solid 1px black;
-    margin-bottom: 3px
+    margin-top: 3px;
 }
 
 .svg1 {
@@ -95,4 +95,10 @@ td {
     border: solid #808080 .2px;
     border-radius: 5px;
     padding: 1px;
+}
+
+.ui-autocomplete 
+{
+  height: 200px;
+  overflow-y: auto;
 }

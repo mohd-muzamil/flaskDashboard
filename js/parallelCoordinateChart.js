@@ -8,43 +8,36 @@
 
 
 function parallelCord( chart, participantId, feature, featurelist, starting_min_date, starting_max_date ){
-    // var featuresNames = ["Number of Screen Locks", "first Screen Unlock Event", "last Screen Lock event", "max Screen usage Time", "total Screen usage Time", "no of Missed calls", "no of Dialled calls", "no of Incoming calls", "min Duration of Incoming calls",  "max Duration of Incoming calls", "total Duration of Incoming calls", "no of Outgoing calls",  "min Duration Outgoing calls", "max Durtaion of Outgoing calls", "total Duration Outgoing calls", "total No of Calls", "total Duration of Calls", "step Count", "total Distance travelled" , "no of Stay Points", "location Variance", "location Entropy", "sleep Start Time1", "sleep End Time1", "sleep Duration1", "sleep Start Time2", "sleep End Time2", "sleep Duration2", "total Sleep Duration", "no Sleep Interruptions"],//, "participant"],
+    // var featuresNames = ["Number of Screen Locks", "first Screen Unlock Event", "last Screen Lock event", "max Screen usage Time", "total Screen usage Time", "no of Missed calls", "no of Dialled calls", "no of Incoming calls", "min Duration of Incoming calls",  "max Duration of Incoming calls", "total Duration of Incoming calls", "no of Outgoing calls",  "min Duration Outgoing calls", "max Durtaion of Outgoing calls", "total Duration Outgoing calls", "total No of Calls", "total Duration of Calls", "step Count", "total Distance travelled" , "no of Stay Points", "location Variance", "location Entropy", "sleep Start Time1", "sleep End Time1", "sleep Duration1", "sleep Start Time2", "sleep End Time2", "sleep Duration2", "total Sleep Duration", "no Sleep Interruptions"],//, "participantId"],
     // var featuresNames = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
     // "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
     // "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"],
-    
-    // featuresCodes = ["noScreenLocks", "firstScreenUnlock", "lastScreenLock", "maxScreenTime", "totalScreenTime", "noMissed", "noDialled", "noIncoming",  "minDurationIncoming",  "maxDurationIncoming", 
-    // "totalDurationIncoming", "noOutgoing",  "minDurationOutgoing", "maxDurtaionOutgoing", "totalDurationOutgoing", "totalNoCalls", "totalDurationCalls", "stepCount", "totalDistance" , "noStayPoints", 
-    // "locationVariance", "locationEntropy", "sleepStartTime1", "sleepEndTime1", "sleepDuration1", "sleepStartTime2", "sleepEndTime2", "sleepDuration2", "totalSleepDuration", "noSleepInterruptions"];
 
-    var featuresNames = featurelist
-    var featuresCodes = featurelist
-    var titleText
+    var featuresNames = featurelist 
 
-    // if (feature == "aggregatedFeatures"){
-    //     if (!featuresNames.includes("participantId")){
-    //         console.log("before")
-    //     }
-    //     console.log('adding extra column')
-    //     featuresNames.push("participantId")
-    //     if (featuresNames.includes("participantId")){
-    //         console.log("after")
-    //     }
-    // }
-    // else {
-    //     featuresNames.pop("participantId")
-    //     featuresNames.push("date")
-    // }
+    if (feature == "aggregatedFeatures"){
+        if (featuresNames.includes("date_num")){
+            const index = featuresNames.indexOf("date_num");
+            if (index > -1) {
+            featuresNames.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+    }
+    else if  (feature == "individualFeatures"){
+        if (!featuresNames.includes("date_num")){
+            featuresNames.unshift("date_num")
+        }
+    }
 
     var featuresCodes = featuresNames
+    var titleText
 
-    var margin = { left: 30, top: 25, right: 20, bottom: 50 },
+    var margin = { left: 50, top: 25, right: 20, bottom: 50 },
         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom,
-        // deltawidth = width/featuresNames.length,
         colorClusters = d3.scaleOrdinal(d3.schemeCategory10),
-        line_color = "#1b9e77";  //?dark_orange : dark_green
-        deltawidth = width/30;
+        line_color = "#1b9e77";  //green
+        deltawidth = (width - margin.left - margin.right)/21;
 
     // defining tooltip
     var tooltip = d3.select("body")
@@ -58,9 +51,46 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         .style('background-color', 'white')
         .style('border-radius', '10% 10% 10% 10%')
         .text("tooltip data");
+
+    var xHigh
+    // xHigh = featurelist.length * deltawidth
     
-    var x = d3.scalePoint().domain(featuresCodes).range([0, width]),
-        y = {};
+    if(feature == "aggregatedFeatures"){
+        featureLength = featurelist.length
+    }
+    else if (feature == "individualFeatures"){
+        featureLength = featurelist.length - 1
+    }
+    // featureLength = featurelist.length
+    if (featureLength<=5){
+        // xHigh = featureLength*deltawidth*4
+        xHigh = 10 * deltawidth
+    }
+    else if(featureLength<=10){
+        // xHigh = featureLength*deltawidth*2
+        xHigh = 15 * deltawidth
+    }
+    else if(featureLength<=15){
+        // xHigh = featureLength*deltawidth*1.3
+        xHigh = 20 * deltawidth
+    }
+    else{
+        // xHigh = featureLength*deltawidth
+        xHigh = 20 * deltawidth
+    }
+
+    if(feature == "aggregatedFeatures"){
+        margin.left = margin.left + (20*deltawidth - xHigh)/2 + deltawidth
+        // margin.left = margin.left + xHigh/featurelist.length
+        }
+        else if (feature == "individualFeatures"){
+            margin.left = margin.left + (20*deltawidth - xHigh)/2
+            xHigh = xHigh + deltawidth
+        }
+    // margin.left = margin.left + (20*deltawidth - xHigh)/2
+    var x = d3.scalePoint().domain(featuresCodes).range([0, xHigh]),
+        y = {},
+        formatDecimal = d3.format(".0f");
 
     var line = d3.line(),
         //    axis = d3.svg.axis().orient("left"),
@@ -81,11 +111,11 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
     // select server route based on feature paramenter
     if(feature == "aggregatedFeatures"){
         serverRoute = "/fetchAggFeatures"
-        titleText = "Aggregated features of all the participants over Study period"
+        titleText = "Aggregated features of all the participantIds over Study period"
     }
     else if (feature == "individualFeatures"){
         serverRoute = "/fetchIndividualFeatures"
-        titleText = "Day-wise features - participant:" + participantId
+        titleText = "Day-wise features - participantId:" + participantId
         // featuresNames.push("date")
         // featuresCodes.push("date")
     }
@@ -95,28 +125,27 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         .post(JSON.stringify(postForm),
         function(data) {
         var filteredData = data
-        console.log(filteredData)
         if(feature == "individualFeatures" & (starting_min_date!="" | starting_max_date!="")){ 
             var filteredData = data.filter((d)=>{ 
             if(d.date>=starting_min_date & d.date<=starting_max_date)
                 return d
             }   
         )}
-
         
-
-        var prtcpnts = [...new Set(filteredData.map(d => d["participantId"]))]
-        
+        // var date_num = [...new Set(filteredData.map(d => d["date_num"]))]
         
         // Create a scale and brush for each trait.
         featuresCodes.forEach(function(d) {
             // Coerce values to numbers.
             
-            filteredData.forEach(function(p) {p[d] = +p[d]; });            
-            if( d == "participantId" ) {
-                y[d] = d3.scaleOrdinal()
-                    .domain(prtcpnts)
-                    .range(d3.range(height, 0, -height/prtcpnts.length));
+            if( d == "date_num" ) {
+                // y[d] = d3.scaleOrdinal()
+                //     .domain(date_num)
+                //     .range(d3.range(height, 0, -height/date_num.length));
+                data.forEach(function(p) { p[d] = formatDecimal(p[d])});
+                y[d] = d3.scaleLinear()
+                .domain(d3.extent(data, function(p) { return +p[d]; }))
+                .range([height, 0])
             }
             // else if (d == "date") {
             //     y[d] = d3.scateTime()
@@ -124,33 +153,41 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             //         .range([0, height]);
             // }
             else {
+            data.forEach(function(p) { p[d] = +p[d]});            
             y[d] = d3.scaleLinear()
                 .domain(d3.extent(data, function(p) { return +p[d]; }))
                 .range([height, 0]);
             }
 
+            if(true){
+            // if (feature == "aggregatedFeatures"){ 
             y[d].brush = d3.brushY()
                 .extent([[-7, y[d].range()[1]], [7, y[d].range()[0]]]) //刷子范围
                 .on("brush", brush)
                 .on("start", brushstart)
                 .on("end", brush);
+            }
         });
 
 
-        // Add grey background lines for context.
+        // Add gray background lines for context.
         background = svg.append("svg:g")
         .attr("class", "background")
         .selectAll("path")
         .data(data)
         .enter().append("svg:path")
-        .attr("d", path);
+        .attr("d", path)
+        .attr("stroke", function(d){ 
+            return (feature == "aggregatedFeatures") ? colorClusters(d.clusters) : line_color;
+        })
 
         // Add a title.
         var title = svg.append("text")
+            .attr("transform", "translate(" + (-margin.left) + "," + 0 + ")")
             .attr("x", width/2 )
             .attr("y", -2*margin.top/5)
             .style("fill", "rgb(18, 113, 249)")
-            .style("font-size", "12px")
+            .style("font-size", "15px")
             .style("font-weight", "normal")
             .style("text-anchor", "middle")
             .text(titleText)
@@ -172,6 +209,10 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         //     .attr("dy", ".31em")
         //     .text(function(d) { return d; });
 
+        featureImportanceScale = d3.scaleLinear().domain([0,1])
+        .range(["#f0f0f0", "#636363"])
+
+        // add boxes behind each axis 
         var boxes = svg.selectAll("g.tootltip")
         .data(featuresNames)
         .enter()
@@ -181,10 +222,12 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         .attr("y", -margin.top * 0.25)
         .attr("width", deltawidth * 0.8)
         .attr("height", height + margin.bottom * 2/3)
+        .attr("fill", function(d, i) {return feature == "aggregatedFeatures" ? featureImportanceScale(i/featurelist.length) : "#f0f0f0"})
+        .attr("opacity", 0.5)
         // .attr('cx', function(d) { return x(d)} )
         // .attr('cy', height + margin.bottom/3)
         // .attr('r', deltawidth/2)
-        
+
         // Add foreground lines.
         foreground = svg.append("svg:g")
             .attr("class", "foreground")
@@ -192,15 +235,27 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             .data(filteredData)
             .enter().append("svg:path")
             .attr("d", path)
-            .attr("stroke", "red")
-            // .attr("stroke-width", 2)
-            .attr("stroke", function(d){ 
-                return (feature == "aggregatedFeatures") ? colorClusters(d.clusters) : line_color;
+            // .attr("stroke", "red")
+            .attr("stroke-width", function(d){
+                if(feature == "aggregatedFeatures"){
+                    return d.participantId==participantId ? "2px" : "1.5px";
+                    }
+                    else{
+                        return "1.5px"
+                    }
             })
-            // .attr("stroke-width", 5)
+            .attr("stroke", function(d){ 
+                if(feature == "aggregatedFeatures"){
+                    return d.participantId==participantId ? "#252525"  : colorClusters(d.clusters);
+                    }
+                    else{
+                        return line_color
+                    }
+                
+            })
             .attr("opacity", function(d){ 
                 if(feature == "aggregatedFeatures"){
-                return d.participantId==participantId ? 1 : 0.8;
+                return d.participantId==participantId ? 1 : 0.5;
                 }
                 else{
                     return 1
@@ -208,7 +263,8 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             // //     return (feature == "aggregatedFeatures") ? 2 : 1;
             })
             // .attr("class", function(d) { return d.featuresNames; });     can use cluster label to color code the lines
-
+        
+        
         // Add a group element for each trait.
         var g = svg.selectAll(".featuresCodes")
             .data(featuresCodes)
@@ -240,7 +296,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
                       .attr("visibility", null);
                 })
             );
-
+                
        // Add an axis and title.
        g.append("svg:g")
        .attr("class", "axis")
@@ -249,7 +305,6 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
        .attr("text-anchor", "middle")
        .attr("y", -0)
        .attr("transform", `translate(${-deltawidth * 0.1}, ${height + margin.bottom * 0.4}) rotate(-45)`)
-        //.attr("opacity", 0.5)
        .text(function(d){return d})
        .on("mousemove", function(d) { 
         if(d3.event.pageX > 0.95 * width){
@@ -263,7 +318,6 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             return tooltip.style("visibility", "visible");
         })
         .on('mouseout', function() {
-            // d3.select(this).selectAll(".tooltip").remove()
             return tooltip.style("visibility", "hidden");
         }) 
 
@@ -271,7 +325,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         //         if(d3.event.pageX < 0.95*width){return tooltip.style("top", (d3.event.pageY + 10 ) + "px").style("left", (d3.event.pageX - deltawidth ) + "px")}
         //         else{return tooltip.style("top", (d3.event.pageY + 10 ) + "px").style("left", (d3.event.pageX - 3*deltawidth) + "px")}
         //     })
-        //     .on('mouseover', function(d) {
+        //     .on('mouseover', function(d) {x
         //         tooltip.text(d);
         //         return tooltip.style("visibility", "visible");
         //     })
@@ -279,9 +333,10 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         //         // d3.select(this).selectAll(".tooltip").remove()
         //         return tooltip.style("visibility", "hidden");
         //     })
-
-            
-
+        
+        
+        
+        if (feature == "aggregatedFeatures"){ 
         // Add a brush for each axis.
         g.append("svg:g")
             .attr("class", "brush")
@@ -289,6 +344,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
             .selectAll("rect")
             .attr("x", -8)
             .attr("width", 16);
+        }
 
         function position(d) {
             var v = dragging[d];
@@ -297,11 +353,11 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         function transition(g) {
             return g.transition().duration(500);``
         }
-            // Returns the path for a given data point.
+        // Returns the path for a given data point.
         function path(d) {
-            return line(featuresCodes.map(function(p) { if (p=="participantId"){console.log(d);} return [position(p), y[p](d[p])]; }));
+            return line(featuresCodes.map(function(p) { 
+                return [position(p), y[p](d[p])]; }));
         }
-
 
         function dragstart(d) {
             i = featuresCodes.indexOf(d);
@@ -315,7 +371,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
         }
 
         function dragend(d) {
-//            x.domain(featuresCodes).rangePoints([0, w]);
+            //x.domain(featuresCodes).rangePoints([0, w]);
             var t = d3.transition().duration(500);
             t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
             t.selectAll(".foreground path").attr("d", path);
@@ -339,6 +395,7 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
                         extent: d3.brushSelection(this)
                     });
                 });
+
             //set un-brushed foreground line disappear
             foreground.classed("fade", function(d,i) {
                 return !actives.every(function(active) {
@@ -346,18 +403,19 @@ function parallelCord( chart, participantId, feature, featurelist, starting_min_
                     return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim])  <= active.extent[1];
                 });
             });
+            
         }
-
     d3.select("#" + chart).selectAll('.buffer').remove();
     });
 }
 
 function updateParallelCord(chart, participantId, feature, featurelist, starting_min_date="", starting_max_date=""){   
-    console.log("parallel cord called")
     if(Array.isArray(participantId)){
         participantId = participantId[0]
     }
-    d3.select("#" + chart).selectAll('g').remove();     //clearing the chart before plotting new data
+    // d3.select("#" + chart).selectAll('*').remove();     //clearing the chart before plotting new data
+    d3.select("#" + chart).selectAll("*").remove();
+    // d3.select("#" + chart).remove();     //clearing the chart before plotting new data
     buffering(chart, participantId);       //calling method that plots buffering symbol
     parallelCord(chart, participantId, feature, featurelist, starting_min_date, starting_max_date)
 }
