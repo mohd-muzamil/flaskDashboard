@@ -37,7 +37,6 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
         .style("border-width", "2px");
 
     // reading data directly
-    //d3.csv("../../data/participantId_scores", function(error, data) {
     d3.csv("/fetchPersonalityScores", function(data) {
         data.forEach(d => {
             d.x = +d.x
@@ -71,7 +70,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .range([height - margin.bottom - config.r, margin.top + config.r])
 
         // Scales for radial glyph
-        const radialLine = d3.lineRadial()
+        const xradialLine = d3.lineRadial()
         const radialScale = d3.scaleLinear()
             .domain([0, 10])
             .range([0, config.r])
@@ -135,7 +134,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                         .data([d])
                         .enter()
                         .append('path')
-                        .attr('d', d => radialLine([
+                        .attr('d', d => xradialLine([
                             d.open,
                             d.con,
                             d.extra,
