@@ -2,11 +2,13 @@
 html {
     width: 100%;
     height: 100%;
+    overflow:hidden;
 }
 
 body {
     width: 100%;
     height: 100%;
+    overflow:hidden;
 }
 
 #header {
@@ -19,10 +21,82 @@ body {
     /* background-color: gray; */
 }
 
+.scaled {
+    transform: scale(0.8);
+}
+
+.num-block {
+    float: left;
+    width: 100%;
+    padding: 0px 15px 0px 30px;
+}
+
+
+/* number spinner for knn parameter skin 1 */
+
+.skin-1 .num-in {
+    float: left;
+    width: 94;
+}
+
+.skin-1 .num-in span {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 25px;
+    line-height: 32px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.skin-1 .num-in span.dis:before {
+    background-color: #ccc !important;
+}
+
+.skin-1 .num-in input {
+    float: left;
+    width: 30px;
+    height: 25px;
+    border: 1px solid #6E6F7A;
+    border-radius: 5px;
+    color: #000;
+    text-align: center;
+    padding: 0;
+}
+
+.skin-1 .num-in span.minus:before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+    left: 0;
+}
+
+.skin-1 .num-in span.plus:before,
+.skin-1 .num-in span.plus:after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+}
+
+.skin-1 .num-in span.plus:after {
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
 .line {
     width: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 p {
@@ -36,25 +110,22 @@ svg {
 }
 
 .svg1 {
-    height: 60%;
-    width: 58.6%;
+    height: 50%;
+    width: 59.6%;
 }
 
 .svg2 {
-    height: 60%;
+    height: 50%;
     width: 40%;
 }
 
 .svg3 {
-    height: 20%;
-    /* width: 32.8%; */
-    /* width: 49%; */
-    width:99.1%;
+    height: 24.8%;
+    width: 100%;
 }
 
 #dashboardHeader {
-    /* text-align: center; */
-    padding-left: 35%;
+    text-align: center;
     margin: 0px;
 }
 
@@ -71,10 +142,6 @@ svg {
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges;
-}
-
-svg {
-    border: solid 1px black;
 }
 
 #ex1Slider .slider-selection {
@@ -97,8 +164,30 @@ td {
     padding: 1px;
 }
 
-.ui-autocomplete 
-{
-  height: 200px;
-  overflow-y: auto;
+.ui-autocomplete {
+    height: 200px;
+    overflow-y: auto;
+}
+
+.lasso path {
+    stroke: rgb(80, 80, 80);
+    stroke-width: 1.5px;
+}
+
+.lasso .drawn {
+    fill-opacity: 0.05;
+}
+
+.lasso .loop_close {
+    fill: none;
+    stroke-dasharray: 4, 4;
+}
+
+.lasso .origin {
+    /* fill:#3399FF; */
+    fill-opacity: .5;
+}
+
+.lassoselect {
+    cursor: wait;
 }

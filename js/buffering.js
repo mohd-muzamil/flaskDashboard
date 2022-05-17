@@ -1,60 +1,72 @@
 /****Importatnt file****/
 // This script is used to render buffering icon while loading data
 
-function buffering(chart, participantId) {
-    'use strict';
-    var margin = { top: 25, right: 25, bottom: 75, left: 25 },
-        width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
-        height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
+function buffering(chart, participantId, toggleText = true) {
+    d3.select("#" + chart).selectAll('*').remove();
+    const margin = { left: 10, top: 10, right: 10, bottom: 10 },
+        width = $("#" + chart).width(),
+        height = $("#" + chart).height()
+    const R = Math.round(Math.min(height, width) / 20)
+    const dR = 0.2 * R
+    const speed = 50
+    const phi0 = 30
+    const color = "RGB(26,97,247)"
+    const dx = width / 2;
+    var dy = height / 2
+    if (toggleText) { dy = 1 / 3 * height + R }
+
     var t0 = Date.now();
 
     // Create svg
-    var svg = d3.select('#' + chart);
-
-    var planets = [
-        { R: Math.round(Math.max(height, width)/30), r:Math.round(height/100), speed: 80, phi0: 90 }
-    ];
-
+    const svg = d3.select("#" + chart)
+        .attr("width", margin.left + width + margin.right)
+        .attr("height", margin.top + height + margin.bottom);
 
     var container = svg.append('g')
         .attr("class", "buffer")
-        .attr('transform', `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top/2 + height + margin.bottom) / 2})`);
-    // margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom)
+        .attr('transform', `translate(${dx}, ${dy})`);
 
-    console.log()
+    function arc(innerRadius, outerRadius) {
+        return d3.arc()
+            .cornerRadius(R / 10)
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius)
+            .startAngle(0)
+            .endAngle(0.85 * 2 * Math.PI);
+    }
 
-    container.append("text")
-        .attr("dx", -width*0.25+"px")
-        .attr("dy", 2 * planets[0].R +"px")
-        .text(`Loading data for ${participantId}...`)
-        .style("font-size", width/30 + "px");
+    container.append("path")
+        .attr("class", "arc1")
+        .attr("d", arc(R, R + dR))
+        .attr("fill", color);
 
-    container.selectAll('g.planet')
-        .data(planets)
-        .enter().append('g')
-        .attr('class', 'planet')
-        .each(function(d, i) {
-            d3.select(this)
-                .append("circle")
-                .attr("class", "orbit")
-                .attr("r", d.R)
-                .style("fill", "none")
-                .style("stroke", "black");
+    container.append("path")
+        .attr("class", "arc2")
+        .attr("d", arc(0.666 * R, 0.666 * R + dR))
+        .attr("fill", color)
+        .attr('transform', "rotate(90)");
 
-            d3.select(this).append('circle')
-                .attr('r', d.r)
-                .attr('cx', d.R)
-                .attr('cy', 0)
-                .style("fill", "white")
-                // .style("stroke", "black");
-        });
+    container.append("path")
+        .attr("class", "arc3")
+        .attr("d", arc(0.333 * R, 0.333 * R + dR))
+        .attr("fill", color)
+        .attr('transform', "rotate(180)");
+
+    if (toggleText) {
+        container.append("text")
+            .attr("dy", 5 * R + "px")
+            .text(`Loading data for ${ participantId }...`)
+            .style("font-size", 1.5 * R + "px")
+            .style("text-anchor", "middle");
+    }
 
     d3.timer(function() {
         var delta = Date.now() - t0;
-
-        svg.selectAll('.planet')
-            .attr('transform', function(d) {
-                return 'rotate(' + d.phi0 + delta * d.speed / 200 + ')';
-            });
+        svg.selectAll('.arc1')
+            .attr('transform', 'rotate(' + (phi0 + delta * speed / 200) + ')');
+        svg.selectAll('.arc2')
+            .attr('transform', 'rotate(' + -(phi0 + delta * speed / 150) + ')');
+        svg.selectAll('.arc3')
+            .attr('transform', 'rotate(' + (phi0 + delta * speed / 100) + ')');
     });
 }

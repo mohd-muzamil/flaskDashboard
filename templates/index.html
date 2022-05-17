@@ -15,16 +15,6 @@
 </head>
 
 <body>
-    <!-- latest version of bootstrap -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> -->
-
-    <!-- older version of bootstrap with working multiselect dropdown -->
-    <!-- <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script> -->
-    <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js">
-
-    </script>
     <!-- ✅ load bootstrap ✅ -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
     <!-- ✅ load jQuery ✅ -->
@@ -35,26 +25,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css">
+    <!-- AG-grid -->
+    <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js"></script>
     
-    <!--[if lt IE 7]><p class="browsehappy">You are using an <strong>outdated</strong>browser. Please <a href="#">upgrade your browser</a>to improve your experience.</p><![endif]-->
-    <div class="container-fluid p-10" style="height:100%">
+    <div class="container-fluid p-20" style="height:100%">
         <div class="row flex-nowrap" style="height:100%">
+            
+            <!-- sidebar -->
             <div class="col-auto px-0">
                 <div id="sidebar" class="collapse collapse-horizontal show">
                 <!-- show is used here to hide or show the sidebar by default-->
-                <!-- <div id="sidebar" class="collapse collapse-horizontal show border-end">  -->
                     <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
 
                         <img src="../img/PROSIT.PNG" alt="PROSIT" style="display: block; margin-left:auto; margin-right: auto; width: 50%;">
                         <h5 id="dashboardHeader" style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249)">PROSIT</h5>
                         <hr class="line">
 
+                        <!-- search bar to search specific participant -->
                         <div style="margin: 0; padding-left: 10px; padding-right: auto;" class="input-group input-group-sm">
                             <input type="text" id="searchSelector" class="form-control" placeholder="Search participantId" aria-label="Search" stlye="text-align: center;"/>
                         </div>
-
                         <hr class="line">
 
+                        <!-- multi select dropdown -->
                         <div style="padding-left:10px; text-align: center;">
                             <label>Feature selection</label>
                             <select id="featureSelect" multiple>
@@ -97,78 +90,81 @@
                             </optgroup>
                         </select>
                         </div>
-
-                        <!-- <div class="container" style="padding-top: 5px;">
-                            <div class="row">
-                                <div class="col text-center">
-                                    <button class="btn btn-outline-primary btn-sm" id="featureSelectFilter">Submit</button>
-                                </div>
-                            </div>
-                        </div> -->
-
                         <hr class="line">
 
-                        <!-- <div class="box" style="text-align: center;">
-                            <div class="rangeSlider">
-                                <input type="range" class="circleRange" min="0" max="10" value="6">
-                            </div>
-                            <div class="value"></div>
-                        </div> -->
-
+                        <!-- slider for radius of glyph -->
                         <div class="slidecontainer" style="text-align: center; padding-left:10px; padding-bottom:0px; margin-bottom:0px;">
                             <label style="font-size: 15px;">Glyph Radius: </label>
                             <span style="font-size: 15px;" id="sliderVal"></span>
                             <br>
                             <div>
-                                <input type="range" min="2" max="15" value="8" steps='1' class="slider" id="myRange">
+                                <input type="range" min="5" max="25" value="8" steps='1' class="slider" id="myRange">
+                            </div>
+                        </div>
+                        <hr class="line">
+                        
+                        <!-- k-param -->
+                        <div class="num-block skin-1 scaled">
+                            <div style="text-align: center;">
+                                <label style="font-size: 15px; font-weight:500; ">k param for knn</label>
+                            </div>
+                            <div class="num-in">
+                                <span class="minus"></span>
+                                <input type="text" class="in-num" value="3">
+                                <span class="plus"></span>
                             </div>
                         </div>
                         <hr class="line">
 
                         <!-- Toggle glyph switch -->
-                        <div style="text-align: center;">
+                        <div style="text-align: center;" class="scaled">
                             <label class="form-check-label selectedLabel" id="radialSwitch" for="toggleGlyph" style="text-align: center; font-size: 15px;">Radial Glyph</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph"/>
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleGlyph" unchecked/>
                             </div>
                             <label class="form-check-label" id="flowerSwitch" for="toggleGlyph" style="text-align: center; font-size: 15px;">Flower Glyph</label>
                         </div>
-
                         <hr class="line">
 
-                        <!-- Show tooltip switch -->
-                        <div style="text-align: center;">
-                            <label class="form-check-label" id="hideLabels"  for="toggleLabels" style="text-align: center; font-size: 15px;">Hide Labels</label>
+                        <!-- Toggle Dimensionality Reduction technique TSNE/PCA -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="tsneSwitch" for="toggleDimRedux" style="text-align: center; font-size: 15px;">TSNE</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="toggleLabels"/>
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleDimRedux" unchecked/>
                             </div>
-                            <label class="form-check-label selectedLabel" id="showLables" for="toggleLabels" style="text-align: center; font-size: 15px;">Show Lables</label>
+                            <label class="form-check-label" id="pcaSwitch" for="toggleDimRedux" style="text-align: center; font-size: 15px;">PCA</label>
                         </div>
-
                         <hr class="line">
 
-                        <!-- decided not to implement this -->
-                        <!-- Toggle parallel cord chart switch -->
-                        <!-- <div style="text-align: center;">
-                            <label class="form-check-label selectedLabel" id="aggregatedFeatures" for="toggleFeature" style="text-align: center;">Aggregated Features</label>
+                        <!-- Toggle Overlap removal -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="useDGrid" for="toggleDGrid" style="text-align: center; font-size: 15px;">Remove Overlap</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="toggleFeature"/>
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleDGrid" unchecked/>
                             </div>
-                            <label class="form-check-label" id="individualFeatures"  for="toggleFeature" style="text-align: center;">Individual Features</label>
+                            <label class="form-check-label" id="noUseDGrid" for="toggleDGrid" style="text-align: center; font-size: 15px;">Keep Overlap</label>
                         </div>
+                        <hr class="line">
 
-                        <hr class="line"> -->
-
-
-                        <!-- Toggle polar chart switch  -->
-                        <!-- Decided not to implement this feature -->
-                        <!-- <div>
-                            <label class="form-check-label" for="toggleGlyph" style="text-align: center;">Toggle Polar chart</label>
+                        <!-- Show labels switch -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="hideLabels" for="toggleLabels" style="text-align: center; font-size: 15px;">Hide Labels</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="togglePolarChart" style="float: none; margin-left: 20%;" />
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleLabels" unchecked/>
                             </div>
+                            <label class="form-check-label" id="showLables" for="toggleLabels" style="text-align: center; font-size: 15px;">Show Lables</label>
                         </div>
-                        <hr class="line"> -->
+                        <hr class="line">
+
+                        <!-- Show grid switch -->
+                        <div style="text-align: center;" class="scaled">
+                            <label class="form-check-label selectedLabel" id="showSvgGrid" for="toggleSvgGrid" style="text-align: center; font-size: 15px;">Show Grid</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggleSvgGrid" unchecked/>
+                            </div>
+                            <label class="form-check-label" id="hideSvgGrid" for="toggleSvgGrid" style="text-align: center; font-size: 15px;">Hide Grid</label>
+                        </div>
+                        <hr class="line">
 
                         <!-- checkboxes for coloring glyphs -->
                         <div>
@@ -224,33 +220,34 @@
                                         <br>
                                         <label>GYR</label>
                                     </td>
+                                    <td class="filterCheckbox">
+                                        <input type="checkbox" id="sleepNoiseCheckBox">
+                                        <br>
+                                        <label>Noise</label>
+                                    </td>
                                 </tr>
                             </table>
-
                         </div>
-
                         <hr class="line">
                         
-                        
 
-                        <div style="display:flex; justify-content: center; align-items: center;">
+                        <!-- submit button -->
+                        <div style="display:flex; justify-content: center; align-items: center;" class="scaled">
                             <button type="button" class="btn btn-outline-primary btn-sm" id="Submit">Submit</button>
                         </div>
-
                     </div>
                 </div>
             </div>
-            <main class="col ps-md-2 pb-10">
-                <!-- Dashboard title -->
-                <!-- <h5 id="dashboardHeader" style="color:rgb(18, 113, 249)">PROSIT Dashboard</h5> -->
 
+            <!-- main -->
+            <main class="col ps-md-2 pb-10">
                 <div class="ma-5" id="dashboard">
                     <hline>
+                    <div id="gui"></div>
                     <svg class="svg1" id="chart1"></svg>
                     <svg class="svg2" id="chart2"></svg>
                     <svg class="svg3" id="chart3"></svg>
                     <svg class="svg3" id="chart4"></svg>
-                    <!-- <svg class="svg3" id="chart5"></svg> -->
                 </div>
 
                 <div class="row py-2" id="header">
@@ -261,8 +258,8 @@
                         <div class="btn-group btn-group-sm mt-2 mr-2" role="group" aria-label="First group">
                           <button type="button" class="btn btn-light" onclick="onBtnImport()">show csv</button>
                           <button type="button" class="btn btn-light" onclick="onBtnRemove()">hide csv</button>
-                          <button type="button" class="btn btn-light" onclick="onBtnUpdate()"> update csv</button>
-                          <button type="button" class="btn btn-light" onclick="onBtnExport()">download csv</button>
+                          <!-- <button type="button" class="btn btn-light" onclick="onBtnUpdate()"> update csv</button>
+                          <button type="button" class="btn btn-light" onclick="onBtnExport()">download csv</button> -->
                         </div>
                     </div>
                 <div id="csvGrid" class="grid ag-theme-balham mt-2" style="display: none;"></div>
@@ -288,116 +285,202 @@
     $.ajax({
             type: "GET",
             contentType: 'application/json',
-            url: "/getParticipantIds",
-            success: function(participantIds) {
+            url: "/getIds",
+            success: function(Ids) {
                 $("#searchSelector").autocomplete({
-                    source: participantIds
+                    source: Ids
                 });
             }
         });
     
 
-    // Calling server route to find dim reduce for all columns
+    // Calling server route to find dim reduce for all columns - run at the begining of page refresh/first load
     featurelist = $('#featureSelect').val()
     w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
-    h = Math.floor($('.svg1')[0].getBoundingClientRect().height);
-    var data = { "featureColumns": featurelist, "width":w, "height":h };
+    h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
+    radius = +document.getElementById("myRange").value
+    k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+    toggleDimRedux = "TSNE"
+    toggleDGrid = true
+    var postForm = {
+        "featureColumns": featurelist,
+        "width": w,
+        "height": h,
+        "radius": radius,
+        "k": k,
+        "toggleDimRedux": toggleDimRedux,
+        "toggleDGrid": toggleDGrid
+    }
     $.ajax({
-            type: "POST",
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            url: "/dimReduceparticipantIds",
-            success: function(status) {
-                if (status === "status1: file updated") {
-                    // console.log("FeatureData file updated")
-                }
-                if (status === "status2:single column") {
-                    alert("Please select more than one column in Feature selection drop down!!!")
-                    // console.log("FeatureData file reset: single column selected")
-                }
-                if (status === "status3:file reset") {
-                    // console.log("FeatureData file reset: all columns selected")
-                }
-            }
-        });
+        type: "POST",
+        contentType: 'application/json',
+        data: JSON.stringify(postForm),
+        url: "/dimReduceIds"
+    })
 
     </script>
     
     <!-- Imports -->
-    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
-    <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
-    <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https:/d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <script src="../js/d3-lasso.min.js"></script>
 
     <!-- PROSIT Charts -->
     <!-- glyphs scatter plot : svg1 -->
     <script src="../js/glyphs.js"></script>
     <!-- spiral time chart : svg2 -->
     <script src="../js/radialTimeChart.js"></script>
-    <!-- loading symbol during buffer : svg2 -->
-    <script src="../js/buffering.js"></script>
     <!-- parallel cordinate chart : svg3 & svg4 -->
     <script src="../js/parallelCoordinateChart.js"></script>
-
-    <script>
-        // parameters
-        var firstLoad = true
-        var glyphsChart ="chart1";
-        var radialTimeChart ="chart2";
-        var parallelCordChart1 ="chart3";
-        var parallelCordChart2 ="chart4";
-        var radius  = document.getElementById("myRange").value;
-        var toggleGlyph 
-        var toggleLabels
-        var glyphColor
-        var lckChecked
-        var brtChecked
-        var accChecked
-        var gyrChecked
-        var featurelist = $('#featureSelect').val();
-        var selectedparticipantId;
+    <!-- loading symbol during buffer -->
+    <script src="../js/buffering.js"></script>
     
-        // jquery handlers for setting the values of variables
+    <script>
+    // config
+    var glyphsChart ="chart1";
+    var radialTimeChart ="chart2";
+    var parallelCordChart1 ="chart3";
+    var parallelCordChart2 ="chart4";
+    var ids
+    var selectedId
+    var featurelist = $('#featureSelect').val()
+    var radius  = document.getElementById("myRange").value;
+    var k
+    var toggleGlyph //'radialGlyph' for radial glyph and 'flowerGlyph' for flower glyph
+    var toggleDimRedux
+    var toggleDGrid
+    var toggleLabels //true for showing labels
+    var toggleSvgGrid //true for showing the grid
+    var glyphColor
+    var lckChecked
+    var brtChecked
+    var accChecked
+    var gyrChecked
+    var noiseChecked
+    var delayInMilliseconds = 750
+
+    // jquery handlers for showing chart for random data on screen
+    {
+        // set a  ramdom value to select an id 
+        $.ajax({
+            type: "GET",
+            async: false,
+            url: "/getIds",
+            success: function(response) {
+                ids = response
+                selectedId = ids[Math.floor(Math.random() * ids.length)]
+            }
+        })
+        renderCharts()
+    }
+
+    // jquery handlers for initially setting the values of variables
     {        
-        if ($("#toggleGlyph").is(':checked')) {
-                toggleGlyph = "flowerGlyph";
+        if (!$("#toggleGlyph").is(':checked')) {
+            toggleGlyph = "radialGlyph"
         } else {
-            toggleGlyph = "radialGlyph";
+            toggleGlyph = "flowerGlyph"
         }
 
-        if ($("#toggleLabels").is(':checked')) {
-            toggleLabels = false;
+        if (!$("#toggleDimRedux").is(':checked')) {
+            toggleDimRedux = "TSNE"
         } else {
-            toggleLabels = true;
+            toggleDimRedux = "PCA"
         }
+
+        if (!$("#toggleDGrid").is(':checked')) {
+            toggleDGrid = true
+        } else {
+            toggleDGrid = false
+        }
+
+        if (!$("#toggleLabels").is(':checked')) {
+            toggleLabels = false
+        } else {
+            toggleLabels = true
+        }
+
+        if (!$("#toggleSvgGrid").is(':checked')) {
+            toggleSvgGrid = true
+        } else {
+            toggleSvgGrid = false
+        }
+
+        //number spinner for knn param +/-
+        $(document).ready(function() {
+                const min = 1
+                const max = ids.length
+                k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                $('.num-in span').click(function() {
+                    var $input = $(this).parents('.num-block').find('input.in-num')
+                    if ($(this).hasClass('minus')) {
+                        var count = parseFloat($input.val()) - 1
+                        count = count < min ? 1 : count
+                        if (count == min) {
+                            $(this).addClass('dis')
+                        } else {
+                            $(this).removeClass('dis')
+                        }
+                        $input.val(count)
+                    } else {
+                        var count = parseFloat($input.val()) + 1
+                        count = count > max ? max : count
+                        $input.val(count)
+                        if (count == max) {
+                            $(this).parents('.num-block').find(('.minus')).removeClass('dis')
+                        }
+                    }
+                    $input.change()
+                    return false
+                })
+
+                // auto update the button for k param when input goes above the range
+                $('.num-in span').parents('.num-block').find('input.in-num').on("change", () => {
+                    k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                    if (k < 1) {
+                        $('.num-in span').parents('.num-block').find('input.in-num').val(1)
+                    } else if (k > 150) {
+                        $('.num-in span').parents('.num-block').find('input.in-num').val(150)
+                    }
+                })
+            })
 
         glyphColor = $("input:checkbox[name=colorCheckbox]").attr("value")
 
-        if ($("#lckCheckBox").is(':checked')){
-            lckChecked = true
-        }
-        else {
+        if (!$("#lckCheckBox").is(':checked')){
             lckChecked = false
         }
-
-        if ($("#brtCheckBox").is(':checked')){
-            brtChecked = true
-        }
         else {
+            lckChecked = true
+        }
+
+        if (!$("#brtCheckBox").is(':checked')){
             brtChecked = false
         }
-
-        if ($("#accCheckBox").is(':checked')){
-            accChecked = true
-        }
         else {
+            brtChecked = true
+        }
+
+        if (!$("#accCheckBox").is(':checked')){
             accChecked = false
         }
+        else {
+            accChecked = true
+        }
 
-        if ($("#gyrCheckBox").is(':checked')){
-            gyrChecked = true
+        if (!$("#gyrCheckBox").is(':checked')){
+            gyrChecked = false
         }
         else {
-            gyrChecked = false
+            gyrChecked = true
+        }
+
+        if (!$("#sleepNoiseCheckBox").is(':checked')){
+            noiseChecked = false
+        }
+        else {
+            noiseChecked = true
         }
     }
 
@@ -406,109 +489,109 @@
     {
         // auto refresh after window resizing
         jQuery(function($) {
-            var windowWidth = $(window).width();
-            var windowHeight = $(window).height();
-            var id;
+            var windowWidth = $(window).width()
+            var windowHeight = $(window).height()
+            var id
             $(window).resize(function() {
                 clearTimeout(id)
-                id = setTimeout(doneResizing, 500); 
-            });
-            function doneResizing(){
+                id = setTimeout(doneResizing, 500)
+            })
+
+            function doneResizing() {
                 if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
-                    location.reload();
-                    return;
+                    location.reload()
+                    return
                 }
             }
-        });
+        })
 
-        // auto refresh after window resizing
-        jQuery(function($) {
-            var windowWidth = $("#dashboard").width();
-            var windowHeight = $("#dashboard").height();
-            var id;
-            $(window).resize(function() {
-                clearTimeout(id)
-                id = setTimeout(doneResizing, 500); 
-            });
-            function doneResizing(){
-                if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
-                    location.reload();
-                    return;
-                }
-            }
-        });
+        // refresh after the side open or close using menu click event
+        var a = document.getElementById("menu")
+        a.addEventListener("click", function() {
+            renderCharts(500)
+        }, false)
 
-        // Refresh after sidebar close
-        new ResizeObserver(checkFirstLoad).observe(dashboard)
-        function checkFirstLoad(){
-            if (firstLoad == true){
-                firstLoad = false
-            }
-            else{
-                renderCharts()
-            }
-        }
     }
 
     // jquery handlers for the input types in the Menu
     {   
         $('#searchSelector').change(function () {
-            selectedparticipantId = $('#searchSelector').val()
+            selectedId = $('#searchSelector').val()
         });
 
         //range slider 
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("sliderVal");
-        output.innerHTML = slider.value;
-        slider.oninput = function() {
-            radius = this.value
-            // plotCharts(this.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
-            output.innerHTML = radius;
-        }
+        var slider = document.getElementById("myRange")
+            var output = document.getElementById("sliderVal")
+            output.innerHTML = slider.value
+            slider.oninput = function() {
+                radius = this.value
+                output.innerHTML = radius
+            }
 
         // switch to select glyphs
         $("#toggleGlyph").on('change', function() {
-            if ($(this).is(':checked')) {
-                toggleGlyph = "flowerGlyph";
-                $("#flowerSwitch").addClass("selectedLabel")
-                $("#radialSwitch").removeClass("selectedLabel")
-            } else {
-                toggleGlyph = "radialGlyph";
-                $("#radialSwitch").addClass("selectedLabel")
-                $("#flowerSwitch").removeClass("selectedLabel")
-            }
-            // console.log("toggle glyph switch")
-            // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
-        });
+                if (!$(this).is(':checked')) {
+                    toggleGlyph = "radialGlyph"
+                    $("#radialSwitch").addClass("selectedLabel")
+                    $("#flowerSwitch").removeClass("selectedLabel")
+                } else {
+                    toggleGlyph = "flowerGlyph"
+                    $("#radialSwitch").removeClass("selectedLabel")
+                    $("#flowerSwitch").addClass("selectedLabel")
+                }
+            })
+
+        // switch to select the type of dimensionality reduction
+        $("#toggleDimRedux").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleDimRedux = "TSNE"
+                    $("#tsneSwitch").addClass("selectedLabel")
+                    $("#pcaSwitch").removeClass("selectedLabel")
+                } else {
+                    toggleDimRedux = "PCA"
+                    $("#tsneSwitch").removeClass("selectedLabel")
+                    $("#pcaSwitch").addClass("selectedLabel")
+                }
+            })
+
+        // switch to use DGrid to remove overlap over the glyphs
+        $("#toggleDGrid").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleDGrid = true
+                    $("#useDGrid").addClass("selectedLabel")
+                    $("#noUseDGrid").removeClass("selectedLabel")
+                } else {
+                    toggleDGrid = false
+                    $("#useDGrid").removeClass("selectedLabel")
+                    $("#noUseDGrid").addClass("selectedLabel")
+                }
+            })
 
         // switch to show or hide labels
         $("#toggleLabels").on('change', function() {
-            if (!($(this).is(':checked'))) {
-                toggleLabels = true;
-                $("#showLables").addClass("selectedLabel")
-                $("#hideLabels").removeClass("selectedLabel")
-            } else {
-                toggleLabels = false;
-                $("#hideLabels").addClass("selectedLabel")
-                $("#showLables").removeClass("selectedLabel")
-            }
-        });
+                if (!$(this).is(':checked')) {
+                    toggleLabels = false
+                    $("#hideLabels").addClass("selectedLabel")
+                    $("#showLables").removeClass("selectedLabel")
+                } else {
+                    toggleLabels = true
+                    $("#hideLabels").removeClass("selectedLabel")
+                    $("#showLables").addClass("selectedLabel")
+                }
+            })
 
-        // decided not to implement this
-        // switch to select Parallel cord Features
-        // $("#toggleFeature").on('change', function() {
-        //     if ($(this).is(':checked')) {
-        //         toggleFeature = "individualFeatures";
-        //         $("#individualFeatures").addClass("selectedLabel")
-        //         $("#aggregatedFeatures").removeClass("selectedLabel")
-        //     } else {
-        //         toggleFeature = "aggregatedFeatures";
-        //         $("#aggregatedFeatures").addClass("selectedLabel")
-        //         $("#individualFeatures").removeClass("selectedLabel")
-        //     }
-        //     // console.log("toggle feature switch")
-        //     // plotCharts(slider.value, toggleGlyph, toggleFeature, brtChecked, accChecked, gyrChecked, lckChecked)
-        // });
+        // switch to show or hide grid
+        $("#toggleSvgGrid").on('change', function() {
+                if (!$(this).is(':checked')) {
+                    toggleSvgGrid = true
+                    $("#showSvgGrid").addClass("selectedLabel")
+                    $("#hideSvgGrid").removeClass("selectedLabel")
+                } else {
+                    toggleSvgGrid = false
+                    $("#hideSvgGrid").addClass("selectedLabel")
+                    $("#showSvgGrid").removeClass("selectedLabel")
+                }
+            })
 
         // checkboxes to select glyph coloring column
         $("input:checkbox[name=colorCheckbox]").on('click', function() {
@@ -524,94 +607,106 @@
             }
         });
 
+        // checkbox to select gyroscope lockstate:  Decided not to implement this feature
+        $("#lckCheckBox").on('change', function() {
+            if (!$(this).is(':checked')) {
+                lckChecked = false
+            } else {
+                lckChecked = true
+            }
+        });
+
         // checkbox to select brightness
         $("#brtCheckBox").on('change', function() {
-            if ($(this).is(':checked')) {
-                brtChecked = true
-            } else {
+            if (!$(this).is(':checked')) {
                 brtChecked = false
+            } else {
+                brtChecked = true
             }
         });
 
         // checkbox to select accelerometer
         $("#accCheckBox").on('change', function() {
-            if ($(this).is(':checked')) {
-                accChecked = true
-            } else {
+            if (!$(this).is(':checked')) {
                 accChecked = false
+            } else {
+                accChecked = true
             }
         });
 
         // checkbox to select gyroscope
         $("#gyrCheckBox").on('change', function() {
-            if ($(this).is(':checked')) {
-                gyrChecked = true
-            } else {
+            if (!$(this).is(':checked')) {
                 gyrChecked = false
-            }
-        });
-
-
-        // // checkbox to select gyroscope lockstate:  Decided not to implement this feature
-        $("#lckCheckBox").on('change', function() {
-            if ($(this).is(':checked')) {
-                lckChecked = true
             } else {
-                lckChecked = false
+                gyrChecked = true
             }
         });
 
-        // //togglePolarChart switch:  Decided not to implement this feature
-        // var togglePolarChart = "circular"
-        // $("#togglePolarChart").on('change', function() {
-        //     if ($(this).is(':checked')) {
-        //         togglePolarChart = "lateral";
-        //         // updateFlowerGlyphs("chart1","chart2", radius = slider.value);
-        //     } else {
-        //         togglePolarChart = "circular";
-        //         // updateGlyphs("chart1","chart2", radius = slider.value);
-        //     }
-
-        // });
+        // checkbox to select sleepNoise
+        $("#sleepNoiseCheckBox").on('change', function() {
+            if (!$(this).is(':checked')) {
+                noiseChecked = false
+            } else {
+                noiseChecked = true
+            }
+        });
 
         // submit button
-        $("#Submit").click(function(){
-            featurelist = $('#featureSelect').val()
-            w = Math.floor($('.svg1')[0].getBoundingClientRect().width);
-            h = Math.floor($('.svg1')[0].getBoundingClientRect().height);
-            var data = { "featureColumns": featurelist, "width":w, "height":h };
-        
-            $.ajax({
-                type: "POST",
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                url: "/dimReduceparticipantIds",
-                success: function(status) {
-                    if (status === "status1: file updated") {
-                        // console.log("FeatureData file updated")
-                    }
-                    if (status === "status2:single column") {
-                        alert("Please select more than one column in Feature selection drop down!!!")
-                        // console.log("FeatureData file reset: single column selected")
-                    }
-                    if (status === "status3:file reset") {
-                        // console.log("FeatureData file reset: all columns selected")
-                    }
+        $("#Submit").click(function() {
+                featurelist = $('#featureSelect').val()
+                w = Math.floor($('.svg1')[0].getBoundingClientRect().width)
+                h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
+                    // radius = +document.getElementById("myRange").value
+                var postForm = {
+                    "featureColumns": featurelist,
+                    "width": w,
+                    "height": h,
+                    "radius": radius,
+                    "k": k,
+                    "toggleDimRedux": toggleDimRedux,
+                    "toggleDGrid": toggleDGrid
                 }
-            });
-            
-            var delayInMilliseconds = 2000;
-            setTimeout(function() {
-                //your code to be executed after delay
-                radius = document.getElementById("myRange").value
-                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedparticipantId, featurelist, radius, toggleGlyph, toggleLabels, glyphColor, brtChecked, accChecked, gyrChecked, lckChecked);
-                // updateParallelCord(parallelCordChart1, selectedparticipantId, feature="aggregatedFeatures", featurelist)
-            }, delayInMilliseconds);
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/dimReduceIds",
+                    success: function(status) {
+                        if (status === "status1:fileUpdated") {
+                            // console.log("FeatureData file updated")
+                        }
+                        if (status === "status2:singleColumn") {
+                            $('#featureSelect').val(['sepal_length', 'sepal_width', 'petal_length', 'petal_width'])
+                            $('#featureSelect').multiselect("refresh")
+                            alert("Please select more than one column in Feature selection drop down!!!")
+                            // console.log("FeatureData file reset: single column selected")
+                        }
+                    }
+                })
+                renderCharts(4 * delayInMilliseconds)
 
-            //uncomment this like to hide the sidebar after submit button
-            // $("#sidebar").removeClass("show");
-        })
+                //uncomment below line to hide the sidebar after submit button
+                // $("#sidebar").removeClass("show")
+            })
     }
+
+    // Funtion to plot the charts
+    function renderCharts(delay = delayInMilliseconds) {
+            $("body").css("cursor", "wait")
+                //calling method that plots buffering symbol
+            buffering(glyphsChart, selectedId, toggleText = false)
+            buffering(parallelCordChart1, selectedId)
+            buffering(parallelCordChart2, selectedId)
+            buffering(radialTimeChart, selectedId, toggleText=false)
+
+            setTimeout(function() {
+                //code to be executed after delay
+                updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid)
+                updateParallelCord(parallelCordChart, selectedId, [], featurelist)
+                $("body").css("cursor", "default")
+            }, delay)
+        }
 
     // jquery handlers for showing the raw data in a tabluar form below all the charts
     // Table for showing raw data
@@ -705,48 +800,25 @@
             location.reload();
         }
 
-        function onBtnUpdate() {
-        // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
-        data = gridOptions.api.getDataAsCsv();
-        $.ajax({
-                    type: "POST",
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    url: "/dataTable",
-                    success: function(status) {
-                        console.log(status)
-                    }
-                });
-        }
+        // function onBtnUpdate() {
+        // // document.querySelector('#csvResult').value = gridOptions.api.getDataAsCsv();
+        // data = gridOptions.api.getDataAsCsv();
+        // $.ajax({
+        //             type: "POST",
+        //             contentType: 'application/json',
+        //             data: JSON.stringify(data),
+        //             url: "/dataTable",
+        //             success: function(status) {
+        //                 console.log(status)
+        //             }
+        //         });
+        // }
 
-        function onBtnExport() {
-            $("#downloadcsv").css("visibility", "hidden")
-            gridOptions.api.exportDataAsCsv();
-        }
+        // function onBtnExport() {
+        //     $("#downloadcsv").css("visibility", "hidden")
+        //     gridOptions.api.exportDataAsCsv();
+        // }
     }
-
-    // jquery handlers for showing chart for random data on screen
-    {
-        // set a  ramdom value to 
-        $.ajax({
-                type: "GET",
-                async: false,
-                url: "/getRandomparticipantId",
-                success: function(participantId) {
-                    selectedparticipantId = participantId
-                }
-            })
-        
-        renderCharts()
-    } 
-    
-    // Funtion to plot the charts
-    function renderCharts() {
-            radius = document.getElementById("myRange").value
-            updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedparticipantId, featurelist, radius, toggleGlyph, toggleLabels, glyphColor, brtChecked, accChecked, gyrChecked, lckChecked);
-            // updateParallelCord(parallelCordChart1, selectedparticipantId, feature="aggregatedFeatures", featurelist)
-        }
-    
     </script>
 </body>
 </html>
