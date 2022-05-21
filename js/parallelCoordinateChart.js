@@ -1,6 +1,4 @@
-/****Importatnt file****/
-// This script is used to plot parallel cord charts in third and fourth svg
-
+// This script is used to generate visual representations over Feature comparison View.
 // d3V4 implementation of code similar to that by Mike Bostock
 // https://bl.ocks.org/mbostock/1341021
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
@@ -10,13 +8,14 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
     var featuresNames
     var importanceScores
     const line_color = "purple"
+    const titleLegend = "Feature Importance"
 
     postForm = { "featureColumns": featurelist }
     $.ajax({
         type: "POST",
         contentType: 'application/json',
         data: JSON.stringify(postForm),
-        url: "/featureImportance",
+        url: "/getFeatureImportance",
         async: false,
         success: function(data) {
             featuresNames = Object.keys(data)
@@ -31,7 +30,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
         yHigh = (height - margin.top - margin.bottom)
 
     if (featuresType == "aggregatedFeatures") {
-        serverRoute = "/fetchAggFeatures"
+        serverRoute = "/getAggFeatures"
         titleText = "Aggregated features of all the selectedIds over Study period"
         featureLength = featurelist.length
         if (featuresNames.includes("date_num")) {
@@ -41,7 +40,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
             }
         }
     } else if (featuresType == "individualFeatures") {
-        serverRoute = "/fetchIndividualFeatures"
+        serverRoute = "/getIndividualFeatures"
         titleText = "Day-wise features - selectedId:" + selectedId
         featureLength = featurelist.length - 1
         if (!featuresNames.includes("date_num")) {
@@ -50,9 +49,8 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
     }
 
     var deltaWidth = 0
-    if(featurelist.length>1)
-    {   
-        deltaWidth = (20 - featurelist.length)*xHigh / 4
+    if (featurelist.length > 1) {
+        deltaWidth = (20 - featurelist.length) * xHigh / 4
         xHigh = xHigh - deltaWidth
     }
 
@@ -96,16 +94,14 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
         .post(JSON.stringify(postForm),
             function(data) {
                 var filteredData = data
-                if(featuresType == "aggregatedFeatures")
-                {
+                if (featuresType == "aggregatedFeatures") {
                     if (lassoSelectedIds.length > 1) {
                         filteredData = data.filter(d => {
                             if (lassoSelectedIds.includes(+d.id))
                                 return d
                         })
                     }
-                }
-                else if (featuresType == "individualFeatures" & (starting_min_date != "" | starting_max_date != "")) {
+                } else if (featuresType == "individualFeatures" & (starting_min_date != "" | starting_max_date != "")) {
                     var filteredData = data.filter((d) => {
                         if (d.date >= starting_min_date & d.date <= starting_max_date)
                             return d
@@ -122,8 +118,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         y[d] = d3.scaleLinear()
                             .domain(d3.extent(data, function(p) { return +p[d]; }))
                             .range([height, 0])
-                    }
-                    else {
+                    } else {
                         data.forEach(function(p) { p[d] = +p[d] });
                         min = d3.extent(data, function(p) { return +p[d]; })[0]
                         max = d3.extent(data, function(p) { return +p[d]; })[1]
@@ -144,10 +139,10 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         return (featuresType == "aggregatedFeatures") ? colorClusters(d.variety) : line_color;
                     })
 
-                // Add a title.
+                // Add a title to svg.
                 svg.append("text")
                     .attr("x", xHigh / 2)
-                    .attr("y", -margin.top+15)
+                    .attr("y", -margin.top + 15)
                     .style("fill", "rgb(18, 113, 249)")
                     .style("font-size", "15px")
                     .style("font-weight", "normal")
@@ -161,26 +156,26 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                     .cells(11)
                     .shapePadding(-5)
                     .shapeWidth(16)
-                    .shapeHeight(yHigh/5)
+                    .shapeHeight(yHigh / 5)
 
                 svg.append("g")
                     .attr("class", "legend")
                     .attr("transform", `translate(${xHigh + deltaWidth/2}, ${0}) scale(${0.5})`)
                     .call(colorLegend)
                     .style("opacity", 1);
-                
+
+                //Add a title to legend
                 svg.append("text")
-                    .attr("x", xHigh)
-                    .attr("y", 0)
-                    .attr("id", "title")
-                    .attr("font-size", "10px")
-                    .attr("rotate", -90)
-                    .attr("dx", "1em")
-                    .attr("dy", "-1em")
-                    .attr("kerning", 0)
-                    .attr("letter-spacing", "0.5em")
-                    .attr("transform", "translate(150,0) rotate(90)")
-                    .text("Feature Importance");
+                    .attr("transform", `translate(${xHigh},${xHigh/50}) scale(${yHigh/235})`)
+                    .attr("font-size", "12px")
+                    .attr("text-anchor", "middle")
+                    .style("font-weight", "normal")
+                    .selectAll("tspan")
+                    .data(titleLegend.split(""))
+                    .enter().append("tspan")
+                    .attr("x", "-1em")
+                    .attr("dy", "0.8em")
+                    .text(function(d) { return d; });
 
                 // Add foreground lines.
                 foreground = svg.append("svg:g")
@@ -202,7 +197,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         } else {
                             return line_color
                         }
-                        
+
                     })
                     .attr("stroke-width", function(d) {
                         if (featuresType == "aggregatedFeatures") {
@@ -277,12 +272,13 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                     .each(function(d) { d3.select(this).append("rect"); })
                     .append("rect")
                     .attr("class", "boxes")
-                    .attr("width", 8)
-                    .attr("height", yHigh )
+                    .attr("width", 7)
+                    .attr("height", yHigh)
                     .attr("fill", function(d, i) {
                         return featureImportanceScale(importanceScores[i])
                     })
                     .attr("stroke", "black")
+                    .attr("stroke-width", 0.4)
                     .attr("opacity", 1)
 
                 function position(d) {
@@ -291,7 +287,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                 }
 
                 function transition(g) {
-                    return g.transition().duration(500);
+                    return g.transition().duration(750);
                 }
 
                 // Returns the path for a given data point.
@@ -317,6 +313,6 @@ function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, f
     if (Array.isArray(selectedId)) {
         selectedId = selectedId[0]
     }
-    d3.select("#" + chart).selectAll('*').remove();     //clearing the chart before plotting new data
+    d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
     parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, starting_min_date, starting_max_date)
 }

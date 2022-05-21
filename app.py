@@ -1,3 +1,5 @@
+# BackEnd Server
+from datetime import time
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 import pandas as pd
 import numpy as np
@@ -42,35 +44,31 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     return resultX, resultY
 
 
-def getTSNE(df, columns, DGrid, width, height, radius):
+def getTSNE(df, columns, width, height, radius):
     #TSNE projection
     tsne = TSNE(n_components=2, verbose=1,
                 perplexity=40, n_iter=300, init='random', learning_rate="auto")
     tsneResult = tsne.fit_transform(df.loc[:, columns])
     tsneResult = np.round(MinMaxScaler().fit_transform(tsneResult), 3)
-    if DGrid:
-        tsneX, tsneY = DGridRemoveOverlap(tsneResult, width, height, radius)
-    else:
-        tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
-    return tsneX, tsneY
+    tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
+    tsneX_overlapRemoved, tsneY_overlapRemoved = DGridRemoveOverlap(tsneResult, width, height, radius)
+    return tsneX, tsneY, tsneX_overlapRemoved, tsneY_overlapRemoved
 
 
-def getPCA(df, columns, DGrid, width, height, radius):
+def getPCA(df, columns, width, height, radius):
     #PCA projection
     pca = PCA(n_components=2)
     pcaResult = pca.fit_transform(df.loc[:, columns])
     pcaResult = np.round(MinMaxScaler().fit_transform(pcaResult), 3)
-    if DGrid:
-        pcaX, pcaY = DGridRemoveOverlap(pcaResult, width, height, radius)
-    else:
-        pcaX, pcaY = pcaResult[:, 0], pcaResult[:, 1]
-    return pcaX, pcaY
+    pcaX, pcaY = pcaResult[:, 0], pcaResult[:, 1]
+    pcaX_overlapRemoved, pcaY_overlapRemoved = DGridRemoveOverlap(pcaResult, width, height, radius)
+    return pcaX, pcaY, pcaX_overlapRemoved, pcaY_overlapRemoved
 
 
-def getClusters(df, columns, k):
+def getClusters(df, columns, label, k):
     # KNN clustering
     X = df.loc[:, columns]
-    Y = df.loc[:, "Age"]
+    Y = df.loc[:, label]    #change the column here-use glyph color column for knn
     clusters = []
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X, Y)
@@ -78,32 +76,31 @@ def getClusters(df, columns, k):
     return clusters
 
 
-def getFeatureImportance(df, columns):
-    label = "variety"
-    le = LabelEncoder().fit(df[label].values)
-    df["label"] = le.transform(df[label].values)
-    X, y = df.loc[:, columns], df.loc[:, "label"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
+def getFeatureImportance(df, columns, label):
+    # Feature imporance score is measured by training an XGboost model.
+    if not label.isnumeric():
+        le = LabelEncoder().fit(df[label].values)
+        df["label"] = le.transform(df[label].values)
+    elif df[label].unique()>10:
+        df[label] = pd.cut(df[label], q=4, labels=[1, 2, 3, 4])
+
+    X, y = df.loc[:, columns], df.loc[:, label]
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
+    X_train, y_train = X, y     #no test set, since all of the instances are needed to calculate the feature importance
+    
     xgb_clf = xgb.XGBClassifier()
-    # es = xgb.callback.EarlyStopping(
-    #     rounds=2,
-    #     abs_tol=1e-3,
-    #     save_best=True,
-    #     maximize=False,
-    #     data_name="validation_0",
-    #     metric_name="mlogloss",
-    # )
     xgb_clf.fit(X_train, y_train)
-    # perm_importance = permutation_importance(xgb_clf, X_test, y_test)
-    # sorted_idx = perm_importance.importances_mean.argsort()
-    importanceScore = np.round(xgb_clf.feature_importances_, 3)
+    #feature importance using XGboost model alone
+    importanceScore = xgb_clf.feature_importances_
+
+    #Permutation importance for feature evaluation using XGboost classifier. Works better in cases with test data, which is different that train data used for model fitting.
+    # importanceScore = permutation_importance(xgb_clf, X_train, y_train).importances_mean
+
+    importanceScore = np.round(importanceScore, 3)
     return dict(sorted(zip(columns, [str(x) for x in importanceScore])))
 
 
 app = Flask(__name__, static_url_path='', static_folder='')
-@app.route("/ping")
-def hello_world():
-    return jsonify("pong")
 
 
 @app.route('/')
@@ -112,59 +109,85 @@ def index():
     return render_template('index.html', title="Home", header="Home")
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('index.html'), 404
+
+
+# Get a list of distinct participants for the search bar
+@app.route('/getIds', methods=['GET'])
+def getIds():
+    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
+    ids = featureData["id"].unique().tolist()
+    return jsonify(ids)
+
+
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceIds():
-    global featureData
-    global personalityData
-
-    df = pd.read_csv(os.path.join("data/processedData",
-                     featureFile), sep="|")
-    featureData = pd.read_csv(os.path.join(
-        "data/processedData", featureFile), sep="|").groupby("participantId").mean().reset_index()
-    personalityData = pd.read_csv(os.path.join(
-        "./data/processedData", personalityFile), sep="|")
+    featureData = pd.read_csv(os.path.join("data/rawData", featureFile)).groupby("id").mean().reset_index()
+    personalityData = pd.read_csv(os.path.join("data/rawData", personalityFile))
+    combinedData = featureData.merge(personalityData, how='inner', on='id')
+    print("______________\n"*10, featureData.shape, personalityData.shape, combinedData.shape, combinedData.columns)
     
     if request.method == 'POST':
         content = request.get_json()
+        print("$$$$$$", content)
         columns = content["featureColumns"]
         width = content['width']
         height = content['height']
         radius = int(content["radius"])
         k = int(content["k"])
         toggleDimRedux = content["toggleDimRedux"]
-        toggleDGrid = content["toggleDGrid"]
-        if len(columns)<2:  #in case of feature columns are selected in dropdown, consider only those
-            columns = [col for col in list(featureData.columns) if col not in ["id", "variety"]]
-            message = "status2:singleColumn"
-        else:
-            message = "status1:fileUpdated"
+        label = content["label"]
 
+        # print("_"*100, "\n", columns, featureData[columns].head(5))
         # dim reduction
-        if toggleDimRedux == "TSNE":
-            x, y = getTSNE(featureData, columns, toggleDGrid, width, height, radius)
-        elif toggleDimRedux == "PCA":
-            x, y = getPCA(featureData, columns, toggleDGrid, width, height, radius)
+        if toggleDimRedux == "tsne":
+            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(combinedData, columns, width, height, radius)
+        elif toggleDimRedux == "pca":
+            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(combinedData, columns, width, height, radius)
         
-        cluster = getClusters(featureData, columns, k)    #KNN clustering
-        for column in [ feature for feature in featureData.columns if feature not in ["id", "variety"]]:
-            featureData["scaled_"+column] = np.round(featureData[column] / featureData[column].abs().max(), 3)
-
+        cluster = getClusters(combinedData, columns, label, k)    #KNN clustering
         personalityData["x"], personalityData["y"] = x, y
+        personalityData["x_overlapRemoved"], personalityData["y_overlapRemoved"] = x_overlapRemoved, y_overlapRemoved
         personalityData["cluster"] = cluster
         
+        personalityData.dropna(axis=1, how='all', inplace=True)
         personalityData.to_csv(os.path.join(
-            "data/processedData", personalityFile), sep="|", index=False, header=True)
+            "data/processedData", personalityFile), index=False, header=True)
+        message = "status1:fileUpdated"
     return jsonify(message)
 
 
-@app.route('/fetchProjections', methods=['GET'])
+@app.route('/knnClustering', methods=["POST"])
+def knnClustering():
+    """
+    This function is used to just calculate the k-nearest neighbours of the feature instances
+    """
+    featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
+    if request.method == 'POST':
+        content = request.get_json()
+        columns = content["featureColumns"]
+        k = int(content["k"])
+
+        cluster = getClusters(featureData, columns, k)    #KNN clustering
+        featureData["cluster"] = cluster
+        featureData.dropna(axis=1, how='all', inplace=True)
+        featureData.to_csv(os.path.join(
+            "data/processedData", featureFile), index=False, header=True)
+        message = "status1:fileUpdated"
+
+    return jsonify(message)
+
+
+@app.route('/getProjections', methods=['GET'])
 def fetchProjections():
     """
     Return Data for Chart1: Personality scores that are used to make glyphs
     """
     if request.method == 'GET':
         data = pd.read_csv(os.path.join(
-            "data/processedData", personalityFile), sep="|")
+            "data/processedData", personalityFile))
 
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
@@ -183,7 +206,7 @@ def filterparticipantIdsDummy():
         content = request.get_json()
 
         # filename = content['filename']
-        participantId = content['participantId']
+        id = content['id']
         attributes = content["attributes"]
 
         strt = time.time()
@@ -193,12 +216,12 @@ def filterparticipantIdsDummy():
         for attr, checkState in attributes.items():
             if checkState:
                 df = pd.read_csv(os.path.join(
-                    "data/processedData", filenames[attr]), sep="|")
+                    "data/processedData", filenames[attr]))
                 # .sample(frac=0.001)
-                df = df[df["participantId"] == participantId]
+                df = df[df["id"] == id]
 
                 # Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
-                for i in range(ceil(df.shape[0]/1440)):
+                for i in range(np.ceil(df.shape[0]/1440)):
                     x = np.random.randint(0, 3*60)
                     sleepDur = np.random.randint(6, 9)
                     startindex = i * 1440 + x
@@ -212,7 +235,7 @@ def filterparticipantIdsDummy():
         resp.headers["Content-Type"] = "text/csv"
         print(time.time()-strt)
         return resp
-        # return jsonify(f"post works filename:{filename} participantId:{participantId}")
+        # return jsonify(f"post works filename:{filename} id:{id}")
 
     else:
         return jsonify("no post requests")
@@ -228,7 +251,7 @@ def filterparticipantIdsNew():
     if request.method == 'POST':
         content = request.get_json()
         # filename = content['filename']
-        participantId = content['participantId']
+        id = content['id']
         attributes = content["attributes"]
 
         strt = time.time()
@@ -239,9 +262,9 @@ def filterparticipantIdsNew():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
                 df = pd.read_csv(os.path.join(
-                    "data/processedData", filenames[attr]), sep="|")
+                    "data/processedData", filenames[attr]))
                 # .sample(frac=0.001)
-                df = df[df["participantId"] == participantId]
+                df = df[df["id"] == id]
                 dfImputed = pd.DataFrame()
 
                 # addind -1 values for minutesOfTheDay where data is not present
@@ -266,9 +289,9 @@ def filterparticipantIdsNew():
                     dfImputed = pd.concat([dfImputed, dfDate], axis=0)
 
                     # if attr=="brt":
-                    #     temp = pd.read_csv(os.path.join("data", filenames['lck']), sep="|")
-                    #     temp = temp[(temp["participantId"]==participantId) & (temp.date == date)].copy()
-                    #     temp = temp.merge(dfImputed, on=["participantId", "device", "date", "minuteOfTheDay"], how="inner")
+                    #     temp = pd.read_csv(os.path.join("data", filenames['lck']))
+                    #     temp = temp[(temp["id"]==id) & (temp.date == date)].copy()
+                    #     temp = temp.merge(dfImputed, on=["id", "device", "date", "minuteOfTheDay"], how="inner")
                     #     dfImputed = temp[temp.lck==1]
                     #     dfImputed.drop("lck", axis=1, inplace=True)
 
@@ -280,7 +303,7 @@ def filterparticipantIdsNew():
         resp.headers["Content-Type"] = "text/csv"
         print("Execution Time", time.time()-strt)
         return resp
-        # return jsonify(f"post works filename:{filename} participantId:{participantId}")
+        # return jsonify(f"post works filename:{filename} id:{id}")
 
     else:
         return jsonify("no post requests")
@@ -293,21 +316,21 @@ def fetchAggFeatures():
     """
     if request.method == 'POST':
         content = request.get_json()
-        participantId = content['participantId']
+        id = content['id']
 
         featureData = pd.read_csv(os.path.join(
-            "data/processedData", featureFile), sep="|")
-        # Aggregating based on participantId
-        featureData = featureData.groupby("participantId").mean().reset_index()
-        # getting cluster id for participantIds form personality file
+            "data/processedData", featureFile))
+        # Aggregating based on id
+        featureData = featureData.groupby("id").mean().reset_index()
+        # getting cluster id for ids form personality file
         df = pd.read_csv(os.path.join("data/processedData", personalityFile),
-                        sep="|").loc[:, ["participantId", "clusters"]]
+                        sep="|").loc[:, ["id", "clusters"]]
         featureData = pd.merge(featureData, df, how="left")
 
         # rearranging data such that selected participant data is always at the last
         # this helps in the visualization of parallel cord chart
         idx = df.index.tolist()
-        index_to_shift = featureData.index[featureData["participantId"] == participantId].tolist()[0]
+        index_to_shift = featureData.index[featureData["id"] == id].tolist()[0]
         idx.pop(index_to_shift)
         featureData = featureData.reindex(idx + [index_to_shift])
 
@@ -320,16 +343,16 @@ def fetchAggFeatures():
 @app.route('/fetchIndividualFeatures', methods=['POST'])
 def fetchIndividualFeatures():
     """
-    Returns Data for Chart4: Parallel cordinate chart to visualize extracted features - This will return the feature of single participantId.
+    Returns Data for Chart4: Parallel cordinate chart to visualize extracted features - This will return the feature of single id.
     """
     if request.method == 'POST':
         content = request.get_json()
-        participantId = content['participantId']
+        id = content['id']
 
         featureData = pd.read_csv(os.path.join(
-            "data/processedData", featureFile), sep="|")
-        # Fetching data for selected participantId
-        featureData = featureData[featureData["participantId"] == participantId].copy()
+            "data/processedData", featureFile))
+        # Fetching data for selected id
+        featureData = featureData[featureData["id"] == id].copy()
 
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
@@ -341,7 +364,7 @@ def fetchIndividualFeatures():
 def dataTable():
     if request.method == 'GET':
         df = pd.read_csv(os.path.join(
-            "data/processedData", featureFile), sep="|")
+            "data/processedData", featureFile))
         fieldnames = df.columns
         # len = df.shape[0]
         # resp = make_response(df.to_csv())
@@ -368,7 +391,7 @@ def dataTable():
         data1 = []
         [data1.append(d.replace("\"", "").split(",")) for d in data]
         df = pd.read_csv(os.path.join(
-            "data/processedData", featureFile), sep="|")
+            "data/processedData", featureFile))
         df.drop(df.index, inplace=True)
         df = pd.DataFrame(data1[1:], columns=df.columns)
         os.remove(os.path.join("data/processedData", featureFile))
@@ -379,19 +402,12 @@ def dataTable():
         return jsonify(message)
         # test code ends
 
-# Get a list of distinct participants for the search bar
-@app.route('/getIds', methods=['GET'])
-def getIds():
-    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
-    ids = featureData["id"].unique().tolist()
-    return jsonify(ids)
-
 
 # Sort features based on their feature importance: 
 # Permutation Based Feature Importance using XGBoost is used to calculate feature importance
 # https://mljar.com/blog/feature-importance-xgboost/
 # https://explained.ai/rf-importance/
-@app.route('/featureImportance', methods=['POST'])
+@app.route('/getFeatureImportance', methods=['POST'])
 def featureImportance():
     """
     Returns a list of features sorted based on their importance to classify the dataset. 
@@ -401,13 +417,13 @@ def featureImportance():
         content = request.get_json()
         columns = content["featureColumns"]
 
-        featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
-        featureData = featureData.groupby("participantId").mean().reset_index()
+        featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
         if len(columns)<=1:
-            columns = [col for col in list(featureData.columns) if col not in ["id", "variety"]]
+            columns = [col for col in list(featureData.columns) if col not in ["id", "gender"]]
         featuresWithImportance = getFeatureImportance(featureData, columns)
         return jsonify(featuresWithImportance)
 
 
 if __name__ == "__main__":
     app.run(port=5008, debug=True)
+    #age_groups ["Millennial", "GenX", "Boomer", "Silent"] [(18-34), (35-50), (51-69), (70-87)]

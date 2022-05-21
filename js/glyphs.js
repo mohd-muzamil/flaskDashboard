@@ -1,13 +1,15 @@
-function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked) {
-    var scale = +radius / 25
+// This script is used to generate visual representations over Glyph View.
+function plotGlyphs(glyphsChart, polygonTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked) {
+    delta = radius / 100
     const config = {
         r: +radius,
         opacityLow: 0,
         opacityHigh: 1,
-        opacityClickLow: 0.2,
-        opacityClickHigh: 0.5,
-        strokeWidthLow: 0.4 * scale,
-        strokeWidthHigh: 2 * scale,
+        opacityClickLow: 0.35,
+        opacityClickMid: 0.6,
+        opacityClickHigh: 0.7,
+        strokeWidthLow: 0.5 - delta,
+        strokeWidthHigh: 2 - delta,
         fillColor: "transparent",
         fillColorLasso: "#636363",
         petals: 4, //no of petals in the glyph
@@ -18,12 +20,12 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
         max_zoom: 4,
     }
 
-    if (toggleSvgGrid) { config.opacityLow = 0.2 }
+    if (toggleSvgGrid) { config.opacityLow = 0.4 }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
-    // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
-    // const customPath = 'M 0,0 C -40,-40 15,-50 50,-100 C 0,-50 0,0 0,0'; //curved thin
-    // const customPath = 'M 0,0 C -60,-30 0,-40 0,-100 C 0,-40 60,-30 0,0'; // star1
-    // const customPath = "M 0 0 C 50 -80, 80 -100, 0 -100 C -80 -100, -50 -80, 0 0"; //clover leaf
+        // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
+        // const customPath = 'M 0,0 C -40,-40 15,-50 50,-100 C 0,-50 0,0 0,0'; //curved thin
+        // const customPath = 'M 0,0 C -60,-30 0,-40 0,-100 C 0,-40 60,-30 0,0'; // star1
+        // const customPath = "M 0 0 C 50 -80, 80 -100, 0 -100 C -80 -100, -50 -80, 0 0"; //clover leaf
     var flowers = ["Setosa", "Versicolor", "Virginica"]
     const colorClusters = d3.scaleOrdinal().domain(flowers).range(d3.schemeCategory10)
     var current_zoom_scale = 1
@@ -39,8 +41,8 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             d.id = +d.id
         })
         const margin = { left: 5, top: 15, right: 70, bottom: 5 },
-                width = $("#" + glyphsChart).width(),
-                height = $("#" + glyphsChart).height()
+            width = $("#" + glyphsChart).width(),
+            height = $("#" + glyphsChart).height()
 
         const svg = d3.select("#" + glyphsChart)
             .attr("width", margin.left + width + margin.right)
@@ -56,14 +58,14 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
 
         // Add a title.
         svg.append("text")
-        .attr("x", width / 2)
-        .attr("y", "15px")
-        .style("fill", "rgb(18, 113, 249)")
-        .style("font-size", "15px")
-        .style("font-weight", "normal")
-        .style("text-anchor", "middle")
-        .text(titleText)
-        .lower()
+            .attr("x", width / 2)
+            .attr("y", "15px")
+            .style("fill", "rgb(18, 113, 249)")
+            .style("font-size", "15px")
+            .style("font-weight", "normal")
+            .style("text-anchor", "middle")
+            .text(titleText)
+            .lower()
 
         // rect to assist with zoom and pan
         svgGlyphs.append("rect")
@@ -85,7 +87,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .attr("x2", d => { return d })
             .attr("y2", height)
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
             })
             .style("stroke", "black")
             .style("stroke-width", config.strokeWidthLow)
@@ -99,7 +101,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .attr("x2", width)
             .attr("y2", d => { return d })
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 2 : config.opacityLow
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
             })
             .style("stroke", "black")
             .style("stroke-width", config.strokeWidthLow)
@@ -112,7 +114,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .cellFilter(d => { return d.label !== "e" })
             .scale(colorClusters)
             .on("cellover", () => {
-                svg.style("cursor", "default")
+                svg.style("cursor", "pointer")
             })
             .on("cellclick", function(e) {
                 d3.selectAll(".hovercircle")
@@ -140,7 +142,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .on("cellout", () => {
                 svg.style("cursor", "move")
             })
-        
+
         svg.append("g")
             .attr("class", "legendOrdinal")
             .attr("transform", `translate(${width - 65}, ${5}) scale(${1/2})`)
@@ -188,13 +190,13 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
         svg.call(zoom).on("dblclick.zoom", null)
 
         d3.select("body")
-        .on("keydown", function() {
-            if (d3.event.shiftKey) {
-                svg.style("cursor", "crosshair")
-                svg.on(".zoom", null)
-                addLasso()
-            }
-        })
+            .on("keydown", function() {
+                if (d3.event.shiftKey) {
+                    svg.style("cursor", "crosshair")
+                    svg.on(".zoom", null)
+                    addLasso()
+                }
+            })
 
         d3.select("body").on("keyup", function() {
             svg.style("cursor", "move")
@@ -204,7 +206,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             svgGlyphs.on(".dragend", null)
         })
 
-        // x & y scales for both radial and flower glyphs
+        // x & y scales for both polygon and flower glyphs
         const xScale = d3.scaleLinear()
             .domain(d3.extent(data.map(d => d.x)))
             .range([margin.left + config.r, width - margin.right - config.r])
@@ -213,9 +215,9 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .domain(d3.extent(data.map(d => d.y)))
             .range([height - margin.bottom - config.r, margin.top + config.r])
 
-        // Scales for radial glyph
-        const xradialLine = d3.lineRadial()
-        const radialScale = d3.scaleLinear()
+        // Scales for polygon glyph
+        const xpolygonLine = d3.lineRadial()
+        const polygonScale = d3.scaleLinear()
             .domain([0, 10])
             .range([0, config.r])
 
@@ -225,8 +227,8 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             svgGlyphs.attr("transform", transform)
         }
 
-        function plotRadialGlyph() {
-            // RadialGlyph
+        function plotPolygonGlyph() {
+            // polygonGlyph
             svgGlyphs.append("g").attr("class", "glyphs")
                 .selectAll("circle")
                 .data(data)
@@ -240,15 +242,15 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                         .enter()
                         .append("path")
                         .attr("class", d => { return d.selectedId == selectedId ? "selectedGlyph" : null })
-                        .attr("d", d => xradialLine([ d["open"], d["con"], d["extra"], d["agree"], 10 - d["neuro"], d["open"] ].map((v, i) => [Math.PI * (i) / 2, radialScale(v)])))
-                        .attr("transform", `translate(${xScale(d.x)}, ${yScale(d.y)})`)
+                        .attr("d", d => xpolygonLine([d["open"], d["con"], d["extra"], d["agree"], 10 - d["neuro"], d["open"]].map((v, i) => [Math.PI * (i) / 2, polygonScale(v)])))
+                        .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
                         .attr("stroke-width", config.strokeWidthHigh * 1)
                         .attr("fill", colorClusters(d["variety"]))
-                        
+
                 })
-            // adding text to show over selected selectedIds
+                // adding text to show over selected selectedIds
             if (toggleLabels == true) { addSelectedText() }
         }
 
@@ -260,7 +262,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                 .enter()
                 .append('g')
                 .each(function(d) {
-                    const tPetals = [ d["open"], d["con"], d["extra"], d["agree"], d["neuro"] ]
+                    const tPetals = [d["open"], d["con"], d["extra"], d["agree"], d["neuro"]]
                     d3.select(this)
                         .selectAll("path")
                         .data(tPetals)
@@ -271,14 +273,15 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                             return customPath
                         })
                         .attr("transform", function(v, i) {
-                            return `translate(${xScale(d.x)}, ${yScale(d.y)}), rotate(${360/config.petals * i}), scale(${v * config.r/100})`
+                            translate = toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})`
+                            return `${translate}, rotate(${360/config.petals * i}), scale(${v * config.r/100})`
                         })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
                         .attr("stroke-width", config.strokeWidthHigh * 5)
                         .attr("fill", colorClusters(d["variety"]))
                 })
-            // adding text to show over selected selectedIds
+                // adding text to show over selected selectedIds
             if (toggleLabels == true) { addSelectedText() }
         }
 
@@ -294,7 +297,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                 .attr("dy", (config.r) + "px")
                 .attr("font-size", config.labelSize.toString() + "px")
                 .attr("opacity", 0.8)
-                .text( d => {return d.id})
+                .text(d => { return d.id })
         }
 
         function addHoverCircle(Id) {
@@ -313,8 +316,8 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                 .attr("stroke", "black")
                 .attr("stroke-width", d => { return d.id == Id ? config.strokeWidthHigh : config.strokeWidthLow })
                 .style("fill", config.fillColor)
-                
-                .on("mousemove", () => {
+
+            .on("mousemove", () => {
                     tooltip_mousemove()
                 })
                 .on("mouseover", d => {
@@ -327,7 +330,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                 .on("click", function(d) {
                     selectedId = d.id
                     classCurrentSelection = d3.select(this).attr("class")
-                    // case1: pre-selected lasso-selected
+                        // case1: pre-selected lasso-selected
                     if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph") & classCurrentSelection.includes("selectedLasso")) {
                         // console.log("case1")
                         svgGlyphs.selectAll(".hovercircle")
@@ -402,7 +405,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                         return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
                     })
                     .attr("opacity", (d) => {
-                        return (d.id == selectedId) ? config.opacityClickHigh : config.opacityClickLow
+                        return (d.id == selectedId) ? config.opacityClickHigh : d.variety != d.cluster ? config.opacityClickMid : config.opacityClickLow
                     })
                     .attr("stroke", "black")
                     .attr("stroke-width", (d) => {
@@ -425,238 +428,238 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             svgGlyphs.call(lasso)
         }
 
-        if (toggleGlyph == "radialGlyph") {
-            // plotting the radial glyphs
-            plotRadialGlyph()
+        if (toggleGlyph == "polygonGlyph") {
+            // plotting the polygon glyphs
+            plotpolygonGlyph()
         } else if (toggleGlyph == "flowerGlyph") {
             // plotting the flower glyphs
             plotFloweGlyph()
         }
 
         addHoverCircle(selectedId)
-        // adding text to show over selected selectedIds
+            // adding text to show over selected selectedIds
         if (toggleLabels) {
             addSelectedText()
         }
 
         // help button
         svgButtons.append("image")
-        .attr("class", "help")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 110 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("xlink:href", "../img/help.png")
+            .attr("class", "help")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 110 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("xlink:href", "../img/help.png")
 
         svgButtons.append("rect")
-        .attr("class", "help")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 110 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("opacity", config.opacityClickHigh)
-        .attr("fill", "transparent")
-        .attr("rx", 3)
-        .on("mousemove", () => {
-            tooltip_mousemove(dx = -50, dy = 0)
-        })
-        .on("mouseover", d => {
-            tooltip_mouseover("Help")
-        })
-        .on("mouseout", () => {
-            tooltip_mouseout()
-        })
-        .on("click", function() {
-            alert(
-                'This is an alert with basic formatting\n\n' +
-                "\t• list item 1\n" +
-                '\t• list item 2\n' +
-                '\t• list item 3\n\n' +
-                '▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬\n\n' +
-                'Simple table\n\n' +
-                'Char\t| Result\n' +
-                '\\n\t| line break\n' +
-                '\\t\t| tab space'
-            )
-        })
+            .attr("class", "help")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 110 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("opacity", config.opacityClickHigh)
+            .attr("fill", "transparent")
+            .attr("rx", 3)
+            .on("mousemove", () => {
+                tooltip_mousemove(dx = -50, dy = 0)
+            })
+            .on("mouseover", d => {
+                tooltip_mouseover("Help")
+            })
+            .on("mouseout", () => {
+                tooltip_mouseout()
+            })
+            .on("click", function() {
+                alert(
+                    'This is an alert with basic formatting\n\n' +
+                    "\t• list item 1\n" +
+                    '\t• list item 2\n' +
+                    '\t• list item 3\n\n' +
+                    '▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬\n\n' +
+                    'Simple table\n\n' +
+                    'Char\t| Result\n' +
+                    '\\n\t| line break\n' +
+                    '\\t\t| tab space'
+                )
+            })
 
         // clear all button
         svgButtons.append("image")
-        .attr("class", "clearall")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 70 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("xlink:href", "../img/clearAll.png")
+            .attr("class", "clearall")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 70 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("xlink:href", "../img/clearAll.png")
 
         svgButtons.append("rect")
-        .attr("class", "clearall")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 70 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("opacity", config.opacityClickHigh)
-        .attr("stroke", "black")
-        .attr("fill", "transparent")
-        .attr("opacity", config.opacityClickHigh)
-        .attr("rx", 3)
-        .on("mousemove", () => {
-            tooltip_mousemove(dx = -70, dy = 0)
-        })
-        .on("mouseover", d => {
-            tooltip_mouseover("ClearAll")
-        })
-        .on("mouseout", () => {
-            tooltip_mouseout()
-        })
-        .on("click", function() {
-            d3.select(this).style("fill", "gray")
-            d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
-            d3.selectAll(".selectedLasso")
-                .classed("selectedLasso", false)
-                .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
-                .attr("stroke", "black")
-                .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
-                .style("fill", d => { return d.id == selectedId ? config.fillColor : config.fillColor })
-            plotParallelCord()
-        })
+            .attr("class", "clearall")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 70 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("opacity", config.opacityClickHigh)
+            .attr("stroke", "black")
+            .attr("fill", "transparent")
+            .attr("opacity", config.opacityClickHigh)
+            .attr("rx", 3)
+            .on("mousemove", () => {
+                tooltip_mousemove(dx = -70, dy = 0)
+            })
+            .on("mouseover", d => {
+                tooltip_mouseover("ClearAll")
+            })
+            .on("mouseout", () => {
+                tooltip_mouseout()
+            })
+            .on("click", function() {
+                d3.select(this).style("fill", "gray")
+                d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
+                d3.selectAll(".selectedLasso")
+                    .classed("selectedLasso", false)
+                    .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
+                    .style("fill", d => { return d.id == selectedId ? config.fillColor : config.fillColor })
+                plotParallelCord()
+            })
 
         // recenter button
         svgButtons.append("image")
-        .attr("class", "recenter")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 45 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("xlink:href", "../img/zoomOutMap.png")
+            .attr("class", "recenter")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 45 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("xlink:href", "../img/zoomOutMap.png")
 
         svgButtons.append("rect")
-        .attr("class", "recenter")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 45 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("opacity", config.opacityClickHigh)
-        .attr("stroke", "black")
-        .attr("fill", "transparent")
-        .attr("rx", 3)
-        .on("mousemove", () => {
-            tooltip_mousemove(dx = -80, dy = 0)
-        })
-        .on("mouseover", d => {
-            tooltip_mouseover("Recenter")
-        })
-        .on("mouseout", () => {
-            tooltip_mouseout()
-        })
-        .on("click", function() {
-            d3.select(this).style("fill", "gray")
-            d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
-            svg.transition().duration(config.transition_duration).call(zoom.transform, d3.zoomIdentity)
-            svgGlyphs.selectAll(".hovercircle")
-                .attr("r", config.r / 2)
-            svgGlyphs.selectAll(".hovercircle")
-                .transition().duration(config.transition_duration)
-                .attr("r", config.r)
-        })
-
-        // zoomin button
-        svgButtons.append("image")
-        .attr("class", "zoomin")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 20 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("xlink:href", "../img/zoomIn.png")
-
-        svgButtons.append("rect")
-        .attr("class", "zoomin")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 20 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("opacity", config.opacityClickHigh)
-        .attr("stroke", "black")
-        .attr("fill", "transparent")
-        .attr("rx", 3)
-        .on("mousemove", () => {
-            tooltip_mousemove(dx = -70, dy = 0)
-        })
-        .on("mouseover", d => {
-            tooltip_mouseover("ZoomIn")
-        })
-        .on("mouseout", () => {
-            tooltip_mouseout()
-        })
-        .on("click", function() {
-            d3.select(this).style("fill", "gray")
-            d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
-            current_zoom_scale = Math.ceil(d3.zoomTransform(svg.node()).k)
-            if (current_zoom_scale <= config.max_zoom - 1) {
-                current_zoom_scale += 1
-                svg.transition()
-                    .duration(config.transition_duration)
-                    .call(zoom.scaleTo, current_zoom_scale)
-            } else {
-                svg.transition()
-                    .duration(config.transition_duration)
-                    .call(zoom.scaleTo, config.max_zoom)
-                svgGlyphs.selectAll(".hovercircle")
-                    .attr("r", config.r / 2)
-                    .attr("stroke-width", config.strokeWidthHigh / 2)
-                svgGlyphs.selectAll(".hovercircle")
-                    .transition().duration(config.transition_duration)
-                    .attr("r", config.r)
-                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
-            }
-        })
-
-        // zoomout button
-        svgButtons.append("image")
-        .attr("class", "zoomout")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 0 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("xlink:href", "../img/zoomOut.png")
-
-        svgButtons.append("rect")
-        .attr("class", "zoomout")
-        .attr("x", width - margin.left - margin.right)
-        .attr("y", height - margin.top - 0 - 20)
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("opacity", config.opacityClickHigh)
-        .attr("stroke", "black")
-        .attr("fill", "transparent")
-        .attr("rx", 3)
-        .on("mousemove", () => {
-            tooltip_mousemove(dx = -80, dy = 0)
-        })
-        .on("mouseover", d => {
-            tooltip_mouseover("ZoomOut")
-        })
-        .on("mouseout", () => {
-            tooltip_mouseout()
-        })
-        .on("click", function() {
-            d3.select(this).style("fill", "gray")
-            d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
-            current_zoom_scale = Math.floor(d3.zoomTransform(svg.node()).k)
-            if (current_zoom_scale > 2) {
-                current_zoom_scale -= 1
-                svg.transition()
-                    .duration(config.transition_duration)
-                    .call(zoom.scaleTo, current_zoom_scale)
-            } else {
+            .attr("class", "recenter")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 45 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("opacity", config.opacityClickHigh)
+            .attr("stroke", "black")
+            .attr("fill", "transparent")
+            .attr("rx", 3)
+            .on("mousemove", () => {
+                tooltip_mousemove(dx = -80, dy = 0)
+            })
+            .on("mouseover", d => {
+                tooltip_mouseover("Recenter")
+            })
+            .on("mouseout", () => {
+                tooltip_mouseout()
+            })
+            .on("click", function() {
+                d3.select(this).style("fill", "gray")
+                d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
                 svg.transition().duration(config.transition_duration).call(zoom.transform, d3.zoomIdentity)
                 svgGlyphs.selectAll(".hovercircle")
                     .attr("r", config.r / 2)
                 svgGlyphs.selectAll(".hovercircle")
                     .transition().duration(config.transition_duration)
                     .attr("r", config.r)
-            }
-        })
+            })
+
+        // zoomin button
+        svgButtons.append("image")
+            .attr("class", "zoomin")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 20 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("xlink:href", "../img/zoomIn.png")
+
+        svgButtons.append("rect")
+            .attr("class", "zoomin")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 20 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("opacity", config.opacityClickHigh)
+            .attr("stroke", "black")
+            .attr("fill", "transparent")
+            .attr("rx", 3)
+            .on("mousemove", () => {
+                tooltip_mousemove(dx = -70, dy = 0)
+            })
+            .on("mouseover", d => {
+                tooltip_mouseover("ZoomIn")
+            })
+            .on("mouseout", () => {
+                tooltip_mouseout()
+            })
+            .on("click", function() {
+                d3.select(this).style("fill", "gray")
+                d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
+                current_zoom_scale = Math.ceil(d3.zoomTransform(svg.node()).k)
+                if (current_zoom_scale <= config.max_zoom - 1) {
+                    current_zoom_scale += 1
+                    svg.transition()
+                        .duration(config.transition_duration)
+                        .call(zoom.scaleTo, current_zoom_scale)
+                } else {
+                    svg.transition()
+                        .duration(config.transition_duration)
+                        .call(zoom.scaleTo, config.max_zoom)
+                    svgGlyphs.selectAll(".hovercircle")
+                        .attr("r", config.r / 2)
+                        .attr("stroke-width", config.strokeWidthHigh / 2)
+                    svgGlyphs.selectAll(".hovercircle")
+                        .transition().duration(config.transition_duration)
+                        .attr("r", config.r)
+                        .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
+                }
+            })
+
+        // zoomout button
+        svgButtons.append("image")
+            .attr("class", "zoomout")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 0 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("xlink:href", "../img/zoomOut.png")
+
+        svgButtons.append("rect")
+            .attr("class", "zoomout")
+            .attr("x", width - margin.left - margin.right)
+            .attr("y", height - margin.top - 0 - 20)
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("opacity", config.opacityClickHigh)
+            .attr("stroke", "black")
+            .attr("fill", "transparent")
+            .attr("rx", 3)
+            .on("mousemove", () => {
+                tooltip_mousemove(dx = -80, dy = 0)
+            })
+            .on("mouseover", d => {
+                tooltip_mouseover("ZoomOut")
+            })
+            .on("mouseout", () => {
+                tooltip_mouseout()
+            })
+            .on("click", function() {
+                d3.select(this).style("fill", "gray")
+                d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
+                current_zoom_scale = Math.floor(d3.zoomTransform(svg.node()).k)
+                if (current_zoom_scale > 2) {
+                    current_zoom_scale -= 1
+                    svg.transition()
+                        .duration(config.transition_duration)
+                        .call(zoom.scaleTo, current_zoom_scale)
+                } else {
+                    svg.transition().duration(config.transition_duration).call(zoom.transform, d3.zoomIdentity)
+                    svgGlyphs.selectAll(".hovercircle")
+                        .attr("r", config.r / 2)
+                    svgGlyphs.selectAll(".hovercircle")
+                        .transition().duration(config.transition_duration)
+                        .attr("r", config.r)
+                }
+            })
 
         function plotParallelCord() {
             lassoSelectedIds = [selectedId]
@@ -666,17 +669,17 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             lassoSelectedIds = [...new Set(lassoSelectedIds)]
             setTimeout(function() {
                 //your code to be executed after 1 second
-                updateParallelCord(parallelCordChart1, selectedId, lassoSelectedIds, featuresType="aggregatedFeatures", featurelist, starting_min_date = "", starting_max_date = "")
-                updateParallelCord(parallelCordChart2, selectedId, lassoSelectedIds, featuresType="individualFeatures", featurelist, starting_min_date = "", starting_max_date = "")
+                updateParallelCord(parallelCordChart1, selectedId, lassoSelectedIds, featuresType = "aggregatedFeatures", featurelist, starting_min_date = "", starting_max_date = "")
+                updateParallelCord(parallelCordChart2, selectedId, lassoSelectedIds, featuresType = "individualFeatures", featurelist, starting_min_date = "", starting_max_date = "")
             }, delayInMilliseconds)
         }
     })
 }
 
 
-function updateGlyphsglyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked) {
+function updateGlyphsglyphs(glyphsChart, polygonTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked) {
     d3.selectAll(".Tooltip").remove()
     d3.select("#" + glyphsChart).selectAll("*").remove()
-    d3.select("#" + radialTimeChart).selectAll("*").remove();
-    glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked)
+    d3.select("#" + polygonTimeChart).selectAll("*").remove();
+    glyphs(glyphsChart, polygonTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, noiseChecked)
 }

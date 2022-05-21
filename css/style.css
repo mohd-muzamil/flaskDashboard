@@ -1,14 +1,32 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
-html {
-    width: 100%;
-    height: 100%;
-    overflow:hidden;
+body {
+    /* width: 100%; */
+    /* height: 100%; */
+    overflow: hidden;
 }
 
-body {
-    width: 100%;
+#sidebar {
+    position: fixed;
+    width: 200px;
+    overflow-y: scroll;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#dashboard {
+    position: fixed;
+    margin-left: 200px;
+    width: calc(100% - 200px);
     height: 100%;
-    overflow:hidden;
+    padding: 0%;
+    /* width: calc(100% - 170px);
+    height: calc(100% - 30px);
+    transform: translate(170px, 0px);
+    overflow: hidden;
+    */
+    /* background-color: gray; */
 }
 
 #header {
@@ -16,13 +34,8 @@ body {
     height: 40px;
 }
 
-#dashboard {
-    height: calc(100% - 50px);
-    /* background-color: gray; */
-}
-
 .scaled {
-    transform: scale(0.8);
+    transform: scale(0.9);
 }
 
 .num-block {
@@ -93,10 +106,25 @@ body {
     transform: rotate(90deg);
 }
 
-.line {
-    width: 100%;
-    margin-top: 0px;
-    margin-bottom: 0px;
+hr {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    border: none;
+    background-color: #333;
+    height: 1px;
+}
+
+hr.double {
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+    border: none;
+    height: 10px;
+}
+
+br {
+    display: block;
+    content: "";
+    margin: 0;
 }
 
 p {
@@ -105,22 +133,26 @@ p {
 }
 
 svg {
-    border: solid 1px black;
-    margin-top: 3px;
+    border: solid 1px #000;
+    margin-top: 2px;
+    /* margin: 5px; */
+    /* padding: 0%; */
 }
 
 .svg1 {
+    /* margin-top: 5px; */
     height: 50%;
-    width: 59.6%;
+    width: 59.5%;
 }
 
 .svg2 {
+    /* margin-top: 5px; */
     height: 50%;
-    width: 40%;
+    width: 39.9%;
 }
 
 .svg3 {
-    height: 24.8%;
+    /* height: 24.8%; */
     width: 100%;
 }
 
@@ -130,12 +162,35 @@ svg {
 }
 
 #sidebar-nav {
-    width: 160px;
+    width: 180px;
 }
 
-.axis {
-    font: 10px sans-serif;
+.slider {
+    width: 90%;
+    height: 100%;
 }
+
+.button {
+    background-color: rgb(18, 113, 249);
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.multiselect {
+    transform: scale(0.9);
+}
+
+
+/* .axis { */
+
+
+/* font: 12px sans-serif; */
+
+
+/* } */
 
 .axis path,
 .axis line {
@@ -158,10 +213,10 @@ td {
 .selectedLabel {
     color: #0275d8;
     box-sizing: border-box;
-    width: 80%;
+    width: 100%;
     border: solid #808080 .2px;
     border-radius: 5px;
-    padding: 1px;
+    padding-left: 50px 0;
 }
 
 .ui-autocomplete {
@@ -190,4 +245,17 @@ td {
 
 .lassoselect {
     cursor: wait;
+}
+
+
+/* toggle button styling */
+
+.toggle.round,
+.toggle-on.round,
+.toggle-off.round {
+    border-radius: 20rem;
+}
+
+.toggle.round .toggle-handle {
+    border-radius: 20rem;
 }
