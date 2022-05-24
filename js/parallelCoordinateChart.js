@@ -4,13 +4,13 @@
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
 // https://gist.github.com/titipignataro/47135818bad65a439174038227e0eb20
 
-function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, starting_min_date, starting_max_date) {
+function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date, starting_max_date) {
     var featuresNames
     var importanceScores
     const line_color = "purple"
     const titleLegend = "Feature Importance"
 
-    postForm = { "featureColumns": featurelist }
+    postForm = { "featureColumns": featurelist, "classLabel": classLabel }
     $.ajax({
         type: "POST",
         contentType: 'application/json',
@@ -309,10 +309,11 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
 }
 
 
-function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, starting_min_date = "", starting_max_date = "") {
+function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date = "", starting_max_date = "") {
+    // featuresType: aggregatedFeatures/individualFeatures
     if (Array.isArray(selectedId)) {
         selectedId = selectedId[0]
     }
     d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
-    parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, starting_min_date, starting_max_date)
+    parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date, starting_max_date)
 }

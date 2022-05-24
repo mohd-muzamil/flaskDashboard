@@ -45,6 +45,7 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
 
 
 def getTSNE(df, columns, width, height, radius):
+    print(df.loc[:, columns].head)
     #TSNE projection
     tsne = TSNE(n_components=2, verbose=1,
                 perplexity=40, n_iter=300, init='random', learning_rate="auto")
@@ -52,6 +53,7 @@ def getTSNE(df, columns, width, height, radius):
     tsneResult = np.round(MinMaxScaler().fit_transform(tsneResult), 3)
     tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
     tsneX_overlapRemoved, tsneY_overlapRemoved = DGridRemoveOverlap(tsneResult, width, height, radius)
+    print("#"*100, "TSNE completed")
     return tsneX, tsneY, tsneX_overlapRemoved, tsneY_overlapRemoved
 
 
@@ -65,26 +67,27 @@ def getPCA(df, columns, width, height, radius):
     return pcaX, pcaY, pcaX_overlapRemoved, pcaY_overlapRemoved
 
 
-def getClusters(df, columns, label, k):
+def getClusters(df, columns, classLabel, k):
     # KNN clustering
     X = df.loc[:, columns]
-    Y = df.loc[:, label]    #change the column here-use glyph color column for knn
+    Y = df.loc[:, classLabel]    #change the column here-use glyph color column for knn
     clusters = []
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X, Y)
     clusters = knn.predict(X)
+    print("#"*100, "KNN clustering completed")
     return clusters
 
 
-def getFeatureImportance(df, columns, label):
+def getImportance(df, columns, classLabel):
     # Feature imporance score is measured by training an XGboost model.
-    if not label.isnumeric():
-        le = LabelEncoder().fit(df[label].values)
-        df["label"] = le.transform(df[label].values)
-    elif df[label].unique()>10:
-        df[label] = pd.cut(df[label], q=4, labels=[1, 2, 3, 4])
+    if not classLabel.isnumeric():
+        le = LabelEncoder().fit(df[classLabel].values)
+        df["classLabel"] = le.transform(df[classLabel].values)
+    elif df[classLabel].unique()>10:
+        df[classLabel] = pd.cut(df[classLabel], q=4, labels=[1, 2, 3, 4])
 
-    X, y = df.loc[:, columns], df.loc[:, label]
+    X, y = df.loc[:, columns], df.loc[:, classLabel]
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
     X_train, y_train = X, y     #no test set, since all of the instances are needed to calculate the feature importance
     
@@ -121,6 +124,17 @@ def getIds():
     ids = featureData["id"].unique().tolist()
     return jsonify(ids)
 
+# Get a list of distinct values for classLabel
+@app.route('/getClassLabels', methods=['POST'])
+def getClassLabels():
+    if request.method == 'POST':
+        content = request.get_json()
+        classLabel = content["classLabel"]
+        print("$"*100, classLabel)
+        personalityData = pd.read_csv(os.path.join("data/rawData", personalityFile))
+        classLabels = personalityData[classLabel].unique().tolist()
+        return jsonify(classLabels)
+
 
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceIds():
@@ -131,14 +145,13 @@ def dimReduceIds():
     
     if request.method == 'POST':
         content = request.get_json()
-        print("$$$$$$", content)
         columns = content["featureColumns"]
         width = content['width']
         height = content['height']
         radius = int(content["radius"])
         k = int(content["k"])
         toggleDimRedux = content["toggleDimRedux"]
-        label = content["label"]
+        classLabel = content["classLabel"]
 
         # print("_"*100, "\n", columns, featureData[columns].head(5))
         # dim reduction
@@ -147,7 +160,7 @@ def dimReduceIds():
         elif toggleDimRedux == "pca":
             x, y, x_overlapRemoved, y_overlapRemoved = getPCA(combinedData, columns, width, height, radius)
         
-        cluster = getClusters(combinedData, columns, label, k)    #KNN clustering
+        cluster = getClusters(combinedData, columns, classLabel, k)    #KNN clustering
         personalityData["x"], personalityData["y"] = x, y
         personalityData["x_overlapRemoved"], personalityData["y_overlapRemoved"] = x_overlapRemoved, y_overlapRemoved
         personalityData["cluster"] = cluster
@@ -156,6 +169,7 @@ def dimReduceIds():
         personalityData.to_csv(os.path.join(
             "data/processedData", personalityFile), index=False, header=True)
         message = "status1:fileUpdated"
+        print("#"*100, message)
     return jsonify(message)
 
 
@@ -181,7 +195,7 @@ def knnClustering():
 
 
 @app.route('/getProjections', methods=['GET'])
-def fetchProjections():
+def getProjections():
     """
     Return Data for Chart1: Personality scores that are used to make glyphs
     """
@@ -309,8 +323,8 @@ def filterparticipantIdsNew():
         return jsonify("no post requests")
 
 
-@app.route('/fetchAggFeatures', methods=['POST'])
-def fetchAggFeatures():
+@app.route('/getAggFeatures', methods=['POST'])
+def getAggFeatures():
     """
     Returns Data for Chart3: Parallel cordinate chart to visualize extracted features
     """
@@ -340,8 +354,8 @@ def fetchAggFeatures():
         return resp
 
 
-@app.route('/fetchIndividualFeatures', methods=['POST'])
-def fetchIndividualFeatures():
+@app.route('/getIndividualFeatures', methods=['POST'])
+def getIndividualFeatures():
     """
     Returns Data for Chart4: Parallel cordinate chart to visualize extracted features - This will return the feature of single id.
     """
@@ -408,7 +422,7 @@ def dataTable():
 # https://mljar.com/blog/feature-importance-xgboost/
 # https://explained.ai/rf-importance/
 @app.route('/getFeatureImportance', methods=['POST'])
-def featureImportance():
+def getFeatureImportance():
     """
     Returns a list of features sorted based on their importance to classify the dataset. 
     This will be used to sort features in parallel cord chart
@@ -416,11 +430,12 @@ def featureImportance():
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
+        classLabel = content["classLabel"]
 
         featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
         if len(columns)<=1:
             columns = [col for col in list(featureData.columns) if col not in ["id", "gender"]]
-        featuresWithImportance = getFeatureImportance(featureData, columns)
+        featuresWithImportance = getImportance(featureData, columns, classLabel)
         return jsonify(featuresWithImportance)
 
 

@@ -1,42 +1,222 @@
-body {
-    overflow: hidden;
+body,
+html {
+    height: 100%;
+    /* background-image: */
+        /* linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), */
+        /* url("https://unsplash.com/photos/yI3weKNBRTc"); */
+    /* overflow: hidden; */
 }
 
-#sidebar-wrapper {
+#wrapper {
+    /* display: flex; */
+    width: 100%;
+}
+
+#sidebar {
+    width: 200px;
     min-height: 100vh;
-    margin-left: -15rem;
-    -webkit-transition: margin .25s ease-out;
-    -moz-transition: margin .25s ease-out;
-    -o-transition: margin .25s ease-out;
-    transition: margin .25s ease-out;
+    position: fixed;
+    transition: all 0.4s;
+    overflow-y: auto;
+    overflow-x: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: gray;
 }
 
-#sidebar-wrapper .sidebar-heading {
-    padding: 0.875rem 1.25rem;
-    font-size: 1.2rem;
+#content {
+    width: calc(100% - 200px);
+    min-height: 100vh;
+    position: absolute;
+    right: 0;
+    transition: all 0.4s;
 }
 
-#sidebar-wrapper .list-group {
-    width: 15rem;
+.no-sidebar #sidebar {
+    /* width: 0%; */
+    margin-left: -200px !important;
+    transition: all 0.4s;
 }
 
-#page-content-wrapper {
-    min-width: 100vw;
+.no-sidebar #content {
+    width: 100%;
 }
 
-#wrapper.toggled #sidebar-wrapper {
-    margin-left: 0;
+svg {
+    border: solid 1px #000;
+    margin-top: 3px;
 }
 
-@media (min-width: 768px) {
-    #sidebar-wrapper {
-        margin-left: 0;
-    }
-    #page-content-wrapper {
-        min-width: 0;
-        width: 100%;
-    }
-    #wrapper.toggled #sidebar-wrapper {
-        margin-left: -15rem;
-    }
+.svg1 {
+    height: 50%;
+    width: 59.5%;
+    /* width: 58.6%; */
+}
+
+.svg2 {
+    height: 50%;
+    width: 39.5%;
+}
+
+.svg3 {
+    height: 24.5%;
+    width: 99.5%
+}
+
+.help {
+    cursor: pointer;
+}
+
+.multiselect-container,
+.dropdown-menu,
+.show {
+    position: fixed !important;
+    top: inherit !important;
+    left: inherit !important;
+    z-index: 1000;
+    transform: scale(0.7);
+}
+
+
+/* number spinner for knn parameter skin 1 */
+
+.skin-1 .num-in {
+    float: left;
+    width: 94;
+}
+
+.skin-1 .num-in span {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 25px;
+    line-height: 32px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.skin-1 .num-in span.dis:before {
+    background-color: #ccc !important;
+}
+
+.skin-1 .num-in input {
+    float: left;
+    width: 30px;
+    height: 25px;
+    border: 1px solid #6E6F7A;
+    border-radius: 5px;
+    color: #000;
+    text-align: center;
+    padding: 0;
+}
+
+.skin-1 .num-in span.minus:before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+    left: 0;
+}
+
+.skin-1 .num-in span.plus:before,
+.skin-1 .num-in span.plus:after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+}
+
+.skin-1 .num-in span.plus:after {
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+hr {
+    margin-top: 0em !important;
+    margin-bottom: 5px !important;
+    background-color: gray;
+}
+
+hr.double {
+    margin-top: 0em !important;
+    margin-bottom: 0em !important;
+    border-width: 3px;
+    background-color: gray;
+}
+
+br {
+    display: block;
+    content: "";
+    margin: 2px 0;
+}
+
+.slider {
+    width: 90%;
+    height: 100%;
+}
+
+.button {
+    background-color: rgb(18, 113, 249);
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+
+/* toggle button styling */
+
+.toggle.round,
+.toggle-on.round,
+.toggle-off.round {
+    border-radius: 20rem;
+}
+
+.toggle.round .toggle-handle {
+    border-radius: 20rem;
+}
+
+.lasso path {
+    stroke: rgb(80, 80, 80);
+    stroke-width: 1.5px;
+}
+
+.lasso .drawn {
+    fill-opacity: 0.05;
+}
+
+.lasso .loop_close {
+    fill: none;
+    stroke-dasharray: 4, 4;
+}
+
+.lasso .origin {
+    /* fill:#3399FF; */
+    fill-opacity: .5;
+}
+
+.lassoselect {
+    cursor: wait;
+}
+
+.scaled {
+    transform: scale(0.7);
+}
+
+button.multiselect {
+    height: 2em;
+    font-size: x-small;
+    line-height: 0;
 }

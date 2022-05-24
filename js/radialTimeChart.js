@@ -1,7 +1,5 @@
-/****Importatnt file****/
 // This script is used to plot radial chart in second svg
-
-function plotAreaChart(chart, dependendChart, participantId, attributes, featurelist) {
+function radialTimeChart(chart, dependendChart, participantId, attributes, featurelist) {
         // var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyro": "#7570b3", "lck": "#a6bddb"}
         // var pathColor = {"brt": "#1f78b4", "acc": "#33a02c", "gyro": "#b2df8a", "lck": "#dadaeb"}    //darkBlue, darkgreen, lightgreen, lightpurple
         // var pathColor = {"brt": "#377eb8", "acc": "#e41a1c", "gyro": "#fb8072", "lck": "#d0d1e6"}    //darkBlue, darkRed, lightRed, lightBlue
@@ -469,7 +467,7 @@ function plotAreaChart(chart, dependendChart, participantId, attributes, feature
 //         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
 // }
 
-function updatePlotAreaChart(chart, dependendChart, participantId, featurelist, brtChecked, accChecked, gyroChecked, lckChecked) {
+function updateRadialTimeChart(chart, dependendChart, participantId, featurelist, brtChecked, accChecked, gyroChecked, lckChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
     d3.select("#" + chart).selectAll('g').remove(); //clearing the chart before plotting new data
     buffering(chart, participantId); //calling method that plots buffering symbol
@@ -483,7 +481,7 @@ function updatePlotAreaChart(chart, dependendChart, participantId, featurelist, 
     // attr = "brt";
     // pathColor = "green";
 
-    plotAreaChart(chart, dependendChart, participantId, attributes, featurelist)
+    radialTimeChart(chart, dependendChart, participantId, attributes, featurelist)
 
     var delayInMilliseconds = 1000; //1 second
     setTimeout(function() {
@@ -496,14 +494,14 @@ function updatePlotAreaChart(chart, dependendChart, participantId, featurelist, 
     //     filename = "dummyAccelerometer";
     //     attr = "acc";
     //     pathColor = "red";
-    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    //     brushPlotted, gridPlotted = radialTimeChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
     // }
     // //gyrooscopeData
     // if (gyroChecked == true) {
     //     filename = "dummygyrooscope";
     //     attr = "gyro";
     //     pathColor = "blue";
-    //     brushPlotted, gridPlotted = plotAreaChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
+    //     brushPlotted, gridPlotted = radialTimeChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
     // }
     // //lockstateData
     // if (lckChecked == true) {

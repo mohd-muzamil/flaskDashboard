@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>PROSIT</title>
+    <link rel="shortcut icon" href="../img/PROSIT.png">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet" />
+    <link href="../css/style1.css" rel="stylesheet">
+    <link href="../css/parallelCordMBostock.css" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css'>
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- load bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <!-- load jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!-- load jQuery UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
+        integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- load libraries for multiselect dropdown -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
+        crossorigin="anonymous"></script>
+    <!-- multi select -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js"
+        integrity="sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.css"
+        integrity="sha512-Lif7u83tKvHWTPxL0amT2QbJoyvma0s9ubOlHpcodxRxpZo4iIGFw/lDWbPwSjNlnas2PsTrVTTcOoaVfb4kwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- toggle switch -->
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <!-- AG-grid -->
+    <script src="https://unpkg.com/ag-grid-enterprise@27.0.1/dist/ag-grid-enterprise.min.js"></script>
+
+    <!-- start wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar" class="card m-0 p-0">
+            <!-- show is used here to hide or show the sidebar by default-->
+            <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                <div class="card bg-secondary m-0 p-0 pb-1" style="display:flex; text-align: left;">
+                    <img src="../img/PROSIT.png" alt="PROSIT" style="display: block; margin: auto; width: 50%;">
+                    <h6 id="dashboardHeader"
+                        style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249); font-size:x-small ;">
+                        PROSIT Dashboard</h6>
+                </div>
+                <hr class="double">
+
+                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                    <!-- search bar to search specific participant -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0 pl-0">
+                                <span class="pl-1" onclick=alertSearchBar()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;"> Search Id</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-searchId">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group input-group-sm m-0 p-0 scaled" style="width: 15em; left: -2em;">
+                            <input type="text" id="searchSelector" class="form-control" aria-label="Search"
+                                stlye="text-align: center;" />
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+
+                    <!-- multi select dropdown -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertFeatureSelection()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;">Feature Selection</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-featureSelection">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="multiselect-menu px-0">
+                            <select id="featureSelect" multiple>
+                                <optgroup label="Screen">
+                                    <option value="noScreenLocks" selected="selected">No of Unlocks</option>
+                                    <option value="firstScreenUnlock" selected="selected">First Screen Unlock</option>
+                                    <option value="lastScreenLock" selected="selected">Last Screen Lock</option>
+                                    <option value="maxScreenTime" selected="selected">Max On time</option>
+                                    <option value="totalScreenTime" selected="selected">Total On time</option>
+                                </optgroup>
+
+                                <optgroup label="Calling">
+                                    <option value="noMissed" selected="selected">No of missed calls</option>
+                                    <option value="noDialled" selected="selected">No of dialed calls</option>
+                                    <option value="noIncoming" selected="selected">No of incoming calls</option>
+                                    <option value="minDurationIncoming" selected="selected">Min dur of incoming calls
+                                    </option>
+                                    <option value="maxDurationIncoming" selected="selected">Max dur of incoming calls
+                                    </option>
+                                    <option value="totalDurationIncoming" selected="selected">Total dur of incoming
+                                        calls</option>
+                                    <option value="noOutgoing" selected="selected">No of outgoing calls</option>
+                                    <option value="minDurationOutgoing" selected="selected">Min dur of outgoing calls
+                                    </option>
+                                    <option value="maxDurtaionOutgoing" selected="selected">Max dur of outgoing calls
+                                    </option>
+                                    <option value="totalDurationOutgoing" selected="selected">Total dur of outgoing
+                                        calls</option>
+                                    <option value="totalNoCalls" selected="selected">Total number of calls</option>
+                                    <option value="totalDurationCalls" selected="selected">Total dur of all calls
+                                    </option>
+                                </optgroup>
+
+                                <!-- <optgroup label="Mobility">
+                                        <option value="noOfStayPoints" selected="selected">No of stay points</option>
+                                        <option value="locationVariance" selected="selected">Location Variance</option>
+                                        <option value="entropy" selected="selected">Entropy</option>
+                                        <option value="normalizedEntropy" selected="selected">Normalized Entropy</option>
+                                        <option value="homeStay" selected="selected">Home stay</option>
+                                        <option value="radiusOfGyration" selected="selected">Radius of Gyration</option>
+                                    </optgroup> -->
+
+                                <optgroup label="Sleep">
+                                    <option value="sleepStartTime" selected="selected">Sleep start Time</option>
+                                    <option value="sleepEndTime" selected="selected">Sleep end Time</option>
+                                    <option value="sleepDuration" selected="selected">Sleep duration</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+
+                    <script>
+                        //settings for multiselect dropdown - run at the begining of page refresh/first load
+                        // $('#featureSelect').multiselect();
+                        $('#featureSelect').multiselect({
+                            enableClickableOptGroups: true,
+                            enableCollapsibleOptGroups: true,
+                            enableFiltering: true,
+                            filterPlaceholder: 'Search',
+                            includeSelectAllOption: true,
+                            buttonWidth: '140px',
+                            maxHeight: screen.height * 0.5,
+                            // buttonClass: 'btn btn-link',
+                            numberDisplayed: 1,
+                            dropRight: true
+                        })
+                    </script>
+                    <!-- k-param -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertKparam()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;"> K param for KNN</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-knn">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="num-block skin-1 m-0 p-0 pl-2">
+                            <div class="num-in">
+                                <span class="minus"></span>
+                                <input style="font-weight:bold; font-size: 13px" type="text" class="in-num" value="3">
+                                <span class="plus"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+
+                    <!-- Toggle Dimensionality Reduction technique tsne/pca -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertDimRedux()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;">2D projection</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-toggleDimRedux">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="m-0 p-0 pl-1">
+                            <input type="checkbox" checked data-toggle="toggle" data-style="round" data-size="xs"
+                                data-width=100 data-on="t-SNE" data-off="PCA" id="toggleDimRedux">
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+
+                    <!-- slider for radius of glyph -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertGlyphRadius()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;">Glyph Radius:</label>
+                                <span style="font-weight:bold" id="sliderVal"></span>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-glyphRadius">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="m-0 p-0 pl-2">
+                            <input type="range" min="5" max="20" value="5" steps='1' class="slider" id="myRange">
+                        </div>
+                    </div>
+                </div>
+                <hr class="double">
+
+                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                    <!-- checkboxes for coloring glyphs -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertClassLabel()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;">Class Label</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-classLabel" style="align-items: flex-start;">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="classLabel">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age" name="colorCheckbox">
+                                <label class="form-check-label" for="inlineCheckbox1">Age</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="gender" name="colorCheckbox" checked>
+                                <label class="form-check-label" for="inlineCheckbox2">Gender</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="dass1" name="colorCheckbox">
+                                <label class="form-check-label" for="inlineCheckbox3">Dass1</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="dass2" name="colorCheckbox">
+                                <label class="form-check-label" for="inlineCheckbox3">Dass2</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <hr>
+
+                    <!-- checkboxes to select sensor data to render on radial time chart -->
+                    <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="row">
+                            <div class="col-10 m-0 p-0">
+                                <span class="pl-1" onclick=alertClassLabels()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <label class="pl-2" style="font-size: 13px; font-weight:500;">Mobile Sensors</label>
+                            </div>
+                            <div class="col-2 m-0 p-0">
+                                <button class="button" id="btn-mobileSensors" style="align-items: flex-start;">
+                                    <i class="fa fa-square-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mobileSensors">
+                            <div class="form-check form-check-inline">
+                                <input id="lckCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox1">
+                                <label class="form-check-label" for="inlineCheckbox1">Lck</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input id="brtCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox2"
+                                    checked>
+                                <label class="form-check-label" for="inlineCheckbox2">Brt</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input id="accCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox3"
+                                    checked>
+                                <label class="form-check-label" for="inlineCheckbox3">Acc</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input id="gyrCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox3"
+                                    checked>
+                                <label class="form-check-label" for="inlineCheckbox3">Gyro</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input id="sleepNoiseCheckBox" class="form-check-input" type="checkbox"
+                                    id="inlineCheckbox3">
+                                <label class="form-check-label" for="inlineCheckbox3">Noise</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="double">
+
+                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                    <!-- Toggle glyph switch -->
+                    <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch pl-1" style="text-align: left">
+                            <div>
+                                <span onclick=alertGlyph()><i class="fa-solid fa-circle-question help"></i></span>
+                                <input class="pl-4 scaled" type="checkbox" checked data-toggle="toggle"
+                                    data-style="round" data-size="xs" data-width=90 data-on="Flower" data-off="Polygon"
+                                    id="toggleGlyph">
+                                <label class="form-check-label" for="toggleGlyph"
+                                    style="font-size: 13px; font-weight:500;">Glyph</label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Toggle Overlap removal -->
+                    <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch pl-1" style="text-align: left">
+                            <div>
+                                <span onclick=alertOverlap()><i class="fa-solid fa-circle-question help"></i></span>
+                                <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round"
+                                    data-size="xs" data-width=90 data-on="Remove" data-off="Keep" id="toggleDGrid">
+                                <label style="font-size: 13px; font-weight:500;">Overlap</label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Show labels switch -->
+                    <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch pl-1" style="text-align: left">
+                            <div>
+                                <span onclick=alertLabels()><i class="fa-solid fa-circle-question help"></i></span>
+                                <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round"
+                                    data-size="xs" data-width=90 data-on="Hide" data-off="Show" id="toggleLabels">
+                                <label style="font-size: 13px; font-weight:500;">Labels</label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Show grid switch -->
+                    <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch pl-1" style="text-align: left">
+                            <div>
+                                <span onclick=alertGrid()><i class="fa-solid fa-circle-question help"></i></span>
+                                <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round"
+                                    data-size="xs" data-width=90 data-on="Show" data-off="Hide" id="toggleSvgGrid">
+                                <label style="font-size: 13px; font-weight:500;">Grid</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- reset button -->
+                <div class="card bg-secondary" style="display:flex; text-align: left;">
+                    <div class="container" style="display:contents; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch m-0 p-0 ml-1 my-2" style="text-align: left">
+                            <div>
+                                <span class="p-0" onclick=alertReset()><i
+                                        class="fa-solid fa-circle-question help"></i></span>
+                                <input type="button" class="btn btn-info btn-sm ml-1" style="width:60%; height:20%"
+                                    id="btn-reload" value="Reset" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="content" style="height:100%">
+            <div class="ml-1" style="height:95%">
+                <svg class="svg1" id="chart1"></svg>
+                <svg class="svg2" id="chart2"></svg>
+                <svg class="svg3" id="chart3"></svg>
+                <svg class="svg3" id="chart4"></svg>
+            </div>
+            <nav class="ml-1">
+                <!-- <a id="menuButton" data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false">Menu</a> -->
+                <a href="#" id="sidebar-toggle">Menu</a>
+                <div id="csvGrid" class="grid ag-theme-balham" style="display: none;"></div>
+            </nav>
+        </div>
+    </div>
+    <!-- wrapper end -->
+
+    <script>
+        $.ajax({
+            type: "GET",
+            async: false,
+            url: "/getIds",
+            success: function (response) {
+                ids = response
+                ids_str = []
+                ids.forEach(e => {
+                    ids_str.push(e.toString())
+                });
+                $("#searchSelector").autocomplete({
+                    source: ids_str
+                });
+            }
+        })
+    </script>
+
+    <!-- Imports -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https:/d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <script src="../js/d3-lasso.min.js"></script>
+
+    <!-- PROSIT Charts -->
+    <!-- glyphs scatter plot : svg1 -->
+    <script src="../js/glyphs.js"></script>
+    <!-- parallel cordinate chart : svg2 -->
+    <script src="../js/parallelCoordinateChart.js"></script>
+    <!-- loading symbol during buffer -->
+    <script src="../js/buffering.js"></script>
+    <script>
+        // config
+        var glyphsChart = "chart1"
+        var radialTimeChart = "chart2"
+        var parallelCordChart1 = "chart3"
+        var parallelCordChart2 = "chart4"
+        var ids = []
+        var selectedId
+        var featurelist = $('#featureSelect').val()
+        var currentfeaturelistPCP = featurelist
+        var radius = +document.getElementById("myRange").value
+        var k
+        var toggleGlyph //'polygonGlyph' for Polygon Glyph and 'flowerGlyph' for Flower Glyph
+        var toggleDimRedux
+        var toggleDGrid
+        var toggleLabels //true for showing labels
+        var toggleSvgGrid //true for showing the grid
+        var classLabel
+        var lckChecked
+        var brtChecked
+        var accChecked
+        var gyrChecked
+        var sleepnNoiseChecked
+        var delayInMilliseconds = 750
+
+        // setting up the default states for toggle swtiches
+        {
+            $('#toggleDimRedux').bootstrapToggle('on') //on-tsne off-pca
+            $('#toggleGlyph').bootstrapToggle('on') //on-flower off-polygon
+            $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
+            $('#toggleLabels').bootstrapToggle('on') //on-hideLabels off-showLabels
+            $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
+        }
+
+        // jquery handlers for initially setting the values of variables
+        {
+            $('#searchSelector').change(function () {
+                var id = $('#searchSelector').val()
+                if (!ids.includes(id)) {
+                    alert(`Select a valid Id from the suggestion`)
+                }
+                $("#searchSelector").attr('placeholder', selectedId.toString());
+                $('#searchSelector').val('');
+            });
+
+            if ($("#lckCheckBox").is(':checked')) {
+                lckChecked = true
+            } else {
+                lckChecked = false
+            }
+
+            if ($("#brtCheckBox").is(':checked')) {
+                brtChecked = true
+            } else {
+                brtChecked = false
+            }
+
+            if ($("#accCheckBox").is(':checked')) {
+                accChecked = true
+            } else {
+                accChecked = false
+            }
+
+            if ($("#gyrCheckBox").is(':checked')) {
+                gyrChecked = true
+            } else {
+                gyrChecked = false
+            }
+
+            if ($("#sleepNoiseCheckBox").is(':checked')) {
+                sleepnNoiseChecked = true
+            } else {
+                sleepnNoiseChecked = false
+            }
+
+            $('input[name="colorCheckbox"]:checked').each(function () {
+                console.log("classLabel", classLabel)
+                classLabel = this.value
+            });
+
+            if ($("#toggleGlyph").is(':checked')) {
+                toggleGlyph = "flowerGlyph"
+            } else {
+                toggleGlyph = "polygonGlyph"
+            }
+
+            if ($("#toggleDimRedux").is(':checked')) {
+                toggleDimRedux = "tsne"
+            } else {
+                toggleDimRedux = "pca"
+            }
+
+            if ($("#toggleDGrid").is(':checked')) {
+                toggleDGrid = true
+            } else {
+                toggleDGrid = false
+            }
+
+            if ($("#toggleLabels").is(':checked')) {
+                toggleLabels = false
+            } else {
+                toggleLabels = true
+            }
+
+            if ($("#toggleSvgGrid").is(':checked')) {
+                toggleSvgGrid = true
+            } else {
+                toggleSvgGrid = false
+            }
+
+            k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+
+            // jquery handlers for knn input spinner
+            {
+                //number spinner for knn param +/-
+                $(document).ready(function () {
+                    const min = 1
+                    const max = ids.length
+                    $('.num-in span').click(function () {
+                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                        var $input = $(this).parents('.num-block').find('input.in-num')
+                        if ($(this).hasClass('plus')) count++
+                        else count--
+                        $input.val(count)
+                        $input.change()
+                        return false
+                    })
+
+                    // auto update the button for k param when input goes above the range
+                    $('.num-in span').parents('.num-block').find('input.in-num').on("change", () => {
+                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                        if (count <= min) {
+                            count = min
+                            $('.num-in span').parents('.num-block').find(('.minus')).addClass('dis')
+                        } else if (count >= max) {
+                            count = max
+                            $('.num-in span').parents('.num-block').find(('.plus')).addClass('dis')
+                        } else {
+                            $('.num-in span').parents('.num-block').find(('.minus')).removeClass('dis')
+                            $('.num-in span').parents('.num-block').find(('.plus')).removeClass('dis')
+                        }
+                        $('.num-in span').parents('.num-block').find('input.in-num').val(count)
+                        k = count
+                    })
+                })
+            }
+
+            // jquery handlers for showing chart for random data on screen
+            {
+                // set a  ramdom value to select an id 
+                $.ajax({
+                    type: "GET",
+                    async: false,
+                    url: "/getIds",
+                    success: function (response) {
+                        ids = response
+                        ids_str = []
+                        ids.forEach(e => {
+                            ids_str.push(e.toString())
+                        });
+                        selectedId = ids[Math.floor(Math.random() * ids.length)]
+                        $("#searchSelector").attr("placeholder", selectedId.toString())
+                    }
+                })
+                process(delayInMilliseconds, true)
+            }
+        }
+
+        // jquery handlers for regreshing charts after resizing
+        {
+            // auto refresh after window resizing
+            jQuery(function ($) {
+                var windowWidth = $(window).width()
+                var windowHeight = $(window).height()
+                var id
+                $(window).resize(function () {
+                    clearTimeout(id)
+                    id = setTimeout(doneResizing, 750)
+                })
+
+                function doneResizing() {
+                    if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+                        location.reload()
+                        return
+                    }
+                }
+            })
+        }
+
+        // refresh after the side open or close using menu click event
+        // muzzu
+        $(document).ready(function () {
+            $("#sidebar-toggle").on('click', function () {
+                $("#wrapper").toggleClass("no-sidebar");
+                renderCharts(delayInMilliseconds, true)
+            });
+        });
+
+        // jquery handlers for the input types in the Menu
+        {
+            // menu button click events
+            $("#btn-searchId").click(function () {
+                // selectedId = parseInt($("#btn-searchId").val())
+                renderCharts()
+            })
+            $("#btn-featureSelection").click(function () {
+                process(delayInMilliseconds, true)
+            })
+            $("#btn-knn").click(function () {
+                processKNN(delayInMilliseconds)
+            })
+            $("#btn-toggleDimRedux").click(function () {
+                process(delayInMilliseconds)
+            })
+            $("#btn-glyphRadius").click(function () {
+                process(delayInMilliseconds)
+            })
+            $("#btn-classLabel").click(function () {
+                $('input[name="colorCheckbox"]:checked').each(function () {
+                console.log("classLabel", classLabel)
+                classLabel = this.value
+            });
+                console.log("btn-classLabel")
+                process(delayInMilliseconds)
+            })
+            $("#btn-mobileSensors").click(function () {
+                console.log("btn-mobileSensors")
+                process(delayInMilliseconds)
+            })
+
+            //range slider 
+            var slider = document.getElementById("myRange")
+            var output = document.getElementById("sliderVal")
+            output.innerHTML = slider.value
+            slider.oninput = function () {
+                radius = this.value
+                output.innerHTML = radius
+            }
+
+            // checkbox to render lockstate data
+            $("#lckCheckBox").on('change', function () {
+                if ($(this).is(':checked')) {
+                    lckChecked = true
+                } else {
+                    lckChecked = false
+                }
+            })
+
+            // checkbox to render brightness data
+            $("#brtCheckBox").on('change', function () {
+                if ($(this).is(':checked')) {
+                    brtChecked = true
+                } else {
+                    brtChecked = false
+                }
+            })
+
+            // checkbox to render accelerometer data
+            $("#accCheckBox").on('change', function () {
+                if ($(this).is(':checked')) {
+                    accChecked = true
+                } else {
+                    accChecked = false
+                }
+            })
+
+            // checkbox to render gyroscope data
+            $("#gyrCheckBox").on('change', function () {
+                if ($(this).is(':checked')) {
+                    gyrChecked = true
+                } else {
+                    gyrChecked = false
+                }
+            })
+
+            // checkbox to render sleepnoise data
+            $("#sleepNoiseCheckBox").on('change', function () {
+                if ($(this).is(':checked')) {
+                    sleepnNoiseChecked = true
+                } else {
+                    sleepnNoiseChecked = false
+                }
+            })
+
+            // switch to select glyphs
+            $("#toggleGlyph").on('change', function () {
+                if ($(this).is(':checked')) {
+                    toggleGlyph = "flowerGlyph"
+                } else {
+                    toggleGlyph = "polygonGlyph"
+                }
+                // console.log("toggleGlyph:", toggleGlyph)
+                renderCharts()
+            })
+
+            // switch to select the type of dimensionality reduction
+            $("#toggleDimRedux").on('change', function () {
+                if ($(this).is(':checked')) {
+                    toggleDimRedux = "tsne"
+                } else toggleDimRedux = "pca"
+            })
+
+            // switch to use DGrid to remove overlap over the glyphs
+            $("#toggleDGrid").on('change', function () {
+                if ($(this).is(':checked')) {
+                    toggleDGrid = true
+                } else {
+                    toggleDGrid = false
+                }
+                // console.log("toggleDGrid:", toggleDGrid)
+                renderCharts()
+            })
+
+            // switch to show or hide labels
+            $("#toggleLabels").on('change', function () {
+                if ($(this).is(':checked')) {
+                    toggleLabels = true
+                } else {
+                    toggleLabels = false
+                }
+                // console.log("toggleLabels:", toggleLabels)
+                renderCharts()
+            })
+
+            // switch to show or hide grid
+            $("#toggleSvgGrid").on('change', function () {
+                if ($(this).is(':checked')) {
+                    toggleSvgGrid = true
+                } else {
+                    toggleSvgGrid = false
+                }
+                // console.log("toggleSvgGrid:", toggleSvgGrid)
+                renderCharts()
+            })
+
+            // single label selection
+            // https://stackoverflow.com/questions/9709209/html-select-only-one-checkbox-in-a-group
+            $('input[name="colorCheckbox"]').on('click ', function () {
+                var $box = $(this);
+                if ($box.is(":checked")) {
+                    var group = "input:checkbox[name='" + $box.attr("name") + "' ]";
+                    $(group).prop("checked", false);
+                    $box.prop("checked", true);
+                } else {
+                    $box.prop("checked", false);
+                }
+                label = $box.val()
+            })
+        }
+
+        // function to call the server route which computes the ML algorithms.
+        function process(delay = 0, PCP = false) {
+            featurelist = $('#featureSelect').val()
+            if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
+            if (featurelist.length < 2) {
+                alert("Please select more than one column in Feature selection drop down!!!")
+            } else {
+                w = Math.floor($('.svg1')[0].getBoundingClientRect().width)
+                h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
+                var postForm = {
+                    "featureColumns": featurelist,
+                    "width": w,
+                    "height": h,
+                    "radius": radius,
+                    "k": k,
+                    "toggleDimRedux": toggleDimRedux,
+                    "classLabel": classLabel
+                }
+                console.log("postForm", postForm)
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/dimReduceIds",
+                    success: function (status) {
+                        if (status === "status1:fileUpdated") {
+                            // console.log("FeatureData file updated")
+                        } else console.log("unknown status", status, "File has been reset using default values")
+                    }
+                })
+                buffering(glyphsChart, selectedId, toggleText = false)
+                buffering(radialTimeChart, selectedId, toggleText = false)
+                if (PCP == true) {
+                    buffering(parallelCordChart1, selectedId)
+                    buffering(parallelCordChart2, selectedId, toggleText = false)
+                }
+                renderCharts(delay, PCP)
+                // uncomment below line to hide the sidebar after submit button
+                // $("#sidebar").removeClass("show")
+            }
+        }
+
+        function processKNN(delay = 0, PCP = false) {
+            featurelist = $('#featureSelect').val()
+            if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
+            if (featurelist.length < 2) {
+                alert("Please select more than one column in Feature selection drop down!!!")
+            } else {
+                postForm = {
+                    "featureColumns": featurelist,
+                    "k": k
+                }
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/knnClustering",
+                    async: false,
+                    success: function (status) {
+                        if (status === "status1:fileUpdated") {
+                            // console.log("FeatureData file updated")
+                        } else console.log("unknown status", status, "File has been reset using default values")
+                        renderCharts(delay)
+                    }
+                })
+            }
+        }
+
+        // Funtion to plot the glyph-view and PCP-view
+        function renderCharts(delay = 0, PCP = false) {
+            //calling method that plots buffering symbol
+            setTimeout(function () {
+                //code to be executed after delay
+                // updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
+                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, classLabel, lckChecked, brtChecked, accChecked, gyrChecked, sleepnNoiseChecked)
+                if (PCP == true) {
+                    // aggregatedFeatures/individualFeatures
+                    // updateParallelCord(parallelCordChart1, selectedId, [], featuresType="aggregatedFeatures", featurelist, classLabel)
+                    // updateParallelCord(parallelCordChart1, selectedId, [], featuresType="individualFeatures", featurelist, classLabel)
+                    currentfeaturelistPCP = $('#featureSelect').val()
+                }
+            }, delay)
+        }
+
+        // jquery handlers for showing the raw data in a tabluar form below all the charts
+        // Table for showing raw data
+        {
+            // code for rendering csv data on the screen
+            var columnDefs = [{
+                headerName: "",
+                children: [{
+                    field: 'participantId'
+                }, {
+                    field: 'date'
+                }]
+            }, {
+                headerName: 'screenFeatures',
+                children: [{
+                    field: 'noScreenLocks',
+                    filter: 'agNumberColumnFilter'
+                }, {
+                    field: 'firstScreenUnlock',
+                    filter: 'agNumberColumnFilter'
+                }, {
+                    field: 'lastScreenLock',
+                    filter: 'agNumberColumnFilter'
+                }, {
+                    field: 'maxScreenTime',
+                    filter: 'agNumberColumnFilter'
+                }, {
+                    field: 'totalScreenTime',
+                    filter: 'agNumberColumnFilter'
+                }]
+            }, {
+                headerName: 'callingFeatures',
+                children: [{
+                    field: 'noMissed'
+                }, {
+                    field: 'noDialled'
+                }, {
+                    field: 'noIncoming'
+                }, {
+                    field: 'minDurationIncoming'
+                }, {
+                    field: 'maxDurationIncoming'
+                }, {
+                    field: 'totalDurationIncoming'
+                }, {
+                    field: 'noOutgoing'
+                }, {
+                    field: 'minDurationOutgoing'
+                }, {
+                    field: 'maxDurtaionOutgoing'
+                }, {
+                    field: 'totalDurationOutgoing'
+                }, {
+                    field: 'totalNoCalls'
+                }, {
+                    field: 'totalDurationCalls'
+                }]
+            },
+            // {
+            //     headerName: 'mobilityFeatures',
+            //     children: [{field: 'stepCount'}, {field: 'totalDistance'}, {field: 'noStayPoints'}, {field: 'locationVariance'}, {field: 'locationEntropy'}]
+            // },
+            {
+                headerName: 'sleepFeatures',
+                children: [{
+                    field: 'sleepStartTime1'
+                }, {
+                    field: 'sleepEndTime1'
+                }, {
+                    field: 'sleepDuration1'
+                }]
+            }
+            ];
+
+            // fields = ['participantId', 'date', 'depressionScore', 'firstScreenUnlock', 'lastScreenLock', 'locationEntropy', 'locationVariance', 'maxDurationIncoming', 'maxDurtaionOutgoing', 'maxScreenTime', 'minDurationIncoming', 'minDurationOutgoing', 'noDialled', 'noIncoming', 'noMissed', 'noOutgoing', 'noScreenLocks', 'noSleepInterruptions', 'noStayPoints', 'sleepDuration1', 'sleepDuration2', 'sleepEndTime1', 'sleepEndTime2', 'sleepStartTime1', 'sleepStartTime2', 'stepCount', 'totalDistance', 'totalDurationCalls', 'totalDurationIncoming', 'totalDurationOutgoing', 'totalNoCalls', 'totalScreenTime', 'totalSleepDuration']
+            // for (var i=0; i<fields.length; i++ ){
+            //     columnDefs.push({"field": fields[i]})
+            // }
+
+            // let the grid know which columns to use
+            const gridOptions = {
+                // Group columns
+                groupHeaderHeight: 40,
+                // Label columns
+                headerHeight: 40,
+
+                defaultColDef: {
+                    // flex: 1,
+                    minWidth: 100,
+                    sortable: true,
+                    filter: true,
+                    resizable: true,
+                    // editable: true,
+                },
+
+                debug: false,
+                columnDefs: columnDefs,
+                rowData: null,
+                sideBar: true,
+                enableCellChangeFlash: true,
+                rowDragManaged: true,
+                enterMovesDownAfterEdit: true,
+                enterMovesDown: true,
+            };
+
+            function onBtnImport() {
+                if ($('div.grid').is(':empty')) {
+                    var el = document.getElementById("chart4"); // or other selector like querySelector()
+                    var rect = el.getBoundingClientRect(); // get the bounding rectangle
+                    $("#csvGrid").css("display", "block")
+                    $("#csvGrid").width(rect.width)
+                    $("#csvGrid").height(rect.width / 2)
+
+                    var gridDiv = document.querySelector('#csvGrid');
+
+                    new agGrid.Grid(gridDiv, gridOptions);
+                    $.ajax({
+                        type: "GET",
+                        url: '/dataTable',
+                        async: false,
+                        success: function (data) {
+                            gridOptions.api.setRowData(data)
+                        }
+                    });
+                } else {
+                    alert('Table already loaded');
+                }
+            }
+
+            function onBtnRemove() {
+                $("#csvGrid").css("display", "none")
+                $("#showcsv").css("visibility", "visible")
+                $("#hidecsv").css("visibility", "hidden")
+                $("#downloadcsv").css("visibility", "hidden")
+                $("#updatecsv").css("visibility", "hidden")
+                $("#csvGrid").children("div").eq(0).remove();
+                location.reload();
+            }
+
+            {
+                // help button alerts
+                function alertSearchBar() {
+                    alert("Searchbar to find an Id and highlight it on the Glyph View.")
+                }
+
+                function alertFeatureSelection() {
+                    alert("This multi-select dropdown filters the features used to compute 2D projections by Dimensionality Reduction and predicted labels using the KNN classifier and filters the axes in a parallel coordinate chart.")
+                }
+
+                function alertKparam() {
+                    alert("K-Nearest Neighbors(KNN) is a supervised ML algorithm. It finds the K nearest neighbours per the specified distance metric( 'minkowski' in this use case) and classifies the instance using those K closest class labels. This spinner varies the K parameter.")
+                }
+
+                function alertDimRedux() {
+                    alert("Dimensionality Reduction(DR) refers to the problem of mapping high dimensional data points into meaningful representations of reduced dimensions(2D in this use case). T-SNE and PCA are the two most popular methods used for DR. This switch toggles between the t - SNE and PCA DR techniques. ")
+                }
+
+                function alertOverlap() {
+                    alert("DGrid: novel post-processing strategy to remove occlusion caused by Dimensionality Reduction(DR) technique. This switch applies DGrid technique to DR projections. [cite: https://arxiv.org/abs/1903.06262]")
+                }
+
+                function alertGlyphRadius() {
+                    alert("This slider varies the radius of the Glyph icon over the Glyph View.")
+                }
+
+                function alertClassLabel() {
+                    alert("These checkboxes selectes the radius of the Glyph icon over the Glyph View.")
+                }
+
+                function alertGlyph() {
+                    alert("This switch toggles between two Glyph icons(Polygon/Flower) used to represent individual data points.")
+                }
+
+                function alertLabels() {
+                    alert("This switch displays the Id corresponding to each data point over the Glyph View.")
+                }
+
+                function alertGrid() {
+                    alert("This switch displays a 3*3 grid including 100 horizontal and 100 vertical thin lines over the Glyph View. This grid does not represent any data, and it only assists in perceiving distances between various visual representations.")
+                }
+
+                function alertReset() {
+                    alert("This button resets all the input selections in the Menu to default.")
+                }
+
+                $("#btn-reload").click(function (event) {
+                    location.reload()
+                })
+            }
+        }
+    </script>
+</body>
+
+</html>

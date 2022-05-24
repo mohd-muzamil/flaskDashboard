@@ -30,7 +30,7 @@ function buffering(chart, participantId, toggleText = true) {
             .innerRadius(innerRadius)
             .outerRadius(outerRadius)
             .startAngle(0)
-            .endAngle(0.85 * 2 * Math.PI);
+            .endAngle(0.6 * 2 * Math.PI);
     }
 
     container.append("path")
