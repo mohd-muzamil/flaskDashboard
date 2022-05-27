@@ -45,6 +45,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
         featureLength = featurelist.length - 1
         if (!featuresNames.includes("date_num")) {
             featuresNames.unshift("date_num")
+            featureImportanceScale.unshift(0)
         }
     }
 
@@ -59,7 +60,8 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
     const featureImportanceScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([1, 0])
 
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
-        y = {}
+        y = {},
+        formatDecimal = d3.format(".0f");
 
     var line = d3.line(),
         background,
@@ -83,7 +85,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
         .style("border-radius", "5px")
         .style("padding", "1px")
         .style("pointer-events", "none")
-        .style("opacity", 0.8 * config.opacityHigh)
+        .style("opacity", 0.8)
 
     postForm = { "id": selectedId }
     dragging = {}
@@ -97,7 +99,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                 if (featuresType == "aggregatedFeatures") {
                     if (lassoSelectedIds.length > 1) {
                         filteredData = data.filter(d => {
-                            if (lassoSelectedIds.includes(+d.id))
+                            if (lassoSelectedIds.includes(d.id))
                                 return d
                         })
                     }
@@ -186,7 +188,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                     .attr("d", path)
                     .attr("opacity", function(d) {
                         if (featuresType == "aggregatedFeatures") {
-                            return d.id == selectedId ? 1 : 0.7;
+                            return d.id == selectedId ? 1 : 1;
                         } else {
                             return 1
                         }
@@ -198,13 +200,13 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                             return line_color
                         }
 
-                    })
-                    .attr("stroke-width", function(d) {
-                        if (featuresType == "aggregatedFeatures") {
-                            return d.id != selectedId ? "1.5px" : "2px";
-                        } else {
-                            return "1.5px"
-                        }
+                    // })
+                    // .attr("stroke-width", function(d) {
+                    //     if (featuresType == "aggregatedFeatures") {
+                    //         return d.id != selectedId ? "1.5px" : "2px";
+                    //     } else {
+                    //         return "1.5px"
+                    //     }
                     })
 
 
@@ -247,15 +249,15 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                     .style("text-anchor", "middle")
                     .attr("text-anchor", "middle")
                     .attr("y", -0)
-                    .attr("transform", `translate(${0}, ${yHigh + margin.bottom * 0.75}) rotate(0)`)
+                    .attr("transform", `translate(${0}, ${yHigh + margin.bottom * 0.75}) rotate(-45)`)
                     .text(d => { return d })
                     .on("mousemove", function(d) {
                         // if (d3.event.pageX > 0.95 * width) {
                         //     if (d.length < 15) return tooltip.style("top", (d3.event.pageY + 1) + "px").style("left", (d3.event.pageX - 2 * deltawidth) + "px")
                         //     else return tooltip.style("top", (d3.event.pageY + 1) + "px").style("left", (d3.event.pageX - 3.5 * deltawidth) + "px")
                         // } else { return tooltip.style("top", (d3.event.pageY + 1) + "px").style("left", (d3.event.pageX - deltawidth) + "px") }
-                        X = d3.event.pageX + dx + 15
-                        Y = d3.event.pageY + dy + 10
+                        X = d3.event.pageX + 15
+                        Y = d3.event.pageY + 10
                         return tooltip.style("left", X + "px").style("top", Y + "px")
                     })
                     .on('mouseover', function(d) {
@@ -272,7 +274,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                     .each(function(d) { d3.select(this).append("rect"); })
                     .append("rect")
                     .attr("class", "boxes")
-                    .attr("width", 7)
+                    .attr("width", 4)
                     .attr("height", yHigh)
                     .attr("fill", function(d, i) {
                         return featureImportanceScale(importanceScores[i])
@@ -304,16 +306,24 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         }
                     });
                 }
-                d3.select("#" + chart).selectAll('.buffer').exit().remove();
+                d3.select("#" + chart).selectAll('.buffer').remove();
             });
 }
 
 
 function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date = "", starting_max_date = "") {
+    console.log("updateParallelCord_muzz:", chart, featuresType, lassoSelectedIds)
     // featuresType: aggregatedFeatures/individualFeatures
     if (Array.isArray(selectedId)) {
         selectedId = selectedId[0]
     }
     d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
+    
+    if (featuresType == "aggregatedFeatures") {
+        buffering(chart, selectedId, toggleText = false)
+    }
+    else if (featuresType == "individualFeatures") {
+        buffering(chart, selectedId)
+    }
     parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date, starting_max_date)
 }

@@ -1,5 +1,5 @@
 // This script is used to generate visual representations over Glyph View.
-function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
     // delta = radius / 100
     const config = {
         r: +radius,
@@ -10,7 +10,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
         opacityClickHigh: 0.7,
         // strokeWidthLow: 0.5 - delta,
         // strokeWidthHigh: 2 - delta,
-        strokeWidthLow: 0.2,
+        strokeWidthLow: 0,
         strokeWidthHigh: 1,
         fillColor: "transparent",
         fillColorLasso: "#636363",
@@ -32,19 +32,17 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
         url: "/getClassLabels",
         async: false,
         success: function(response) {
-            console.log("getClassLabels", response)
             labels = response
+            if(classLabel=="age") classLabel="age_group"
         }
     })
 
-    if (toggleSvgGrid) { config.opacityLow = 0.2 }
+    if (toggleSvgGrid) { config.opacityLow = 0.2; config.strokeWidthLow = 0.2 }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
     // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
     // const customPath = 'M 0,0 C -40,-40 15,-50 50,-100 C 0,-50 0,0 0,0'; //curved thin
     // const customPath = 'M 0,0 C -60,-30 0,-40 0,-100 C 0,-40 60,-30 0,0'; // star1
     // const customPath = "M 0 0 C 50 -80, 80 -100, 0 -100 C -80 -100, -50 -80, 0 0"; //clover leaf
-    
-    console.log(labels)
     
     const colorClusters = d3.scaleOrdinal().domain(labels).range(d3.schemeCategory10)
     var current_zoom_scale = 1
@@ -54,17 +52,18 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
 
     // reading data directly
     d3.csv("/getProjections", function (data) {
-        console.log("Glyphs_data: ", data)
         data.forEach(d => {
             d.x = +d.x
             d.y = +d.y
-            // d.id = +d.id
+            d.x_overlapRemoved = +d.x_overlapRemoved
+            d.y_overlapRemoved = +d.y_overlapRemoved
+            d.age_group = +d.age_group
         })
         const margin = { left: 5, top: 5, right: 60, bottom: 5 },
-            width = $("#" + glyphsChart).width(),
-            height = $("#" + glyphsChart).height()
+            width = $("#" + glyphs).width(),
+            height = $("#" + glyphs).height()
 
-        const svg = d3.select("#" + glyphsChart)
+        const svg = d3.select("#" + glyphs)
             .attr("width", margin.left + width + margin.right)
             .attr("height", margin.top + height + margin.bottom)
             .style("cursor", "move")
@@ -128,9 +127,10 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
 
         // Legends
         var legendOrdinal = d3.legendColor()
-            .shapePadding(10)
-            .shapeWidth(20)
-            .shapeHeight(30)
+            .title(classLabel.toUpperCase())
+            .shapePadding(0)
+            .shapeWidth(15)
+            .shapeHeight(15)
             .cellFilter(d => { return d.label !== "e" })
             .scale(colorClusters)
             .on("cellover", () => {
@@ -162,10 +162,13 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             .on("cellout", () => {
                 svg.style("cursor", "move")
             })
-
+        
+        let dwidth = 40
+        if(classLabel=="age_group") dwidth = 80
+        else if(classLabel=="gender") dwidth = 50
         svg.append("g")
             .attr("class", "legendOrdinal")
-            .attr("transform", `translate(${width - 65}, ${5}) scale(${1 / 2})`)
+            .attr("transform", `translate(${width - dwidth}, ${10}) scale(${1 / 2})`)
             .call(legendOrdinal)
             .style("opacity", config.opacityHigh)
 
@@ -327,7 +330,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                 .data(data)
                 .enter()
                 .append("circle")
-                .attr("class", d => { return d.id == id ? "hovercircle" : "hovercircle" })
+                .attr("class", d => {return d.id == id ? "hovercircle" : "hovercircle" })
                 .attr("cx", d => { return toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x) })
                 .attr("cy", d => { return toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y) })
                 .attr("r", config.r)
@@ -407,6 +410,7 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                             .attr("stroke-width", config.strokeWidthHigh)
                             .style("fill", config.fillColor)
                     }
+                    plotRadialTime()
                     plotParallelCord()
                 })
         }
@@ -532,13 +536,11 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             })
             .on("click", function () {
                 console.log("clearall clicked")
-                d3.select(this).style("fill", "gray")
-                d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
-                d3.selectAll(".selectedLasso")
+                d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
-                    .attr("opacity", d => { return (d.id == id | d[classLabel] != d["cluster"]) ? config.opacityHigh : config.opacityLow })
+                    .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
                     .attr("stroke", "black")
-                    .attr("stroke-width", d => { return d.id == id ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? 1.5*config.strokeWidthLow : config.strokeWidthLow })
+                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
                     .style("fill", config.fillColor)
                 plotParallelCord()
             })
@@ -679,8 +681,14 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
                         .attr("r", config.r)
                 }
             })
+        
+        function plotRadialTime() {
+            console.log("Glyphs->RadialTime")
+            updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+        }
 
         function plotParallelCord() {
+            console.log("paralle cord chart called")
             lassoSelectedIds = [selectedId]
             d3.selectAll(".selectedLasso")["_groups"][0].forEach(function (d) {
                 if (!lassoSelectedIds.includes(d.__data__.id)) { lassoSelectedIds.push(d.__data__.id) }
@@ -688,17 +696,22 @@ function glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordCh
             lassoSelectedIds = [...new Set(lassoSelectedIds)]
             setTimeout(function () {
                 //your code to be executed after 1 second
-                updateParallelCord(parallelCordChart1, selectedId, lassoSelectedIds, featuresType = "aggregatedFeatures", featurelist, starting_min_date = "", starting_max_date = "")
-                updateParallelCord(parallelCordChart2, selectedId, lassoSelectedIds, featuresType = "individualFeatures", featurelist, starting_min_date = "", starting_max_date = "")
+                console.log("Glyphs->ParallelCord_indiv", featurelist, lassoSelectedIds)
+                updateParallelCord(parallelCord1, selectedId, lassoSelectedIds, featuresType="aggregatedFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
             }, delayInMilliseconds)
         }
+
+        // plotRadialTime()
+        // plotParallelCord()
+
+        d3.select("#" + glyphs).selectAll('.buffer').exit().remove();
     })
 }
 
 
-function updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+    // only individual parallel cord  will be updated from here.
     d3.selectAll(".Tooltip").remove()
-    d3.select("#" + glyphsChart).selectAll("*").remove()
-    d3.select("#" + radialTimeChart).selectAll("*").remove();
-    glyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, glyphColor, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+    d3.select("#" + glyphs).selectAll("*").remove()
+    plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
 }

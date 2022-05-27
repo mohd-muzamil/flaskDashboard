@@ -1,5 +1,5 @@
 # BackEnd Server
-from datetime import time
+import time
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 import pandas as pd
 import numpy as np
@@ -24,11 +24,12 @@ from removeOverlap.dgrid import *
 
 personalityFile = "PersonalityScores.csv"
 featureFile = "featureData.csv"
+featureAggFile = "featureDataAgg.csv"
 brightnessFile = "Brightness_processed.csv"
 accelerometerFile = "Accelerometer_processed.csv"
 gyroscopeFile = "Gyroscope_processed.csv"
 lockStateFile = "Lock_state_processed.csv"
-
+noiseFile = "Sleep_Noise_processed.csv"
 
 def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     # Overlap removal of projections
@@ -45,7 +46,6 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
 
 
 def getTSNE(df, columns, width, height, radius):
-    print(df.loc[:, columns].head)
     #TSNE projection
     tsne = TSNE(n_components=2, verbose=1,
                 perplexity=40, n_iter=300, init='random', learning_rate="auto")
@@ -53,7 +53,6 @@ def getTSNE(df, columns, width, height, radius):
     tsneResult = np.round(MinMaxScaler().fit_transform(tsneResult), 3)
     tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
     tsneX_overlapRemoved, tsneY_overlapRemoved = DGridRemoveOverlap(tsneResult, width, height, radius)
-    print("#"*100, "TSNE completed")
     return tsneX, tsneY, tsneX_overlapRemoved, tsneY_overlapRemoved
 
 
@@ -75,7 +74,6 @@ def getClusters(df, columns, classLabel, k):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X, Y)
     clusters = knn.predict(X)
-    print("#"*100, "KNN clustering completed")
     return clusters
 
 
@@ -84,10 +82,8 @@ def getImportance(df, columns, classLabel):
     if not classLabel.isnumeric():
         le = LabelEncoder().fit(df[classLabel].values)
         df["classLabel"] = le.transform(df[classLabel].values)
-    elif df[classLabel].unique()>10:
-        df[classLabel] = pd.cut(df[classLabel], q=4, labels=[1, 2, 3, 4])
 
-    X, y = df.loc[:, columns], df.loc[:, classLabel]
+    X, y = df.loc[:, columns], df.loc[:, "classLabel"]
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
     X_train, y_train = X, y     #no test set, since all of the instances are needed to calculate the feature importance
     
@@ -100,7 +96,8 @@ def getImportance(df, columns, classLabel):
     # importanceScore = permutation_importance(xgb_clf, X_train, y_train).importances_mean
 
     importanceScore = np.round(importanceScore, 3)
-    return dict(sorted(zip(columns, [str(x) for x in importanceScore])))
+    d = dict(zip(columns, [str(x) for x in importanceScore]))
+    return dict(sorted(d.items(), key=lambda x: x[1], reverse=True))
 
 
 app = Flask(__name__, static_url_path='', static_folder='')
@@ -130,19 +127,24 @@ def getClassLabels():
     if request.method == 'POST':
         content = request.get_json()
         classLabel = content["classLabel"]
-        print("$"*100, classLabel)
-        personalityData = pd.read_csv(os.path.join("data/rawData", personalityFile))
-        classLabels = personalityData[classLabel].unique().tolist()
-        return jsonify(classLabels)
+        personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
+        labels = sorted(personalityData[classLabel].unique().tolist())
+        if classLabel == "age":
+            classLabel = "age_group"
+            bins= [0,12,18,39,59,200]
+            labels = ['Child','Teen','Adult','Mid-Adult','Senior-Adult']
+            # labels = range(len(bins)-1)
+            personalityData['age_group'] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
+            labels = sorted(personalityData[classLabel].unique().tolist())
+            personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
+            # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
+            personalityData.to_csv(os.path.join("data/processedData", personalityFile), index=False, header=True)
+        return jsonify(labels)
 
 
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceIds():
-    featureData = pd.read_csv(os.path.join("data/rawData", featureFile)).groupby("id").mean().reset_index()
-    personalityData = pd.read_csv(os.path.join("data/rawData", personalityFile))
-    combinedData = featureData.merge(personalityData, how='inner', on='id')
-    print("______________\n"*10, featureData.shape, personalityData.shape, combinedData.shape, combinedData.columns)
-    
+    featureDataAgg = pd.read_csv(os.path.join("data/rawData", featureAggFile))
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
@@ -153,23 +155,21 @@ def dimReduceIds():
         toggleDimRedux = content["toggleDimRedux"]
         classLabel = content["classLabel"]
 
-        # print("_"*100, "\n", columns, featureData[columns].head(5))
         # dim reduction
         if toggleDimRedux == "tsne":
-            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(combinedData, columns, width, height, radius)
+            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(featureDataAgg, columns, width, height, radius)
         elif toggleDimRedux == "pca":
-            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(combinedData, columns, width, height, radius)
+            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(featureDataAgg, columns, width, height, radius)
+
+        cluster = getClusters(featureDataAgg, columns, classLabel, k)    #KNN clustering
+        featureDataAgg["x"], featureDataAgg["y"] = x, y
+        featureDataAgg["x_overlapRemoved"], featureDataAgg["y_overlapRemoved"] = x_overlapRemoved, y_overlapRemoved
+        featureDataAgg["cluster"] = cluster
         
-        cluster = getClusters(combinedData, columns, classLabel, k)    #KNN clustering
-        personalityData["x"], personalityData["y"] = x, y
-        personalityData["x_overlapRemoved"], personalityData["y_overlapRemoved"] = x_overlapRemoved, y_overlapRemoved
-        personalityData["cluster"] = cluster
-        
-        personalityData.dropna(axis=1, how='all', inplace=True)
-        personalityData.to_csv(os.path.join(
-            "data/processedData", personalityFile), index=False, header=True)
+        featureDataAgg.dropna(axis=1, how='all', inplace=True)
+        featureDataAgg.to_csv(os.path.join(
+            "data/processedData", featureAggFile), index=False, header=True)
         message = "status1:fileUpdated"
-        print("#"*100, message)
     return jsonify(message)
 
 
@@ -178,7 +178,7 @@ def knnClustering():
     """
     This function is used to just calculate the k-nearest neighbours of the feature instances
     """
-    featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
+    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
@@ -231,7 +231,6 @@ def filterparticipantIdsDummy():
             if checkState:
                 df = pd.read_csv(os.path.join(
                     "data/processedData", filenames[attr]))
-                # .sample(frac=0.001)
                 df = df[df["id"] == id]
 
                 # Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
@@ -270,17 +269,16 @@ def filterparticipantIdsNew():
 
         strt = time.time()
         filenames = {"brt": brightnessFile, "acc": accelerometerFile,
-                     "gyro": gyroscopeFile, "lck": lockStateFile}
+                     "gyro": gyroscopeFile, "lck": lockStateFile, "noise": noiseFile}
         data = pd.DataFrame()
         for attr, checkState in attributes.items():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
                 df = pd.read_csv(os.path.join(
                     "data/processedData", filenames[attr]))
-                # .sample(frac=0.001)
                 df = df[df["id"] == id]
+                
                 dfImputed = pd.DataFrame()
-
                 # addind -1 values for minutesOfTheDay where data is not present
                 # creating df with all mins to impute missing values
                 mins = [i for i in range(0, 1440)]
@@ -333,17 +331,11 @@ def getAggFeatures():
         id = content['id']
 
         featureData = pd.read_csv(os.path.join(
-            "data/processedData", featureFile))
-        # Aggregating based on id
-        featureData = featureData.groupby("id").mean().reset_index()
-        # getting cluster id for ids form personality file
-        df = pd.read_csv(os.path.join("data/processedData", personalityFile),
-                        sep="|").loc[:, ["id", "clusters"]]
-        featureData = pd.merge(featureData, df, how="left")
+            "data/processedData", featureAggFile))
 
         # rearranging data such that selected participant data is always at the last
         # this helps in the visualization of parallel cord chart
-        idx = df.index.tolist()
+        idx = featureData.index.tolist()
         index_to_shift = featureData.index[featureData["id"] == id].tolist()[0]
         idx.pop(index_to_shift)
         featureData = featureData.reindex(idx + [index_to_shift])
@@ -364,11 +356,11 @@ def getIndividualFeatures():
         id = content['id']
 
         featureData = pd.read_csv(os.path.join(
-            "data/processedData", featureFile))
+            "data/rawData", featureFile))
         # Fetching data for selected id
         featureData = featureData[featureData["id"] == id].copy()
 
-        resp = make_response(data.to_csv(index=False))
+        resp = make_response(featureData.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=individualFeatureData.csv"
         resp.headers["Content-Type"] = "text/csv"
         return resp
@@ -432,9 +424,10 @@ def getFeatureImportance():
         columns = content["featureColumns"]
         classLabel = content["classLabel"]
 
-        featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
-        if len(columns)<=1:
-            columns = [col for col in list(featureData.columns) if col not in ["id", "gender"]]
+        print("##"*100, columns, classLabel)
+        featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
+        if len(columns) <= 1:
+            columns = [col for col in list(featureData.columns) if col not in ["id", "age", "gender", "dass1", "dass2", "age_group"]]
         featuresWithImportance = getImportance(featureData, columns, classLabel)
         return jsonify(featuresWithImportance)
 

@@ -1,5 +1,5 @@
 // This script is used to plot radial chart in second svg
-function radialTimeChart(chart, dependendChart, participantId, attributes, featurelist) {
+function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLabel, attributes) {
         // var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyro": "#7570b3", "lck": "#a6bddb"}
         // var pathColor = {"brt": "#1f78b4", "acc": "#33a02c", "gyro": "#b2df8a", "lck": "#dadaeb"}    //darkBlue, darkgreen, lightgreen, lightpurple
         // var pathColor = {"brt": "#377eb8", "acc": "#e41a1c", "gyro": "#fb8072", "lck": "#d0d1e6"}    //darkBlue, darkRed, lightRed, lightBlue
@@ -20,11 +20,11 @@ function radialTimeChart(chart, dependendChart, participantId, attributes, featu
 
     var postForm = { //Fetch form data
         // 'filename': filename, //Store name fields value
-        'participantId': participantId, //Store name fields value
+        'id': selectedId, //Store name fields value
         "attributes": attributes
     };
 
-    //fetcing filtered participantId data from flask server
+    //fetcing filtered id data from flask server
     d3.csv("/filterparticipantIdsNew")
         // d3.csv("/filterparticipantIds")
         .header("Content-Type", "application/json")
@@ -185,7 +185,7 @@ function radialTimeChart(chart, dependendChart, participantId, attributes, featu
                             .style("font-size", "15px")
                             .style("font-weight", "normal")
                             .style("text-anchor", "middle")
-                            .text("participantId: " + participantId)
+                            .text("id: " + selectedId)
 
                         // girdcircle for days of study
                         svg.selectAll(".gridCircles")
@@ -392,7 +392,7 @@ function radialTimeChart(chart, dependendChart, participantId, attributes, featu
                                 starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
                                 starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
 
-                                updateParallelCord(dependendChart, participantId, feature = "individualFeatures", featurelist, starting_min_date, starting_max_date)
+                                updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, starting_min_date, starting_max_date)
                             }
 
                         })
@@ -451,62 +451,20 @@ function radialTimeChart(chart, dependendChart, participantId, attributes, featu
 }
 
 
-
-
-// function createGrid(chart) {
-//     // Set the dimensions of the canvas / graph
-//     var margin = { top: 25, right: 25, bottom: 25, left: 25 },
-//         width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
-//         height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
-
-//     // Select the svg
-//     var svg = d3.select("#" + chart)
-//         .attr("width", width)
-//         .attr("height", height)
-//         .append('g')
-//         .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top + height + margin.bottom) / 2})`);
-// }
-
-function updateRadialTimeChart(chart, dependendChart, participantId, featurelist, brtChecked, accChecked, gyroChecked, lckChecked) {
+function updateRadialTime(chart, dependendChart, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
-    d3.select("#" + chart).selectAll('g').remove(); //clearing the chart before plotting new data
-    buffering(chart, participantId); //calling method that plots buffering symbol
+    d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
+    buffering(chart, selectedId); //calling method that plots buffering symbol
+    // buffering(dependendChart, selectedId, toggleText = false)
 
-    // gridPlotted = false;
-    // brushPlotted = false;
-    attributes = { "lck": lckChecked, "acc": accChecked, "gyro": gyroChecked, "brt": brtChecked }
+    attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked, "noise": sleepNoiseChecked }
+    // attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked}
 
-    // brightnessData
-    // filename = "dummyBrightness";
-    // attr = "brt";
-    // pathColor = "green";
-
-    radialTimeChart(chart, dependendChart, participantId, attributes, featurelist)
+    plot_radialTime(chart, dependendChart, selectedId, featurelist, classLabel, attributes)
 
     var delayInMilliseconds = 1000; //1 second
     setTimeout(function() {
         //your code to be executed after 1 second
-        updateParallelCord(dependendChart, participantId, feature = "individualFeatures", featurelist)
+        updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
     }, delayInMilliseconds);
-
-    // //accelerometerData
-    // if (accChecked == true) {
-    //     filename = "dummyAccelerometer";
-    //     attr = "acc";
-    //     pathColor = "red";
-    //     brushPlotted, gridPlotted = radialTimeChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
-    // }
-    // //gyrooscopeData
-    // if (gyroChecked == true) {
-    //     filename = "dummygyrooscope";
-    //     attr = "gyro";
-    //     pathColor = "blue";
-    //     brushPlotted, gridPlotted = radialTimeChart(chart, participantId, filename, attr, pathColor, gridPlotted, brushPlotted)
-    // }
-    // //lockstateData
-    // if (lckChecked == true) {
-    //     pathColor = "purple";
-    //     datapath = "../../data/lockstate_d3";
-    //     attr = "lck";
-    // }
 }

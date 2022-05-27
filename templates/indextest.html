@@ -57,7 +57,7 @@
         <div id="sidebar" class="card m-0 p-0">
             <!-- show is used here to hide or show the sidebar by default-->
             <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
-                <div class="card bg-secondary m-0 p-0 pb-1" style="display:flex; text-align: left;">
+                <div class="card m-0 p-0 pb-1" style="display:flex; text-align: left;">
                     <img src="../img/PROSIT.png" alt="PROSIT" style="display: block; margin: auto; width: 50%;">
                     <h6 id="dashboardHeader"
                         style="margin:0; padding: 0; text-align:center; color:rgb(18, 113, 249); font-size:x-small ;">
@@ -65,7 +65,7 @@
                 </div>
                 <hr class="double">
 
-                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                <div class="card m-0 p-0 py-2" style="display:flex; text-align: left;">
                     <!-- search bar to search specific participant -->
                     <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
                         <div class="row">
@@ -76,7 +76,8 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-searchId">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <!-- <i class="fa-solid fa-play"></i> -->
                                 </button>
                             </div>
                         </div>
@@ -98,7 +99,7 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-featureSelection">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
@@ -180,7 +181,7 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-knn">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
@@ -205,7 +206,7 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-toggleDimRedux">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
@@ -228,18 +229,18 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-glyphRadius">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="m-0 p-0 pl-2">
-                            <input type="range" min="5" max="20" value="5" steps='1' class="slider" id="myRange">
+                            <input type="range" min="5" max="15" value="10" steps='1' class="slider" id="myRange">
                         </div>
                     </div>
                 </div>
                 <hr class="double">
 
-                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                <div class="card m-0 p-0 py-2" style="display:flex; text-align: left;">
                     <!-- checkboxes for coloring glyphs -->
                     <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
                         <div class="row">
@@ -250,17 +251,17 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-classLabel" style="align-items: flex-start;">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="classLabel">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age" name="colorCheckbox">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age_group" name="colorCheckbox" checked>
                                 <label class="form-check-label" for="inlineCheckbox1">Age</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="gender" name="colorCheckbox" checked>
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="gender" name="colorCheckbox">
                                 <label class="form-check-label" for="inlineCheckbox2">Gender</label>
                             </div>
                             <div class="form-check form-check-inline">
@@ -286,7 +287,7 @@
                             </div>
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-mobileSensors" style="align-items: flex-start;">
-                                    <i class="fa fa-square-check"></i>
+                                    <i class="fa-solid fa-play"></i>
                                 </button>
                             </div>
                         </div>
@@ -320,7 +321,7 @@
                 </div>
                 <hr class="double">
 
-                <div class="card bg-secondary m-0 p-0 py-2" style="display:flex; text-align: left;">
+                <div class="card m-0 p-0 py-2" style="display:flex; text-align: left;">
                     <!-- Toggle glyph switch -->
                     <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
                         <div class="form-check form-switch pl-1" style="text-align: left">
@@ -376,7 +377,7 @@
                 </div>
 
                 <!-- reset button -->
-                <div class="card bg-secondary" style="display:flex; text-align: left;">
+                <div class="card" style="display:flex; text-align: left;">
                     <div class="container" style="display:contents; text-align: left; font-size: 13px;">
                         <div class="form-check form-switch m-0 p-0 ml-1 my-2" style="text-align: left">
                             <div>
@@ -434,17 +435,19 @@
 
     <!-- PROSIT Charts -->
     <!-- glyphs scatter plot : svg1 -->
-    <script src="../js/glyphs.js"></script>
-    <!-- parallel cordinate chart : svg2 -->
+    <script src="../js/glyphsChart.js"></script>
+    <!-- radial time chart : svg2 -->
+    <script src="../js/radialTimeChart.js"></script>
+    <!-- parallel cordinate chart : svg3/4 -->
     <script src="../js/parallelCoordinateChart.js"></script>
     <!-- loading symbol during buffer -->
     <script src="../js/buffering.js"></script>
     <script>
         // config
-        var glyphsChart = "chart1"
-        var radialTimeChart = "chart2"
-        var parallelCordChart1 = "chart3"
-        var parallelCordChart2 = "chart4"
+        var glyphs = "chart1"
+        var radialTime = "chart2"
+        var parallelCord1 = "chart3"
+        var parallelCord2 = "chart4"
         var ids = []
         var selectedId
         var featurelist = $('#featureSelect').val()
@@ -461,8 +464,8 @@
         var brtChecked
         var accChecked
         var gyrChecked
-        var sleepnNoiseChecked
-        var delayInMilliseconds = 750
+        var sleepNoiseChecked
+        var delayInMilliseconds = 0
 
         // setting up the default states for toggle swtiches
         {
@@ -480,8 +483,11 @@
                 if (!ids.includes(id)) {
                     alert(`Select a valid Id from the suggestion`)
                 }
-                $("#searchSelector").attr('placeholder', selectedId.toString());
-                $('#searchSelector').val('');
+                else{
+                    selectedId = id
+                    $("#searchSelector").attr('placeholder', selectedId.toString())
+                    $('#searchSelector').val('')
+                }
             });
 
             if ($("#lckCheckBox").is(':checked')) {
@@ -509,13 +515,12 @@
             }
 
             if ($("#sleepNoiseCheckBox").is(':checked')) {
-                sleepnNoiseChecked = true
+                sleepNoiseChecked = true
             } else {
-                sleepnNoiseChecked = false
+                sleepNoiseChecked = false
             }
 
             $('input[name="colorCheckbox"]:checked').each(function () {
-                console.log("classLabel", classLabel)
                 classLabel = this.value
             });
 
@@ -641,7 +646,8 @@
         {
             // menu button click events
             $("#btn-searchId").click(function () {
-                // selectedId = parseInt($("#btn-searchId").val())
+                // selectedId = $("#btn-searchId").val()
+                console.log("searchbar button clicked", selectedId)
                 renderCharts()
             })
             $("#btn-featureSelection").click(function () {
@@ -658,14 +664,11 @@
             })
             $("#btn-classLabel").click(function () {
                 $('input[name="colorCheckbox"]:checked').each(function () {
-                console.log("classLabel", classLabel)
                 classLabel = this.value
             });
-                console.log("btn-classLabel")
                 process(delayInMilliseconds)
             })
             $("#btn-mobileSensors").click(function () {
-                console.log("btn-mobileSensors")
                 process(delayInMilliseconds)
             })
 
@@ -717,9 +720,9 @@
             // checkbox to render sleepnoise data
             $("#sleepNoiseCheckBox").on('change', function () {
                 if ($(this).is(':checked')) {
-                    sleepnNoiseChecked = true
+                    sleepNoiseChecked = true
                 } else {
-                    sleepnNoiseChecked = false
+                    sleepNoiseChecked = false
                 }
             })
 
@@ -755,9 +758,9 @@
             // switch to show or hide labels
             $("#toggleLabels").on('change', function () {
                 if ($(this).is(':checked')) {
-                    toggleLabels = true
-                } else {
                     toggleLabels = false
+                } else {
+                    toggleLabels = true
                 }
                 // console.log("toggleLabels:", toggleLabels)
                 renderCharts()
@@ -791,6 +794,7 @@
 
         // function to call the server route which computes the ML algorithms.
         function process(delay = 0, PCP = false) {
+            radius = +document.getElementById("myRange").value
             featurelist = $('#featureSelect').val()
             if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
             if (featurelist.length < 2) {
@@ -807,7 +811,6 @@
                     "toggleDimRedux": toggleDimRedux,
                     "classLabel": classLabel
                 }
-                console.log("postForm", postForm)
                 $.ajax({
                     type: "POST",
                     contentType: 'application/json',
@@ -819,13 +822,14 @@
                         } else console.log("unknown status", status, "File has been reset using default values")
                     }
                 })
-                buffering(glyphsChart, selectedId, toggleText = false)
-                buffering(radialTimeChart, selectedId, toggleText = false)
-                if (PCP == true) {
-                    buffering(parallelCordChart1, selectedId)
-                    buffering(parallelCordChart2, selectedId, toggleText = false)
-                }
+                // buffering(glyphs, selectedId, toggleText = false)
+                // if (PCP == true) {
+                //     buffering(parallelCord1, selectedId)
+                //     buffering(parallelCord2, selectedId, toggleText = false)
+                // }
                 renderCharts(delay, PCP)
+                updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+                updateParallelCord(parallelCord1, selectedId, lassoSelectedIds=[], featuresType="aggregatedFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
                 // uncomment below line to hide the sidebar after submit button
                 // $("#sidebar").removeClass("show")
             }
@@ -833,6 +837,7 @@
 
         function processKNN(delay = 0, PCP = false) {
             featurelist = $('#featureSelect').val()
+            radius = +document.getElementById("myRange").value
             if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
             if (featurelist.length < 2) {
                 alert("Please select more than one column in Feature selection drop down!!!")
@@ -859,21 +864,20 @@
 
         // Funtion to plot the glyph-view and PCP-view
         function renderCharts(delay = 0, PCP = false) {
+            radius = +document.getElementById("myRange").value
             //calling method that plots buffering symbol
             setTimeout(function () {
                 //code to be executed after delay
-                // updateGlyphs(glyphsChart, parallelCordChart, selectedId, featurelist, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid)
-                updateGlyphs(glyphsChart, radialTimeChart, parallelCordChart1, parallelCordChart2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, classLabel, lckChecked, brtChecked, accChecked, gyrChecked, sleepnNoiseChecked)
+                updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
                 if (PCP == true) {
                     // aggregatedFeatures/individualFeatures
-                    // updateParallelCord(parallelCordChart1, selectedId, [], featuresType="aggregatedFeatures", featurelist, classLabel)
-                    // updateParallelCord(parallelCordChart1, selectedId, [], featuresType="individualFeatures", featurelist, classLabel)
+                    // updateParallelCord(parallelCord1, selectedId, [], featuresType="aggregatedFeatures", featurelist, classLabel)
                     currentfeaturelistPCP = $('#featureSelect').val()
                 }
             }, delay)
         }
 
-        // jquery handlers for showing the raw data in a tabluar form below all the charts
+        // jquery handlers for showing the raw data in a tabulat form below all the charts
         // Table for showing raw data
         {
             // code for rendering csv data on the screen

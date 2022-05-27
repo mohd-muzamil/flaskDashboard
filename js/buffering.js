@@ -4,14 +4,14 @@ function buffering(chart, participantId, toggleText = true) {
     const margin = { left: 10, top: 10, right: 10, bottom: 10 },
         width = $("#" + chart).width(),
         height = $("#" + chart).height()
-    const R = Math.round(Math.min(height, width) / 20)
+    // const R = Math.round(Math.min(height, width) / 20)
+    const R = 15
     const dR = 0.2 * R
     const speed = 50
     const phi0 = 30
     const color = "RGB(26,97,247)"
     const dx = width / 2;
     var dy = height / 2
-    if (toggleText) { dy = 1 / 3 * height + R }
 
     var t0 = Date.now();
 
@@ -30,13 +30,13 @@ function buffering(chart, participantId, toggleText = true) {
             .innerRadius(innerRadius)
             .outerRadius(outerRadius)
             .startAngle(0)
-            .endAngle(0.6 * 2 * Math.PI);
+            .endAngle(0.75 * 2 * Math.PI);
     }
 
-    container.append("path")
-        .attr("class", "arc1")
-        .attr("d", arc(R, R + dR))
-        .attr("fill", color);
+    // container.append("path")
+    //     .attr("class", "arc1")
+    //     .attr("d", arc(R, R + dR))
+    //     .attr("fill", color);
 
     container.append("path")
         .attr("class", "arc2")
@@ -53,8 +53,8 @@ function buffering(chart, participantId, toggleText = true) {
     if (toggleText) {
         container.append("text")
             .attr("dy", 3 * R + "px")
-            .text(`Loading data for ${ participantId }...`)
-            .style("font-size", 1.5 * R + "px")
+            .text(`Loading data for '${ participantId }'`)
+            .style("font-size", 0.75 * R + "px")
             .style("text-anchor", "middle");
     }
 

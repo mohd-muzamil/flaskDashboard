@@ -24,7 +24,7 @@ html {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: gray;
+    /* background: gray; */
 }
 
 #content {
@@ -53,16 +53,18 @@ svg {
 .svg1 {
     height: 50%;
     width: 59.5%;
-    /* width: 58.6%; */
+    /* height: 70%; */
+    /* width: 100%; */
 }
 
 .svg2 {
     height: 50%;
-    width: 39.5%;
+    width: 39.8%;
 }
 
 .svg3 {
     height: 24.5%;
+    /* height: 30%; */
     width: 99.5%
 }
 
@@ -80,6 +82,14 @@ svg {
     transform: scale(0.7);
 }
 
+
+#ui-id-1 {
+    position: absolute !important;
+    /* top: inherit !important; */
+    /* left: inherit !important; */
+    z-index: 1000;
+    transform: scale(0.7);
+}
 
 /* number spinner for knn parameter skin 1 */
 
@@ -145,14 +155,14 @@ svg {
 hr {
     margin-top: 0em !important;
     margin-bottom: 5px !important;
-    background-color: gray;
+    /* background-color: gray; */
 }
 
 hr.double {
     margin-top: 0em !important;
     margin-bottom: 0em !important;
     border-width: 3px;
-    background-color: gray;
+    /* background-color: gray; */
 }
 
 br {
@@ -190,7 +200,7 @@ br {
 
 .lasso path {
     stroke: rgb(80, 80, 80);
-    stroke-width: 1.5px;
+    stroke-width: 1px;
 }
 
 .lasso .drawn {
