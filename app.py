@@ -19,7 +19,7 @@ from removeOverlap.dgrid import *
 # personalityFile = "dummyPersonalityScores"
 # featureFile = "dummyFeatureData"
 # brightnessFile = "dummyBrightness"
-# accelerometerFile = "dummyAccelerometer"
+# accelerometer File = "dummyAccelerometer"
 # gyroscopeFIle = "dummygyroscope"
 
 personalityFile = "PersonalityScores.csv"
@@ -36,8 +36,8 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     x = np.expand_dims(dimReduxProjections[:, 0], axis=1)
     y = np.expand_dims(dimReduxProjections[:, 1], axis=1)
     cords = np.concatenate((x, y), axis=1)
-    icon_width = 1/(width/(2*radius))
-    icon_height = 1/(height/(2*radius))
+    icon_width = 1.1*(1/(width/(2*radius)))
+    icon_height = 1.1*(1/(height/(2*radius)))
 
     dimReduxProjectionsOverlapRemoved = DGrid(icon_width, icon_height, delta=1).fit_transform(cords)
     resultX = np.round(dimReduxProjectionsOverlapRemoved[:, 0], 3)
@@ -127,18 +127,18 @@ def getClassLabels():
     if request.method == 'POST':
         content = request.get_json()
         classLabel = content["classLabel"]
-        personalityData = pd.read_csv(os.path.join("data/processedData", personalityFile))
+        personalityData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
         labels = sorted(personalityData[classLabel].unique().tolist())
-        if classLabel == "age":
-            classLabel = "age_group"
-            bins= [0,12,18,39,59,200]
-            labels = ['Child','Teen','Adult','Mid-Adult','Senior-Adult']
-            # labels = range(len(bins)-1)
-            personalityData['age_group'] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
-            labels = sorted(personalityData[classLabel].unique().tolist())
-            personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
-            # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
-            personalityData.to_csv(os.path.join("data/processedData", personalityFile), index=False, header=True)
+        # if classLabel == "age":
+        #     classLabel = "age_group"
+        #     bins= [0,12,18,39,59,200]
+        #     labels = ['Child','Teen','Adult','Mid-Adult','Senior-Adult']
+        #     # labels = range(len(bins)-1)
+        #     personalityData['age_group'] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
+        #     labels = sorted(personalityData[classLabel].unique().tolist())
+        #     personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
+        #     # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
+        #     personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
         return jsonify(labels)
 
 
@@ -201,8 +201,11 @@ def getProjections():
     """
     if request.method == 'GET':
         data = pd.read_csv(os.path.join(
-            "data/processedData", personalityFile))
-
+            "data/processedData", featureAggFile))
+        cols = [col for col in data.columns if col not in ['id', 'age', 'gender', 'dass1', 'dass2', 'age_group', 'x', 'y', 'x_overlapRemoved', 'y_overlapRemoved', 'cluster']]
+        print(data.columns,cols)
+        data[cols] = np.round(MinMaxScaler().fit_transform(data[cols]), 3)
+        # print(data.head)
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
         resp.headers["Content-Type"] = "text/csv"
@@ -230,7 +233,7 @@ def filterparticipantIdsDummy():
         for attr, checkState in attributes.items():
             if checkState:
                 df = pd.read_csv(os.path.join(
-                    "data/processedData", filenames[attr]))
+                    "data/rawData", filenames[attr]))
                 df = df[df["id"] == id]
 
                 # Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
@@ -275,7 +278,7 @@ def filterparticipantIdsNew():
             print("attr:", attr, "checkState:", checkState)
             if checkState:
                 df = pd.read_csv(os.path.join(
-                    "data/processedData", filenames[attr]))
+                    "data/rawData", filenames[attr]))
                 df = df[df["id"] == id]
                 
                 dfImputed = pd.DataFrame()
@@ -332,13 +335,13 @@ def getAggFeatures():
 
         featureData = pd.read_csv(os.path.join(
             "data/processedData", featureAggFile))
-
+        
         # rearranging data such that selected participant data is always at the last
         # this helps in the visualization of parallel cord chart
-        idx = featureData.index.tolist()
-        index_to_shift = featureData.index[featureData["id"] == id].tolist()[0]
-        idx.pop(index_to_shift)
-        featureData = featureData.reindex(idx + [index_to_shift])
+        # idx = featureData.index.tolist()
+        # index_to_shift = featureData.index[featureData["id"] == id].tolist()[0]
+        # idx.pop(index_to_shift)
+        # featureData = featureData.reindex(idx + [index_to_shift])
 
         resp = make_response(featureData.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"

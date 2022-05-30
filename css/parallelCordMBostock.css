@@ -50,7 +50,7 @@ svg {
 /* Brush no eixo */
 
 .brush .extent .selection {
-    fill: red;
+    /* fill: red; */
     fill-opacity: .3;
     /* stroke: #fff; */
     shape-rendering: crispEdges;

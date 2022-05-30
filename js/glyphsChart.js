@@ -1,5 +1,5 @@
 // This script is used to generate visual representations over Glyph View.
-function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
     // delta = radius / 100
     const config = {
         r: +radius,
@@ -14,28 +14,13 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
         strokeWidthHigh: 1,
         fillColor: "transparent",
         fillColorLasso: "#636363",
-        petals: 5, //no of petals in the glyph
+        petals: featurelist.length, //no of petals in the glyph
         labelSize: radius / 2, //size of labels to show over the glyphs
         toggleBrushOrLasso: "lasso",
         grid_size: 3,
         transition_duration: 750,
         max_zoom: 4,
     }
-
-    // Get all the distinct label values from server
-    var labels
-    postForm = { "classLabel": classLabel }
-    $.ajax({
-        type: "POST",
-        contentType: 'application/json',
-        data: JSON.stringify(postForm),
-        url: "/getClassLabels",
-        async: false,
-        success: function(response) {
-            labels = response
-            if(classLabel=="age") classLabel="age_group"
-        }
-    })
 
     if (toggleSvgGrid) { config.opacityLow = 0.2; config.strokeWidthLow = 0.2 }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
@@ -47,7 +32,7 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
     const colorClusters = d3.scaleOrdinal().domain(labels).range(d3.schemeCategory10)
     var current_zoom_scale = 1
     var lassoSelectedIds = []
-    var delayInMilliseconds = 0 //1 second
+    var delayInMilliseconds = 750 //1 second
     const titleText = "Glyph View"
 
     // reading data directly
@@ -57,7 +42,6 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
             d.y = +d.y
             d.x_overlapRemoved = +d.x_overlapRemoved
             d.y_overlapRemoved = +d.y_overlapRemoved
-            d.age_group = +d.age_group
         })
         const margin = { left: 5, top: 5, right: 60, bottom: 5 },
             width = $("#" + glyphs).width(),
@@ -241,7 +225,7 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
         // Scales for polygon glyph
         const xpolygonLine = d3.lineRadial()
         const polygonScale = d3.scaleLinear()
-            .domain([0, 10])
+            .domain([0, 1])
             .range([0, config.r])
 
         function zoomed(t) {
@@ -251,6 +235,9 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
         }
 
         function plotPolygonGlyph() {
+            var featurelistTemp = featurelist.slice()
+            featurelistTemp.push(featurelist[0])
+            console.log(featurelist, featurelistTemp)
             // polygonGlyph
             svgGlyphs.append("g").attr("class", "glyphs")
                 .selectAll("circle")
@@ -265,7 +252,8 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
                         .enter()
                         .append("path")
                         .attr("class", d => { return d.selectedId == selectedId ? "selectedGlyph" : null })
-                        .attr("d", d => xpolygonLine([d["open"], d["con"], d["extra"], d["agree"], 10 - d["neuro"], d["open"]].map((v, i) => [i* 2*Math.PI / config.petals, polygonScale(v)])))
+                        .attr("d", d => xpolygonLine(featurelistTemp.map(a=>d[a]).map((v, i) => [i* 2*Math.PI / config.petals, polygonScale(v)])))
+                        // .attr("d", d => xpolygonLine([d["open"], d["con"], d["extra"], d["agree"], 10 - d["neuro"], d["open"]].map((v, i) => [i* 2*Math.PI / config.petals, polygonScale(v)])))
                         .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
@@ -284,20 +272,20 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
                 .data(data)
                 .enter()
                 .append('g')
+                .attr("class", (d) => {return d.id == selectedId ? "selectedGlyph" : null })
                 .each(function (d) {
-                    const tPetals = [d["open"], d["con"], d["extra"], d["agree"], d["neuro"]]
+                    const tPetals = featurelist.map(a=>d[a])
                     d3.select(this)
                         .selectAll("path")
                         .data(tPetals)
                         .enter()
                         .append("path")
-                        .attr("class", d => { return d.selectedId == selectedId ? "selectedGlyph" : null })
                         .attr("d", function (v) {
                             return customPath
                         })
                         .attr("transform", function (v, i) {
                             translate = toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})`
-                            return `${translate}, rotate(${360 / config.petals * i}), scale(${v * config.r / 1000})`
+                            return `${translate}, rotate(${360 / config.petals * i}), scale(${v * config.r / 100})`
                         })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
@@ -535,7 +523,6 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
                 tooltip_mouseout()
             })
             .on("click", function () {
-                console.log("clearall clicked")
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
                     .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
@@ -683,12 +670,10 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
             })
         
         function plotRadialTime() {
-            console.log("Glyphs->RadialTime")
-            updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+            updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
         }
 
         function plotParallelCord() {
-            console.log("paralle cord chart called")
             lassoSelectedIds = [selectedId]
             d3.selectAll(".selectedLasso")["_groups"][0].forEach(function (d) {
                 if (!lassoSelectedIds.includes(d.__data__.id)) { lassoSelectedIds.push(d.__data__.id) }
@@ -696,8 +681,7 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
             lassoSelectedIds = [...new Set(lassoSelectedIds)]
             setTimeout(function () {
                 //your code to be executed after 1 second
-                console.log("Glyphs->ParallelCord_indiv", featurelist, lassoSelectedIds)
-                updateParallelCord(parallelCord1, selectedId, lassoSelectedIds, featuresType="aggregatedFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
+                updateParallelCord(parallelCord1, selectedId, lassoSelectedIds, featuresType="aggregatedFeatures", featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
             }, delayInMilliseconds)
         }
 
@@ -709,9 +693,9 @@ function plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedI
 }
 
 
-function updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
     // only individual parallel cord  will be updated from here.
     d3.selectAll(".Tooltip").remove()
     d3.select("#" + glyphs).selectAll("*").remove()
-    plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+    plot_glyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
 }

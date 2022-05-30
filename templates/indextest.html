@@ -257,11 +257,11 @@
                         </div>
                         <div class="classLabel">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age_group" name="colorCheckbox" checked>
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age_group" name="colorCheckbox">
                                 <label class="form-check-label" for="inlineCheckbox1">Age</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="gender" name="colorCheckbox">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="gender" name="colorCheckbox" checked>
                                 <label class="form-check-label" for="inlineCheckbox2">Gender</label>
                             </div>
                             <div class="form-check form-check-inline">
@@ -460,12 +460,13 @@
         var toggleLabels //true for showing labels
         var toggleSvgGrid //true for showing the grid
         var classLabel
+        var labels
         var lckChecked
         var brtChecked
         var accChecked
         var gyrChecked
         var sleepNoiseChecked
-        var delayInMilliseconds = 0
+        var delayInMilliseconds = 250
 
         // setting up the default states for toggle swtiches
         {
@@ -556,6 +557,20 @@
 
             k = $('.num-in span').parents('.num-block').find('input.in-num').val()
 
+            // Get all the distinct label values from server
+            postForm = { "classLabel": classLabel }
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(postForm),
+                url: "/getClassLabels",
+                async: false,
+                success: function(response) {
+                    labels = response
+                    if(classLabel=="age") classLabel="age_group"
+                }
+            })
+
             // jquery handlers for knn input spinner
             {
                 //number spinner for knn param +/-
@@ -638,7 +653,7 @@
         $(document).ready(function () {
             $("#sidebar-toggle").on('click', function () {
                 $("#wrapper").toggleClass("no-sidebar");
-                renderCharts(delayInMilliseconds, true)
+                renderCharts(0, true)
             });
         });
 
@@ -647,8 +662,7 @@
             // menu button click events
             $("#btn-searchId").click(function () {
                 // selectedId = $("#btn-searchId").val()
-                console.log("searchbar button clicked", selectedId)
-                renderCharts()
+                renderCharts(delayInMilliseconds, PCP=true)
             })
             $("#btn-featureSelection").click(function () {
                 process(delayInMilliseconds, true)
@@ -665,7 +679,20 @@
             $("#btn-classLabel").click(function () {
                 $('input[name="colorCheckbox"]:checked').each(function () {
                 classLabel = this.value
-            });
+                // Get all the distinct label values from server
+                postForm = { "classLabel": classLabel }
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/getClassLabels",
+                    async: false,
+                    success: function(response) {
+                        labels = response
+                        if(classLabel=="age") classLabel="age_group"
+                    }
+                })
+            })
                 process(delayInMilliseconds)
             })
             $("#btn-mobileSensors").click(function () {
@@ -828,8 +855,6 @@
                 //     buffering(parallelCord2, selectedId, toggleText = false)
                 // }
                 renderCharts(delay, PCP)
-                updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
-                updateParallelCord(parallelCord1, selectedId, lassoSelectedIds=[], featuresType="aggregatedFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
                 // uncomment below line to hide the sidebar after submit button
                 // $("#sidebar").removeClass("show")
             }
@@ -868,10 +893,10 @@
             //calling method that plots buffering symbol
             setTimeout(function () {
                 //code to be executed after delay
-                updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+                updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
                 if (PCP == true) {
-                    // aggregatedFeatures/individualFeatures
-                    // updateParallelCord(parallelCord1, selectedId, [], featuresType="aggregatedFeatures", featurelist, classLabel)
+                    updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+                    updateParallelCord(parallelCord1, selectedId, lassoSelectedIds=[], featuresType="aggregatedFeatures", featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
                     currentfeaturelistPCP = $('#featureSelect').val()
                 }
             }, delay)

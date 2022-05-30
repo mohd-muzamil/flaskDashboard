@@ -4,10 +4,11 @@
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
 // https://gist.github.com/titipignataro/47135818bad65a439174038227e0eb20
 
-function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date, starting_max_date) {
+function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel , labels, starting_min_date, starting_max_date) {
+    console.log(selectedId, lassoSelectedIds)
     var featuresNames
     var importanceScores
-    const line_color = "purple"
+    const line_color = "#525252"
     const titleLegend = "Feature Importance"
 
     postForm = { "featureColumns": featurelist, "classLabel": classLabel }
@@ -45,20 +46,22 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
         featureLength = featurelist.length - 1
         if (!featuresNames.includes("date_num")) {
             featuresNames.unshift("date_num")
-            featureImportanceScale.unshift(0)
+            importanceScores.unshift(0)
         }
     }
 
     var deltaWidth = 0
     if (featurelist.length > 1) {
-        deltaWidth = (20 - featurelist.length) * xHigh / 4
+        deltaWidth = (20 - featurelist.length) * xHigh / 40
         xHigh = xHigh - deltaWidth
     }
 
     var featuresCodes = featuresNames
-    const colorClusters = d3.scaleOrdinal().domain(["Setosa", "Versicolor", "Virginica"]).range(d3.schemeCategory10);
-    const featureImportanceScale = d3.scaleSequential(d3.interpolateRdYlBu).domain([1, 0])
+    const colorClusters = d3.scaleOrdinal().domain(labels).range(d3.schemeCategory10)
 
+    const featureImportanceScale = d3.scaleSequential(d3.interpolate("#3f007d", "#FFFFFF")).domain([1, 0])
+
+    console.log(featuresNames, featuresCodes)
     var x = d3.scalePoint().domain(featuresCodes).range([margin.left, xHigh - margin.right]),
         y = {},
         formatDecimal = d3.format(".0f");
@@ -119,7 +122,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         data.forEach(function(p) { p[d] = formatDecimal(p[d]) });
                         y[d] = d3.scaleLinear()
                             .domain(d3.extent(data, function(p) { return +p[d]; }))
-                            .range([height, 0])
+                            .range([yHigh, 0])
                     } else {
                         data.forEach(function(p) { p[d] = +p[d] });
                         min = d3.extent(data, function(p) { return +p[d]; })[0]
@@ -134,12 +137,10 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                 background = svg.append("svg:g")
                     .attr("class", "background")
                     .selectAll("path")
+                    .raise()
                     .data(data)
                     .enter().append("svg:path")
                     .attr("d", path)
-                    .attr("stroke", function(d) {
-                        return (featuresType == "aggregatedFeatures") ? colorClusters(d.variety) : line_color;
-                    })
 
                 // Add a title to svg.
                 svg.append("text")
@@ -168,7 +169,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
 
                 //Add a title to legend
                 svg.append("text")
-                    .attr("transform", `translate(${xHigh},${xHigh/50}) scale(${yHigh/235})`)
+                    .attr("transform", `translate(${xHigh + deltaWidth/2},${xHigh/50}) scale(${yHigh/235})`)
                     .attr("font-size", "12px")
                     .attr("text-anchor", "middle")
                     .style("font-weight", "normal")
@@ -183,30 +184,31 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                 foreground = svg.append("svg:g")
                     .attr("class", "foreground")
                     .selectAll("path")
+                    .raise()
                     .data(filteredData)
                     .enter().append("svg:path")
                     .attr("d", path)
                     .attr("opacity", function(d) {
                         if (featuresType == "aggregatedFeatures") {
-                            return d.id == selectedId ? 1 : 1;
+                            return d.id == selectedId ? 1 : 0.8
                         } else {
                             return 1
                         }
                     })
                     .attr("stroke", function(d) {
                         if (featuresType == "aggregatedFeatures") {
-                            return d.id != selectedId ? colorClusters(d["variety"]) : "black";
+                            if(d.id == selectedId){console.log(d)}
+                            return d.id != selectedId ?  colorClusters(d[classLabel]) : "#000";
                         } else {
                             return line_color
                         }
-
-                    // })
-                    // .attr("stroke-width", function(d) {
-                    //     if (featuresType == "aggregatedFeatures") {
-                    //         return d.id != selectedId ? "1.5px" : "2px";
-                    //     } else {
-                    //         return "1.5px"
-                    //     }
+                    })
+                    .attr("stroke-width", function(d) {
+                        if (featuresType == "aggregatedFeatures") {
+                            return d.id != selectedId ? "1px" : "2px";
+                        } else {
+                            return "1px"
+                        }
                     })
 
 
@@ -237,7 +239,24 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                             transition(background).attr("d", path);
                         })
                     );
+                
+                // add boxes behind each axis 
+                g.append("svg:g")
+                    .attr("class", "featureImportance")
+                    .filter(d=>{ if(d!="date_num"){return d} })
+                    .each(function(d) { d3.select(this).append("rect") })
+                    .append("rect")
+                    .attr("class", "boxes")
+                    .attr("width", 4)
+                    .attr("height", yHigh)
+                    .attr("fill", function(d, i) {
+                        return featureImportanceScale(importanceScores[i])
+                    })
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 0.4)
+                    .attr("opacity", 1)
 
+            
                 // Add an axis and title.
                 g.append("g")
                     .attr("class", "axis")
@@ -268,21 +287,6 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
                         return tooltip.style("visibility", "hidden");
                     })
 
-                // add boxes behind each axis 
-                g.append("svg:g")
-                    .attr("class", "featureImportance")
-                    .each(function(d) { d3.select(this).append("rect"); })
-                    .append("rect")
-                    .attr("class", "boxes")
-                    .attr("width", 4)
-                    .attr("height", yHigh)
-                    .attr("fill", function(d, i) {
-                        return featureImportanceScale(importanceScores[i])
-                    })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 0.4)
-                    .attr("opacity", 1)
-
                 function position(d) {
                     var v = dragging[d];
                     return v == null ? x(d) : v;
@@ -311,13 +315,12 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featuresType, feature
 }
 
 
-function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date = "", starting_max_date = "") {
-    console.log("updateParallelCord_muzz:", chart, featuresType, lassoSelectedIds)
+function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "") {
     // featuresType: aggregatedFeatures/individualFeatures
     if (Array.isArray(selectedId)) {
         selectedId = selectedId[0]
     }
-    d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
+    d3.select("#" + chart).selectAll('*').exit().remove(); //clearing the chart before plotting new data
     
     if (featuresType == "aggregatedFeatures") {
         buffering(chart, selectedId, toggleText = false)
@@ -325,5 +328,5 @@ function updateParallelCord(chart, selectedId, lassoSelectedIds, featuresType, f
     else if (featuresType == "individualFeatures") {
         buffering(chart, selectedId)
     }
-    parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, starting_min_date, starting_max_date)
+    parallelCord(chart, selectedId, lassoSelectedIds, featuresType, featurelist, classLabel, labels, starting_min_date, starting_max_date)
 }

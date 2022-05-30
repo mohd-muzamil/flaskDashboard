@@ -392,7 +392,7 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                                 starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
                                 starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
 
-                                updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, starting_min_date, starting_max_date)
+                                updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, labels, starting_min_date, starting_max_date)
                             }
 
                         })
@@ -451,7 +451,7 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
 }
 
 
-function updateRadialTime(chart, dependendChart, selectedId, featurelist, classLabel, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
+function updateRadialTime(chart, dependendChart, selectedId, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
     d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
     buffering(chart, selectedId); //calling method that plots buffering symbol
@@ -459,12 +459,11 @@ function updateRadialTime(chart, dependendChart, selectedId, featurelist, classL
 
     attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked, "noise": sleepNoiseChecked }
     // attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked}
-
     plot_radialTime(chart, dependendChart, selectedId, featurelist, classLabel, attributes)
 
     var delayInMilliseconds = 1000; //1 second
     setTimeout(function() {
         //your code to be executed after 1 second
-        updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, starting_min_date = "", starting_max_date = "")
+        updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
     }, delayInMilliseconds);
 }
