@@ -77,7 +77,6 @@
                             <div class="col-2 m-0 p-0">
                                 <button class="button" id="btn-searchId">
                                     <i class="fa-solid fa-magnifying-glass"></i>
-                                    <!-- <i class="fa-solid fa-play"></i> -->
                                 </button>
                             </div>
                         </div>
@@ -103,61 +102,85 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- feature auto select -->
+                        <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
+                            <div class="row">
+                                <div class="col-2 m-0 p-0 pl-2">
+                                    <label class="pl-2" style="font-size: 10px; font-weight:500;"> Auto </label>
+                                </div>
+                                <div class="col-8 m-0 p-0 scaled">
+                                    <div class="num-block skin-1 m-0 p-0 pl-2">
+                                        <div class="num-in" id="autoSpinner">
+                                            <span class="minus"></span>
+                                            <input style="font-weight:bold; font-size: 13px" type="text" class="in-num" value="10">
+                                            <span class="plus"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2 m-0 p-0 scaled">
+                                    <button class="button" id="btn-FeatureAutoSelect">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="multiselect-menu px-0">
                             <select id="featureSelect" multiple>
                                 <optgroup label="Screen">
-                                    <option value="noScreenLocks" selected="selected">No of Unlocks</option>
-                                    <option value="firstScreenUnlock" selected="selected">First Screen Unlock</option>
-                                    <option value="lastScreenLock" selected="selected">Last Screen Lock</option>
-                                    <option value="maxScreenTime" selected="selected">Max On time</option>
-                                    <option value="totalScreenTime" selected="selected">Total On time</option>
+                                    <option value="noScreenLocks">No of Unlocks</option>
+                                    <option value="firstScreenUnlock">First Screen Unlock</option>
+                                    <option value="lastScreenLock">Last Screen Lock</option>
+                                    <option value="maxScreenTime">Max On time</option>
+                                    <option value="totalScreenTime">Total On time</option>
                                 </optgroup>
 
                                 <optgroup label="Calling">
-                                    <option value="noMissed" selected="selected">No of missed calls</option>
-                                    <option value="noDialled" selected="selected">No of dialed calls</option>
-                                    <option value="noIncoming" selected="selected">No of incoming calls</option>
-                                    <option value="minDurationIncoming" selected="selected">Min dur of incoming calls
+                                    <option value="noMissed">No of missed calls</option>
+                                    <option value="noDialled">No of dialed calls</option>
+                                    <option value="noIncoming">No of incoming calls</option>
+                                    <option value="minDurationIncoming">Min dur of incoming calls
                                     </option>
-                                    <option value="maxDurationIncoming" selected="selected">Max dur of incoming calls
+                                    <option value="maxDurationIncoming">Max dur of incoming calls
                                     </option>
-                                    <option value="totalDurationIncoming" selected="selected">Total dur of incoming
+                                    <option value="totalDurationIncoming">Total dur of incoming
                                         calls</option>
-                                    <option value="noOutgoing" selected="selected">No of outgoing calls</option>
-                                    <option value="minDurationOutgoing" selected="selected">Min dur of outgoing calls
+                                    <option value="noOutgoing">No of outgoing calls</option>
+                                    <option value="minDurationOutgoing">Min dur of outgoing calls
                                     </option>
-                                    <option value="maxDurtaionOutgoing" selected="selected">Max dur of outgoing calls
+                                    <option value="maxDurtaionOutgoing">Max dur of outgoing calls
                                     </option>
-                                    <option value="totalDurationOutgoing" selected="selected">Total dur of outgoing
+                                    <option value="totalDurationOutgoing">Total dur of outgoing
                                         calls</option>
-                                    <option value="totalNoCalls" selected="selected">Total number of calls</option>
-                                    <option value="totalDurationCalls" selected="selected">Total dur of all calls
+                                    <option value="totalNoCalls">Total number of calls</option>
+                                    <option value="totalDurationCalls">Total dur of all calls
                                     </option>
                                 </optgroup>
 
                                 <!-- <optgroup label="Mobility">
-                                        <option value="noOfStayPoints" selected="selected">No of stay points</option>
-                                        <option value="locationVariance" selected="selected">Location Variance</option>
-                                        <option value="entropy" selected="selected">Entropy</option>
-                                        <option value="normalizedEntropy" selected="selected">Normalized Entropy</option>
-                                        <option value="homeStay" selected="selected">Home stay</option>
-                                        <option value="radiusOfGyration" selected="selected">Radius of Gyration</option>
+                                        <option value="noOfStayPoints">No of stay points</option>
+                                        <option value="locationVariance">Location Variance</option>
+                                        <option value="entropy">Entropy</option>
+                                        <option value="normalizedEntropy">Normalized Entropy</option>
+                                        <option value="homeStay">Home stay</option>
+                                        <option value="radiusOfGyration">Radius of Gyration</option>
                                     </optgroup> -->
 
                                 <optgroup label="Sleep">
-                                    <option value="sleepStartTime" selected="selected">Sleep start Time</option>
-                                    <option value="sleepEndTime" selected="selected">Sleep end Time</option>
-                                    <option value="sleepDuration" selected="selected">Sleep duration</option>
+                                    <option value="sleepStartTime">Sleep start Time</option>
+                                    <option value="sleepEndTime">Sleep end Time</option>
+                                    <option value="sleepDuration">Sleep duration</option>
                                 </optgroup>
                             </select>
                         </div>
+                        <br>
                     </div>
                     <br>
                     <hr>
 
                     <script>
                         //settings for multiselect dropdown - run at the begining of page refresh/first load
-                        // $('#featureSelect').multiselect();
                         $('#featureSelect').multiselect({
                             enableClickableOptGroups: true,
                             enableCollapsibleOptGroups: true,
@@ -168,9 +191,11 @@
                             maxHeight: screen.height * 0.5,
                             // buttonClass: 'btn btn-link',
                             numberDisplayed: 1,
-                            dropRight: true
+                            dropRight: true,
+                            buttonTitle: function() {},
                         })
                     </script>
+                    
                     <!-- k-param -->
                     <div class="container" style="display:inline-block; text-align: left; font-size: 13px;">
                         <div class="row">
@@ -186,7 +211,7 @@
                             </div>
                         </div>
                         <div class="num-block skin-1 m-0 p-0 pl-2">
-                            <div class="num-in">
+                            <div class="num-in" id="knnSpinner">
                                 <span class="minus"></span>
                                 <input style="font-weight:bold; font-size: 13px" type="text" class="in-num" value="3">
                                 <span class="plus"></span>
@@ -327,7 +352,7 @@
                         <div class="form-check form-switch pl-1" style="text-align: left">
                             <div>
                                 <span onclick=alertGlyph()><i class="fa-solid fa-circle-question help"></i></span>
-                                <input class="pl-4 scaled" type="checkbox" checked data-toggle="toggle"
+                                <input class="pl-4" type="checkbox" checked data-toggle="toggle"
                                     data-style="round" data-size="xs" data-width=90 data-on="Flower" data-off="Polygon"
                                     id="toggleGlyph">
                                 <label class="form-check-label" for="toggleGlyph"
@@ -374,6 +399,19 @@
                             </div>
                         </div>
                     </div>
+                    <hr>
+
+                    <!-- Toggle parallel cord charts -->
+                    <div class="container m-0 p-0" style="display:inline-block; text-align: left; font-size: 13px;">
+                        <div class="form-check form-switch pl-1" style="text-align: left">
+                            <div>
+                                <span onclick=alertPCP()><i class="fa-solid fa-circle-question help"></i></span>
+                                <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round"
+                                    data-size="xs" data-width=90 data-on="Individual" data-off="Aggregate" id="featureType">
+                                <label style="font-size: 13px; font-weight:500;">PC Plot</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- reset button -->
@@ -398,34 +436,17 @@
                 <svg class="svg1" id="chart1"></svg>
                 <svg class="svg2" id="chart2"></svg>
                 <svg class="svg3" id="chart3"></svg>
-                <svg class="svg3" id="chart4"></svg>
+                <!-- <svg class="svg3" id="chart4"></svg> -->
             </div>
-            <nav class="ml-1">
+            <nav class="mx-2 mt-2 mb-0">
                 <!-- <a id="menuButton" data-toggle="collapse" href="#" data-target="#sidebar" aria-expanded="false">Menu</a> -->
-                <a href="#" id="sidebar-toggle">Menu</a>
+                <a href="#" id="menu">Menu</a>
                 <div id="csvGrid" class="grid ag-theme-balham" style="display: none;"></div>
             </nav>
         </div>
     </div>
     <!-- wrapper end -->
 
-    <script>
-        $.ajax({
-            type: "GET",
-            async: false,
-            url: "/getIds",
-            success: function (response) {
-                ids = response
-                ids_str = []
-                ids.forEach(e => {
-                    ids_str.push(e.toString())
-                });
-                $("#searchSelector").autocomplete({
-                    source: ids_str
-                });
-            }
-        })
-    </script>
 
     <!-- Imports -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -444,10 +465,9 @@
     <script src="../js/buffering.js"></script>
     <script>
         // config
-        var glyphs = "chart1"
-        var radialTime = "chart2"
-        var parallelCord1 = "chart3"
-        var parallelCord2 = "chart4"
+        var chart1 = "chart1"
+        var chart2 = "chart2"
+        var chart3 = "chart3"
         var ids = []
         var selectedId
         var featurelist = $('#featureSelect').val()
@@ -459,6 +479,7 @@
         var toggleDGrid
         var toggleLabels //true for showing labels
         var toggleSvgGrid //true for showing the grid
+        var featureType //"aggregatedFeatures/individualFeatures" 
         var classLabel
         var labels
         var lckChecked
@@ -466,7 +487,29 @@
         var accChecked
         var gyrChecked
         var sleepNoiseChecked
-        var delayInMilliseconds = 250
+        var delayInMilliseconds = 1000
+
+        {
+            // set a  ramdom value to select an id 
+            $.ajax({
+                    type: "GET",
+                    async: false,
+                    url: "/getIds",
+                    success: function (response) {
+                        ids = response
+                        ids_str = []
+                        ids.forEach(e => {
+                            ids_str.push(e.toString())
+                        });
+
+                        selectedId = ids[Math.floor(Math.random() * ids.length)]
+                        $("#searchSelector").autocomplete({
+                            source: ids_str
+                        });
+                        $("#searchSelector").attr("placeholder", selectedId.toString())
+                    }
+                })
+        }
 
         // setting up the default states for toggle swtiches
         {
@@ -475,6 +518,7 @@
             $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
             $('#toggleLabels').bootstrapToggle('on') //on-hideLabels off-showLabels
             $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
+            $('#featureType').bootstrapToggle('off') //on-individualFeatures off-aggregatedFeatures
         }
 
         // jquery handlers for initially setting the values of variables
@@ -555,7 +599,32 @@
                 toggleSvgGrid = false
             }
 
-            k = $('.num-in span').parents('.num-block').find('input.in-num').val()
+            if ($("#featureType").is(':checked')) {
+                featureType = "individualFeatures"
+            } else {
+                featureType = "aggregatedFeatures"
+            }
+
+            k = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
+
+            // setting options for dropdown
+            autoN = $('#autoSpinner span').parents('.num-block').find('input.in-num').val()    
+                // ajax request to get first autoN important features
+                postForm = {"autoN": autoN, "classLabel": classLabel }
+                $.ajax({
+                        type: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify(postForm),
+                        url: "/getAutoN",
+                        async: false,
+                        success: function(response) {
+                            $('#featureSelect').multiselect('clearSelection');
+                            // Selecting up multiselect opting based on the auto suggestions
+                            response.forEach(d=>{
+                                $('#featureSelect').multiselect('select', d);
+                            })
+                        }
+                    })
 
             // Get all the distinct label values from server
             postForm = { "classLabel": classLabel }
@@ -572,13 +641,13 @@
             })
 
             // jquery handlers for knn input spinner
-            {
-                //number spinner for knn param +/-
+            {   
+                // number spinner for auto selection
                 $(document).ready(function () {
-                    const min = 1
-                    const max = ids.length
-                    $('.num-in span').click(function () {
-                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                    const min = 2
+                    const max = 20
+                    $('#autoSpinner span').click(function () {
+                        count = $('#autoSpinner span').parents('.num-block').find('input.in-num').val()
                         var $input = $(this).parents('.num-block').find('input.in-num')
                         if ($(this).hasClass('plus')) count++
                         else count--
@@ -588,94 +657,165 @@
                     })
 
                     // auto update the button for k param when input goes above the range
-                    $('.num-in span').parents('.num-block').find('input.in-num').on("change", () => {
-                        count = $('.num-in span').parents('.num-block').find('input.in-num').val()
+                    $('#autoSpinner span').parents('.num-block').find('input.in-num').on("change", () => {
+                        count = $('#autoSpinner span').parents('.num-block').find('input.in-num').val()
                         if (count <= min) {
                             count = min
-                            $('.num-in span').parents('.num-block').find(('.minus')).addClass('dis')
-                        } else if (count >= max) {
+                            $('#autoSpinner span').parents('.num-block').find(('.minus')).addClass('dis')
+                        } else if (count>= max) {
                             count = max
-                            $('.num-in span').parents('.num-block').find(('.plus')).addClass('dis')
+                            $('#autoSpinner span').parents('.num-block').find(('.plus')).addClass('dis')
                         } else {
-                            $('.num-in span').parents('.num-block').find(('.minus')).removeClass('dis')
-                            $('.num-in span').parents('.num-block').find(('.plus')).removeClass('dis')
+                            $('#autoSpinner span').parents('.num-block').find(('.minus')).removeClass('dis')
+                            $('#autoSpinner span').parents('.num-block').find(('.plus')).removeClass('dis')
                         }
-                        $('.num-in span').parents('.num-block').find('input.in-num').val(count)
+                        $('#autoSpinner span').parents('.num-block').find('input.in-num').val(count)
+                        k = count
+                    })
+                })
+
+                //number spinner for knn param +/-
+                $(document).ready(function () {
+                    const min = 1
+                    const max = ids.length
+                    $('#knnSpinner span').click(function () {
+                        count = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
+                        var $input = $(this).parents('.num-block').find('input.in-num')
+                        if ($(this).hasClass('plus')) count++
+                        else count--
+                        $input.val(count)
+                        $input.change()
+                        return false
+                    })
+
+                    // auto update the button for k param when input goes above the range
+                    $('#knnSpinner span').parents('.num-block').find('input.in-num').on("change", () => {
+                        count = $('#knnSpinner span').parents('.num-block').find('input.in-num').val()
+                        if (count <= min) {
+                            count = min
+                            $('#knnSpinner span').parents('.num-block').find(('.minus')).addClass('dis')
+                        } else if (count>= max) {
+                            count = max
+                            $('#knnSpinner span').parents('.num-block').find(('.plus')).addClass('dis')
+                        } else {
+                            $('#knnSpinner span').parents('.num-block').find(('.minus')).removeClass('dis')
+                            $('#knnSpinner span').parents('.num-block').find(('.plus')).removeClass('dis')
+                        }
+                        $('#knnSpinner span').parents('.num-block').find('input.in-num').val(count)
                         k = count
                     })
                 })
             }
 
             // jquery handlers for showing chart for random data on screen
-            {
-                // set a  ramdom value to select an id 
-                $.ajax({
-                    type: "GET",
-                    async: false,
-                    url: "/getIds",
-                    success: function (response) {
-                        ids = response
-                        ids_str = []
-                        ids.forEach(e => {
-                            ids_str.push(e.toString())
-                        });
-                        selectedId = ids[Math.floor(Math.random() * ids.length)]
-                        $("#searchSelector").attr("placeholder", selectedId.toString())
-                    }
-                })
-                process(delayInMilliseconds, true)
+            {   
+                processDimRedux()
+                callGlyphs()
+                callRadialTime()
+                callParallelCord()
             }
         }
 
         // jquery handlers for regreshing charts after resizing
         {
             // auto refresh after window resizing
-            jQuery(function ($) {
-                var windowWidth = $(window).width()
-                var windowHeight = $(window).height()
-                var id
-                $(window).resize(function () {
-                    clearTimeout(id)
-                    id = setTimeout(doneResizing, 750)
-                })
+            var doit;
+            window.onresize = function(){
+                clearTimeout(doit);
+                doit = setTimeout(function(){console.log("reload"); location.reload()}, 0);
+            };
 
-                function doneResizing() {
-                    if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
-                        location.reload()
-                        return
-                    }
-                }
-            })
+            // jQuery(function ($) {
+            //     var windowWidth = $(window).width()
+            //     var windowHeight = $(window).height()
+            //     var id
+            //     $(window).resize(function () {
+            //         clearTimeout(id)
+            //         id = setTimeout(doneResizing, delayInMilliseconds)
+            //     })
+
+            //     function doneResizing() {
+            //         if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+            //             location.reload()
+            //             return
+            //         }
+            //     }
+            // })
         }
 
         // refresh after the side open or close using menu click event
-        // muzzu
-        $(document).ready(function () {
-            $("#sidebar-toggle").on('click', function () {
-                $("#wrapper").toggleClass("no-sidebar");
-                renderCharts(0, true)
+        $("#menu").on('click', function () {
+                $("#wrapper").toggleClass("no-sidebar")
+                console.log("menu toggled")
+                setTimeout(() => { console.log("menu toggled");
+                callGlyphs();
+                callParallelCord();
+                callRadialTime();
+             }, delayInMilliseconds);
             });
-        });
+
+        // uncomment below line to hide the sidebar after submit button
+        // $("#sidebar").removeClass("show")
 
         // jquery handlers for the input types in the Menu
         {
-            // menu button click events
             $("#btn-searchId").click(function () {
                 // selectedId = $("#btn-searchId").val()
-                renderCharts(delayInMilliseconds, PCP=true)
+                callGlyphs()
+                callParallelCord()
+                callRadialTime()
             })
+
             $("#btn-featureSelection").click(function () {
-                process(delayInMilliseconds, true)
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                processDimRedux()
+                callGlyphs()
+                callParallelCord()
+
             })
+
+            $("#btn-FeatureAutoSelect").click(function () {
+                autoN = $('#autoSpinner span').parents('.num-block').find('input.in-num').val()
+                
+                // ajax request to get first autoN important features
+                postForm = {"autoN": autoN, "classLabel": classLabel }
+                $.ajax({
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(postForm),
+                    url: "/getAutoN",
+                    async: false,
+                    success: function(response) {
+                        $('#featureSelect').multiselect('clearSelection');
+                        // Selecting up multiselect opting based on the auto suggestions
+                        response.forEach(d=>{
+                            $('#featureSelect').multiselect('select', d);
+                        })
+                    }
+                })
+            })
+
             $("#btn-knn").click(function () {
-                processKNN(delayInMilliseconds)
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                processKNN()
+                callGlyphs()
             })
+
             $("#btn-toggleDimRedux").click(function () {
-                process(delayInMilliseconds)
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                processDimRedux()
+                callGlyphs()
+                callParallelCord()
+                callRadialTime()
             })
+
             $("#btn-glyphRadius").click(function () {
-                process(delayInMilliseconds)
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                processDimRedux()
+                callGlyphs()
+                callParallelCord()
             })
+
             $("#btn-classLabel").click(function () {
                 $('input[name="colorCheckbox"]:checked').each(function () {
                 classLabel = this.value
@@ -692,11 +832,16 @@
                         if(classLabel=="age") classLabel="age_group"
                     }
                 })
+            })  
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                processDimRedux()
+                callGlyphs()
+                callParallelCord()
             })
-                process(delayInMilliseconds)
-            })
+
             $("#btn-mobileSensors").click(function () {
-                process(delayInMilliseconds)
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                callRadialTime()
             })
 
             //range slider 
@@ -710,6 +855,7 @@
 
             // checkbox to render lockstate data
             $("#lckCheckBox").on('change', function () {
+                // console.log(lckChecked)
                 if ($(this).is(':checked')) {
                     lckChecked = true
                 } else {
@@ -719,6 +865,7 @@
 
             // checkbox to render brightness data
             $("#brtCheckBox").on('change', function () {
+                // console.log(brtChecked)
                 if ($(this).is(':checked')) {
                     brtChecked = true
                 } else {
@@ -728,6 +875,7 @@
 
             // checkbox to render accelerometer data
             $("#accCheckBox").on('change', function () {
+                // console.log(accChecked)
                 if ($(this).is(':checked')) {
                     accChecked = true
                 } else {
@@ -737,6 +885,7 @@
 
             // checkbox to render gyroscope data
             $("#gyrCheckBox").on('change', function () {
+                // console.log(gyrChecked)
                 if ($(this).is(':checked')) {
                     gyrChecked = true
                 } else {
@@ -746,6 +895,7 @@
 
             // checkbox to render sleepnoise data
             $("#sleepNoiseCheckBox").on('change', function () {
+                // console.log(sleepNoiseChecked)
                 if ($(this).is(':checked')) {
                     sleepNoiseChecked = true
                 } else {
@@ -754,54 +904,64 @@
             })
 
             // switch to select glyphs
-            $("#toggleGlyph").on('change', function () {
+            $("#toggleGlyph").change(function () {
                 if ($(this).is(':checked')) {
                     toggleGlyph = "flowerGlyph"
                 } else {
                     toggleGlyph = "polygonGlyph"
                 }
                 // console.log("toggleGlyph:", toggleGlyph)
-                renderCharts()
+                callGlyphs()
             })
 
             // switch to select the type of dimensionality reduction
-            $("#toggleDimRedux").on('change', function () {
+            $("#toggleDimRedux").change(function () {
                 if ($(this).is(':checked')) {
                     toggleDimRedux = "tsne"
                 } else toggleDimRedux = "pca"
             })
 
             // switch to use DGrid to remove overlap over the glyphs
-            $("#toggleDGrid").on('change', function () {
+            $("#toggleDGrid").change(function () {
                 if ($(this).is(':checked')) {
                     toggleDGrid = true
                 } else {
                     toggleDGrid = false
                 }
                 // console.log("toggleDGrid:", toggleDGrid)
-                renderCharts()
+                callGlyphs()
             })
 
             // switch to show or hide labels
-            $("#toggleLabels").on('change', function () {
+            $("#toggleLabels").change(function () {
                 if ($(this).is(':checked')) {
                     toggleLabels = false
                 } else {
                     toggleLabels = true
                 }
                 // console.log("toggleLabels:", toggleLabels)
-                renderCharts()
+                callGlyphs()
             })
 
             // switch to show or hide grid
-            $("#toggleSvgGrid").on('change', function () {
+            $("#toggleSvgGrid").change(function () {
                 if ($(this).is(':checked')) {
                     toggleSvgGrid = true
                 } else {
                     toggleSvgGrid = false
                 }
-                // console.log("toggleSvgGrid:", toggleSvgGrid)
-                renderCharts()
+                callGlyphs()
+            })
+
+            // switch to toggle between individual and aggregated features for PCP
+            $("#featureType").change(function () {
+                if ($(this).is(':checked')) {
+                    featureType = "individualFeatures"
+                } else {
+                    featureType = "aggregatedFeatures"
+                }
+                selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
+                callParallelCord()
             })
 
             // single label selection
@@ -820,10 +980,10 @@
         }
 
         // function to call the server route which computes the ML algorithms.
-        function process(delay = 0, PCP = false) {
+        function processDimRedux() {
+            buffering(chart1, selectedId, toggleText = false)
             radius = +document.getElementById("myRange").value
             featurelist = $('#featureSelect').val()
-            if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
             if (featurelist.length < 2) {
                 alert("Please select more than one column in Feature selection drop down!!!")
             } else {
@@ -843,24 +1003,18 @@
                     contentType: 'application/json',
                     data: JSON.stringify(postForm),
                     url: "/dimReduceIds",
+                    async: false,
                     success: function (status) {
                         if (status === "status1:fileUpdated") {
                             // console.log("FeatureData file updated")
                         } else console.log("unknown status", status, "File has been reset using default values")
                     }
                 })
-                // buffering(glyphs, selectedId, toggleText = false)
-                // if (PCP == true) {
-                //     buffering(parallelCord1, selectedId)
-                //     buffering(parallelCord2, selectedId, toggleText = false)
-                // }
-                renderCharts(delay, PCP)
-                // uncomment below line to hide the sidebar after submit button
-                // $("#sidebar").removeClass("show")
             }
         }
 
-        function processKNN(delay = 0, PCP = false) {
+        function processKNN() {
+            buffering(chart1, selectedId, toggleText = false)
             featurelist = $('#featureSelect').val()
             radius = +document.getElementById("myRange").value
             if (JSON.stringify(currentfeaturelistPCP) != JSON.stringify(featurelist)) PCP = true
@@ -869,6 +1023,7 @@
             } else {
                 postForm = {
                     "featureColumns": featurelist,
+                    "classLabel": classLabel,
                     "k": k
                 }
                 $.ajax({
@@ -881,25 +1036,29 @@
                         if (status === "status1:fileUpdated") {
                             // console.log("FeatureData file updated")
                         } else console.log("unknown status", status, "File has been reset using default values")
-                        renderCharts(delay)
                     }
                 })
             }
         }
 
-        // Funtion to plot the glyph-view and PCP-view
-        function renderCharts(delay = 0, PCP = false) {
+        function callGlyphs(){
             radius = +document.getElementById("myRange").value
-            //calling method that plots buffering symbol
-            setTimeout(function () {
-                //code to be executed after delay
-                updateGlyphs(glyphs, radialTime, parallelCord1, parallelCord2, selectedId, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
-                if (PCP == true) {
-                    updateRadialTime(radialTime, parallelCord2, selectedId, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
-                    updateParallelCord(parallelCord1, selectedId, lassoSelectedIds=[], featuresType="aggregatedFeatures", featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
-                    currentfeaturelistPCP = $('#featureSelect').val()
-                }
-            }, delay)
+            updateGlyphs(chart1, chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+        }
+
+        function callRadialTime(){
+            updateRadialTime(chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+        }
+
+        function callParallelCord(){
+            lassoSelectedIds = [selectedId]
+            if( featureType == "aggregatedFeatures"){
+                d3.selectAll(".selectedLasso")["_groups"][0].forEach(function (d) {
+                    if (!lassoSelectedIds.includes(d.__data__.id)) { lassoSelectedIds.push(d.__data__.id) }
+                })
+                lassoSelectedIds = [...new Set(lassoSelectedIds)]
+            }
+            updateParallelCord(chart3, selectedId, lassoSelectedIds, featureType, featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
         }
 
         // jquery handlers for showing the raw data in a tabulat form below all the charts
@@ -1080,6 +1239,10 @@
 
                 function alertGrid() {
                     alert("This switch displays a 3*3 grid including 100 horizontal and 100 vertical thin lines over the Glyph View. This grid does not represent any data, and it only assists in perceiving distances between various visual representations.")
+                }
+
+                function alertPCP() {
+                    alert("This switch toggles between aggregated feature data and individual feature data of the selected Glyph.")
                 }
 
                 function alertReset() {

@@ -10,9 +10,10 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
-from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import LabelEncoder
+# from sklearn.feature_selection import SequentialFeatureSelector
+# from sklearn.model_selection import train_test_split
+# from sklearn.inspection import permutation_importance
 
 from removeOverlap.dgrid import *
 
@@ -117,9 +118,26 @@ def page_not_found(e):
 # Get a list of distinct participants for the search bar
 @app.route('/getIds', methods=['GET'])
 def getIds():
-    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
+    featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
     ids = featureData["id"].unique().tolist()
     return jsonify(ids)
+
+# Get a list of features based on sequential feature selector
+# https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SequentialFeatureSelector.html
+@app.route('/getAutoN', methods=['POST'])
+def getAutoN():
+    if request.method == 'POST':
+        content = request.get_json()
+        autoN = int(content["autoN"])
+        classLabel = content["classLabel"]
+        featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
+        featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
+        columns = [col for col in list(featureData.columns) if col not in ["id", "date_num", "age", "gender", "dass1", "dass2", "age_group"]]
+        featuresWithImportance = getImportance(featureDataAgg, columns, classLabel)
+        print("*"*100, list(featuresWithImportance.keys()))
+        Nfeatures = list(featuresWithImportance.keys())[:autoN]
+        return jsonify(Nfeatures)
+
 
 # Get a list of distinct values for classLabel
 @app.route('/getClassLabels', methods=['POST'])
@@ -144,7 +162,7 @@ def getClassLabels():
 
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceIds():
-    featureDataAgg = pd.read_csv(os.path.join("data/rawData", featureAggFile))
+    featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
@@ -178,17 +196,18 @@ def knnClustering():
     """
     This function is used to just calculate the k-nearest neighbours of the feature instances
     """
-    featureData = pd.read_csv(os.path.join("data/rawData", featureFile))
+    featureData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
+        classLabel = content["classLabel"]
         k = int(content["k"])
 
-        cluster = getClusters(featureData, columns, k)    #KNN clustering
+        cluster = getClusters(featureData, columns, classLabel, k)    #KNN clustering
         featureData["cluster"] = cluster
         featureData.dropna(axis=1, how='all', inplace=True)
         featureData.to_csv(os.path.join(
-            "data/processedData", featureFile), index=False, header=True)
+            "data/processedData", featureAggFile), index=False, header=True)
         message = "status1:fileUpdated"
 
     return jsonify(message)
@@ -203,9 +222,7 @@ def getProjections():
         data = pd.read_csv(os.path.join(
             "data/processedData", featureAggFile))
         cols = [col for col in data.columns if col not in ['id', 'age', 'gender', 'dass1', 'dass2', 'age_group', 'x', 'y', 'x_overlapRemoved', 'y_overlapRemoved', 'cluster']]
-        print(data.columns,cols)
         data[cols] = np.round(MinMaxScaler().fit_transform(data[cols]), 3)
-        # print(data.head)
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
         resp.headers["Content-Type"] = "text/csv"
@@ -249,7 +266,6 @@ def filterparticipantIdsDummy():
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredparticipantIds.csv"
         resp.headers["Content-Type"] = "text/csv"
-        print(time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} id:{id}")
 
@@ -266,16 +282,13 @@ def filterparticipantIdsNew():
     """
     if request.method == 'POST':
         content = request.get_json()
-        # filename = content['filename']
         id = content['id']
         attributes = content["attributes"]
 
-        strt = time.time()
-        filenames = {"brt": brightnessFile, "acc": accelerometerFile,
-                     "gyro": gyroscopeFile, "lck": lockStateFile, "noise": noiseFile}
+        filenames = {"lck": lockStateFile, "noise": noiseFile, "brt": brightnessFile, "acc": accelerometerFile,
+                     "gyro": gyroscopeFile}
         data = pd.DataFrame()
         for attr, checkState in attributes.items():
-            print("attr:", attr, "checkState:", checkState)
             if checkState:
                 df = pd.read_csv(os.path.join(
                     "data/rawData", filenames[attr]))
@@ -292,13 +305,12 @@ def filterparticipantIdsNew():
                     dfDate = pd.merge(dfDate, allMinutes,
                                       how="right", on="minuteOfTheDay")
 
-                # df_call["MinuteOfTheDay"] = (df_call.timestamp - df_call.timestamp.dt.floor('d')).astype('timedelta64[m]')
-
                     if attr == "lck":
                         dfDate.loc[0, attr] = 0
                     else:
                         # dfDate.loc[0,attr]=0
                         dfDate[attr].fillna(0, inplace=True)
+
                     dfDate.ffill(inplace=True)
                     dfDate.bfill(inplace=True)
                     dfImputed = pd.concat([dfImputed, dfDate], axis=0)
@@ -311,12 +323,10 @@ def filterparticipantIdsNew():
                     #     dfImputed.drop("lck", axis=1, inplace=True)
 
                 data = pd.concat([data, dfImputed])
-                print("data.date.unique()", data.date.nunique())
 
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredparticipantIds.csv"
         resp.headers["Content-Type"] = "text/csv"
-        print("Execution Time", time.time()-strt)
         return resp
         # return jsonify(f"post works filename:{filename} id:{id}")
 
@@ -427,8 +437,7 @@ def getFeatureImportance():
         columns = content["featureColumns"]
         classLabel = content["classLabel"]
 
-        print("##"*100, columns, classLabel)
-        featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
+        featureData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
         if len(columns) <= 1:
             columns = [col for col in list(featureData.columns) if col not in ["id", "age", "gender", "dass1", "dass2", "age_group"]]
         featuresWithImportance = getImportance(featureData, columns, classLabel)

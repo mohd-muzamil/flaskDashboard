@@ -1,12 +1,20 @@
 // This script is used to plot radial chart in second svg
-function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLabel, attributes) {
+function radialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, attributes) {
         // var pathColor = {"brt": "#1b9e77", "acc": "#d95f02", "gyro": "#7570b3", "lck": "#a6bddb"}
         // var pathColor = {"brt": "#1f78b4", "acc": "#33a02c", "gyro": "#b2df8a", "lck": "#dadaeb"}    //darkBlue, darkgreen, lightgreen, lightpurple
         // var pathColor = {"brt": "#377eb8", "acc": "#e41a1c", "gyro": "#fb8072", "lck": "#d0d1e6"}    //darkBlue, darkRed, lightRed, lightBlue
         // var pathColor = {"brt": "#e41a1c", "acc": "#4daf4a", "gyro": "#b2df8a", "lck": "#d9d9d9"}    //darkRed, darkGreen, lightgreen, lightGray
-    var pathColor = { "checkbox": "#F4F5F5", "lck": "#fdcdac", "acc": "#1b9e77", "gyro": "#7570b3", "brt": "#d95f02" } //{"lck": "lgray", "acc": "dred", "gyro": "orange", "brt": "41ab5d"}
+    var pathColor = { "checkbox": "#F4F5F5", "acc": "#e41a1c", "gyro": "#377eb8", "brt": "#4daf4a", "lck": "#fdc086", "noise":"#984ea3" } //{"acc": "dred", "gyro": "dblue", "brt": "dgreen", "lck": "lyellow", "noise": "dpurple"}
     var dayColor = {0:"#f7f7f7", 1:"#d9d9d9", 2:"#bdbdbd", 3:"#969696", 4:"#737373", 5:"#525252", 6:"#252525"}
-    var gridPlotted = false
+    var gridPlotted = true
+
+    // Set the dimensions of the canvas / graph
+    const margin = { left: 25, top: 5, right: 25, bottom: 25 },
+    width = Math.floor(+$("#" + chart).width()),
+    height = Math.floor(+$("#" + chart).height()),
+    xHigh = (width - margin.left - margin.right),
+    yHigh = (height - margin.top - margin.bottom)
+
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
@@ -16,7 +24,8 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
         .style("border-width", "2px")
         .style("padding", "5px")
         .style('background-color', 'white')
-        .style('border-radius', '10% 10% 10% 10%');
+        .style('border-radius', '10% 10% 10% 10%')
+    var deltaLegend = 1
 
     var postForm = { //Fetch form data
         // 'filename': filename, //Store name fields value
@@ -30,16 +39,14 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
-                d3.select("#" + chart).selectAll('g').remove(); //clearing the chart before plotting new data
                 data.forEach(function(d) {
-                    // d.date = parseDate(d.date);
                     d.minuteOfTheDay = +d.minuteOfTheDay;
                     d.brt = +d.brt;
                     d.acc = +d.acc;
                     d.gyro = +d.gyro;
                     d.lck = +d.lck;
+                    d.noise = +d.noise
                 });
-
                 dates = Array.from(new Set(data.map(d => d.date)).values()).sort();
                 d2i = {};
                 dates.forEach((d, i) => d2i[d] = i + 1);
@@ -50,16 +57,8 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                 var starting_min = 1
                 var starting_max = numDates
 
-                plotRadial(starting_min, starting_max) //for plotting the sensor measurements in the form of circular area chart
-
                 attributesTemp = attributes
                 delete attributesTemp["checkbox"]
-
-                if (!(Object.keys(attributesTemp).every((k) => attributesTemp[k] == false & k != "checkbox"))) {
-                    brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max + 1);
-                }
-                // sliderMin = sliderValues[0]
-                // sliderMax = sliderValues[1]
 
                 // plotRadier function here
                 function plotRadial(starting_min, starting_max) {
@@ -68,29 +67,19 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                         strokewidth: 1
                     }
 
-                    var radians = 0.0174532925,
-                        hourLabelYOffset = 7;
-
-                    // Set the dimensions of the canvas / graph
-                    var margin = { top: 25, right: 25, bottom: 75, left: 25 },
-                        width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
-                        height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
-                    // Parse the date / time
-                    var parseDate = d3.timeFormat("%Y-%m-%d");
-
-                    // var arcGenerator = d3.arc();
+                    const radians = 0.0174532925,
+                        hourLabelYOffset = 2;
 
                     // Select the svg
                     var svg = d3.select("#" + chart)
-                        .attr("width", width)
-                        .attr("height", height)
+                        .attr("width", xHigh)
+                        .attr("height", yHigh)
                         .append('g')
-                        .attr("transform", `translate(${(margin.left + width + margin.right) / 2}, ${(margin.top/2 + height + margin.bottom) / 2})`);
+                        .attr("transform", `translate(${margin.left + xHigh/2}, ${margin.top + yHigh/2})`);
 
                     var find_radius = d3.scaleLinear()
-                        // .domain(d3.extent(data, function(d) { return + (new Date(...d.date.split("-").map((x)=>(+x)))); }))
                         .domain([starting_min - 1, starting_max])
-                        .range([Math.min(height, width) / 8, Math.min(height, width) / 2]);
+                        .range([Math.min(yHigh, xHigh) / 8, Math.min(yHigh, xHigh) / 2]);
 
                     var hourScale = d3.scaleLinear()
                         .domain([0, 24])
@@ -100,23 +89,20 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                         .domain([0, 1440])
                         .range([0, 2 * Math.PI]);
 
-                    attributes = Object.assign({}, { "checkbox": true }, attributes) //this will be used to draw a checkbox over the grid
+                    attributes = Object.assign({}, { "checkbox": true }, attributes)
 
                     for (let i = 0; i < Object.keys(attributes).length; i++) {
                         attr = Object.keys(attributes)[i]
                         if (attributes[attr]) {
-                            // d3.range(starting_min, starting_max)((d, i) =>
                             for (let d = starting_min; d <= starting_max; d++) {
                                 currDate = d;
 
                                 if (attr == "checkbox") {
-
-                                    // if (d % 2 == 0) {
-                                    //     datum = Array.from(Array(1440).keys())
-                                    //         // datum = datum.map(e => ({"minuteOfTheDay":e, "checkbox":e%9==0?0:1}))
-                                    //     datum = datum.map(e => ({ "minuteOfTheDay": e, "checkbox": e % 60 == 0 ? 0 : 1 }))
-                                    // } else
-                                    //     continue
+                                    if (d % 2 == 0) {
+                                        datum = Array.from(Array(1440).keys())
+                                        datum = datum.map(e => ({ "minuteOfTheDay": e, "checkbox": e % 60 == 0 ? 0 : 1 }))
+                                    } else
+                                        continue
                                     datum = Array.from(Array(1440).keys())
                                     datum = datum.map(e => ({ "minuteOfTheDay": e, "checkbox": e % 60 == 0 ? 0 : 1 }))
                                 } else {
@@ -134,73 +120,53 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                                     .innerRadius(d => y(0))
                                     .outerRadius(d => y(+d[attr]));
 
-                                var xScale = d3.scaleLinear()
-                                    .domain([0, 6])
-                                    .range([0, 2 * Math.PI]);
-
-                                var yScale = d3.scaleLinear()
-                                    .domain([0, 20])
-                                    .range([width / 2, height / 2]);
-
                                 // Add the line
-                                svg.append("path")
+                                svg.append("g").append("path")
                                     .attr("class", "areaPath")
                                     .attr("fill", pathColor[attr])
-                                    // .attr("fill", function(attr) {console.log(currDate, dayColor[currDate%7]); return attr=="checkbox" ? dayColor[currDate%7]:pathColor[attr] } )
-                                    // .attr("stroke", pathColor[attr])
-                                    // .attr("stroke", "black")
-                                    .attr('opacity', 1)
-                                    // .attr("stroke-width", function(){return attr=="lck"?0:1/20})
+                                    .attr('opacity', ()=>(attr=="lck")?0.4:(attr=="noise")?0.5:0.8)
                                     .attr("d", area(datum))
-
-                                d3.select("#" + chart).selectAll('.buffer').remove();
                             }
 
                             rect_size = 8
                             if (attr != "checkbox") {
-                                svg.append("rect").attr("x", (width - margin.left) / 2).attr("y", -(height - (-2 + i) * margin.top) / 2).attr('width', rect_size).attr('height', rect_size).style("fill", pathColor[attr]).attr('class', 'legend')
-                                svg.append("text").attr("x", (width + 3 * rect_size - margin.left) / 2).attr("y", -(height - 2 * rect_size - (-2 + i) * margin.top) / 2).text(attr).style("font-size", "10px").style("fill", pathColor[attr]).attr('class', 'legend')
+                                svg.append("rect").attr("x", (xHigh - 4*rect_size) / 2).attr("y", -yHigh/2 + deltaLegend*rect_size).attr('width', rect_size).attr('height', rect_size).style("fill", pathColor[attr]).attr('class', 'legend')
+                                svg.append("text").attr("x", (xHigh - 1*rect_size) / 2).attr("y", -yHigh/2 + (deltaLegend + 1)*rect_size).text(attr).style("font-size", "10px").style("fill", pathColor[attr]).attr('class', 'legend')
+                                deltaLegend += 2
                             }
                         }
                     }
 
-                    if (gridPlotted === false) {
+                // Title
+                svg.append("text")
+                    // .attr("x", -width/5)
+                    .attr("class", "title")
+                    .attr("y", -yHigh/2 + 10)
+                    .attr("dy", "0em")
+                    .style("fill", "rgb(18, 113, 249)")
+                    .style("font-size", "15px")
+                    .style("font-weight", "normal")
+                    .style("text-anchor", "middle")
+                    .text(`Radial View (${selectedId})`)
+
+                    if (gridPlotted === true) {
                         // Creating a grid for reference
-                        radius = Math.min(width, height) / 2 + 15;
-
-                        // var grad = svg.append("defs")
-                        //     .append("linearGradient").attr("id", "grad")
-                        //     .attr("x1", "0%").attr("x2", "0%").attr("y1", "100%").attr("y2", "0%");
-
-                        // grad.append("stop").attr("offset", "50%").style("stop-color", "lightblue");
-                        // grad.append("stop").attr("offset", "50%").style("stop-color", "white");
-
-                        // title
-                        svg.append("text")
-                            // .attr("x", -width/5)
-                            .attr("class", "title")
-                            .attr("y", -1.15 * margin.top - height / 2)
-                            .attr("dy", "-0.1em")
-                            .style("fill", "rgb(18, 113, 249)")
-                            .style("font-size", "15px")
-                            .style("font-weight", "normal")
-                            .style("text-anchor", "middle")
-                            .text("id: " + selectedId)
+                        radius = Math.min(xHigh, yHigh) / 2 + 10;
 
                         // girdcircle for days of study
                         svg.selectAll(".gridCircles")
-                            .data(d3.range(starting_min - 1, starting_max + 1, 1))
-                            .enter()
-                            .append("circle")
-                            .attr("class", "gridCircles")
-                            .attr("fill", "none")
-                            // .style("fill", "url(#grad)")
-                            .attr("stroke", "gray")
-                            .attr("opacity", config.opacity)
-                            .attr("stroke-width", 1 / 5)
-                            .attr("r", function(d) {
-                                return find_radius(d)
-                            })
+                        .data(d3.range(starting_min - 1, starting_max + 1, 1))
+                        .enter()
+                        .append("circle")
+                        .attr("class", "gridCircles")
+                        .attr("fill", "none")
+                        // .style("fill", "url(#grad)")
+                        .attr("stroke", "gray")
+                        .attr("opacity", config.opacity)
+                        .attr("stroke-width", 1 / 10)
+                        .attr("r", function(d) {
+                            return find_radius(d)
+                        })
 
                         // grid lines for hours of the day
                         svg.selectAll(".gridLines")
@@ -212,36 +178,36 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                             .attr("x2", find_radius(starting_max))
                             .attr("opacity", config.opacity)
                             .attr("stroke", "gray")
-                            .attr("stroke-width", 1 / 5)
+                            .attr("stroke-width", 1 / 10)
                             .attr("transform", function(d) { return `rotate(${hourScale(d)})` });
 
                         // labels for the hours of the day
                         svg.selectAll('.hourLabel')
-                            .data(d3.range(0, 24, 1))
-                            .enter()
-                            .append('text')
-                            .attr('class', 'hourLabel')
-                            .attr('text-anchor', 'middle')
-                            .style('font-size', '12px')
-                            .attr('x', function(d) {
-                                return radius * Math.sin(hourScale(d) * radians);
-                            })
-                            .attr('y', function(d) {
-                                if (d == 0) return -radius * Math.cos(hourScale(d) * radians) + 0;
-                                else if (d == 12) return -radius * Math.cos(hourScale(d) * radians) + 14;
-                                else return -radius * Math.cos(hourScale(d) * radians) + 7;
-                            })
-                            .text(function(d) {
-                                if (d == 0)
-                                    return "MidNight";
-                                else if (d < 12)
-                                    return d + " am";
-                                else if (d == 12)
-                                    return "MidDay";
-                                else if (d > 12)
-                                    return d - 12 + " pm";
-                            });
-
+                        .data(d3.range(0, 24, 1))
+                        .enter()
+                        .append('text')
+                        .attr('class', 'hourLabel')
+                        .attr('text-anchor', 'middle')
+                        .style('font-size', '8px')
+                        .style("cursor", "default")
+                        .attr('x', function(d) {
+                            return radius * Math.sin(hourScale(d) * radians);
+                        })
+                        .attr('y', function(d) {
+                            if (d == 0) return -radius * Math.cos(hourScale(d) * radians) + 0;
+                            else if (d == 12) return -radius * Math.cos(hourScale(d) * radians) + (hourLabelYOffset*2);
+                            else return -radius * Math.cos(hourScale(d) * radians) + hourLabelYOffset;
+                        })
+                        .text(function(d) {
+                            if (d == 0)
+                                return "MidNight";
+                            else if (d < 12)
+                                return d + " am";
+                            else if (d == 12)
+                                return "MidDay";
+                            else if (d > 12)
+                                return d - 12 + " pm";
+                        });
 
                         // lables for day number
                         var noDays = starting_max - starting_min
@@ -270,6 +236,7 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                             .on("mousemove", function() { return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px") })
                             .on('mouseover', function(d) {
                                 tooltip.text(`${Object.keys(d2i).find(key => d2i[key] === d)}`);
+                                d3.select(this).style("cursor", "default");
                                 return tooltip.style("visibility", "visible");
                             })
                             .on('mouseout', function() {
@@ -295,9 +262,6 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
 
                         // svg.append("text").attr("x", 220).attr("y", 160).text("variable B").style("font-size", "15px").attr("alignment-baseline","middle")
                     }
-                    //remove the loading symbol
-                    d3.select("#" + chart).selectAll('.buffer').remove();
-
                 }
 
 
@@ -307,19 +271,19 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                     var range = [min, max + 1]
                     var starting_range = [starting_min, starting_max]
 
-                    // set width and height of svg
-                    var margin = { top: 25, right: 25, bottom: 25, left: 25 },
-                        width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
-                        height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
+                    // // set width and height of svg
+                    // var margin = { top: 25, right: 25, bottom: 25, left: 25 },
+                    //     width = Math.floor(+$("#" + chart).width()) - margin.left - margin.right,
+                    //     height = Math.floor(+$("#" + chart).height()) - margin.top - margin.bottom;
 
                     // create x scale
                     var x = d3.scaleLinear()
                         .domain(range) // data space
-                        .range([0, width]); // display space
+                        .range([0, xHigh]); // display space
 
                     // create svg and translated g
                     var svg = d3.select('#' + chart)
-                    var g = svg.append('g').attr("class", "brush").attr('transform', `translate(${margin.left}, ${height + 1.25*(margin.bottom)})`)
+                    var g = svg.append('g').attr("class", "brush").attr('transform', `translate(${margin.left}, ${yHigh})`)
 
                     // draw background lines
                     g.append('g').selectAll('line')
@@ -353,7 +317,7 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                     var brush = d3.brushX()
                         .extent([
                             [0, 0],
-                            [width, margin.bottom / 1.5]
+                            [xHigh, margin.bottom / 1.5]
                         ])
                         .on('brush', function() {
                             var s = d3.event.selection;
@@ -386,13 +350,21 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                                 d3.select("#" + chart).selectAll('.gridLines').remove();
                                 d3.select("#" + chart).selectAll('.hourLabel').remove();
                                 d3.select("#" + chart).selectAll('.dayLabel').remove();
-
+                                deltaLegend = 1;
 
                                 plotRadial(starting_min, starting_max)
                                 starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
                                 starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
 
-                                updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, labels, starting_min_date, starting_max_date)
+                                if ($("#featureType").is(':checked')) {
+                                    featureType = "individualFeatures"
+                                } else {
+                                    featureType = "aggregatedFeatures"
+                                }
+
+                                if (featureType == "individualFeatures"){
+                                    updateParallelCord(dependentChart1, selectedId, lassoSelectedIds=[], featureType, featurelist, classLabel, labels, starting_min_date, starting_max_date)
+                                }
                             }
 
                         })
@@ -433,7 +405,7 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                             cx = d3.mouse(this)[0],
                             x0 = cx - dx / 2,
                             x1 = cx + dx / 2;
-                        d3.select(this.parentNode).call(brush.move, x1 > width ? [width - dx, width] : x0 < 0 ? [0, dx] : [x0, x1]);
+                        d3.select(this.parentNode).call(brush.move, x1 > xHigh ? [xHigh - dx, xHigh] : x0 < 0 ? [0, dx] : [x0, x1]);
                     }
 
                     // select entire starting range
@@ -443,27 +415,27 @@ function plot_radialTime(chart, dependendChart, selectedId, featurelist, classLa
                     return [range[0], range[1]]
                 }
 
+                //for plotting the sensor measurements in the form of circular area chart
+                d3.select("#" + chart).selectAll('*').remove();
+                if (!(Object.keys(attributesTemp).every((k) => attributesTemp[k] == false & k != "checkbox"))) {
+                    brushSlider(min = sliderMin, max = sliderMax, starting_min, starting_max + 1);
+                }
+                plotRadial(starting_min, starting_max)
+                
+                // remove the buffering logo
+                d3.select("#" + chart).selectAll('.buffer').remove();
             })
-
-
 
     return true, true;
 }
 
 
-function updateRadialTime(chart, dependendChart, selectedId, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
+function updateRadialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
-    d3.select("#" + chart).selectAll('*').remove(); //clearing the chart before plotting new data
+
     buffering(chart, selectedId); //calling method that plots buffering symbol
-    // buffering(dependendChart, selectedId, toggleText = false)
 
     attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked, "noise": sleepNoiseChecked }
     // attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked}
-    plot_radialTime(chart, dependendChart, selectedId, featurelist, classLabel, attributes)
-
-    var delayInMilliseconds = 1000; //1 second
-    setTimeout(function() {
-        //your code to be executed after 1 second
-        updateParallelCord(dependendChart, selectedId, lassoSelectedIds=[], featuresType="individualFeatures", featurelist, classLabel, labels, starting_min_date = "", starting_max_date = "")
-    }, delayInMilliseconds);
+    radialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, attributes)
 }

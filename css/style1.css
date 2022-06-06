@@ -12,12 +12,90 @@ html {
     width: 100%;
 }
 
+:root {
+    --code-color: darkred;
+    --code-bg-color: #aaaaaa;
+    --code-font-size: 14px;
+    --code-line-height: 1.4;
+    --scroll-bar-color: RGB(26,97,247);
+    --scroll-bar-bg-color: #f6f6f6;
+}
+
+pre {
+    color: var(--code-color);
+    font-size: var(--code-font-size);
+    line-height: var(--code-line-height);
+    background-color: var(--code-bg-color);
+}
+
+.code-block {
+    max-height: 100px;
+    overflow: auto;
+    padding: 8px 7px 5px 15px;
+    margin: 0px 0px 0px 0px;
+    border-radius: 7px;
+}
+
+* {
+    scrollbar-width: none;
+    scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-bar-color);
+    border-radius: 20px;
+    border: 3px solid var(--scroll-bar-bg-color);
+}
+
+.rotate {
+    position: absolute;
+    animation: rotation 1s infinite linear;
+  }
+  
+  @keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+
+.rotate1 {
+    position: absolute;
+    animation: rotation1 1s infinite;
+  }
+  
+  @keyframes rotation1 {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+.glyphLegend1{
+    rotate: -45;
+}
+
 #sidebar {
     width: 200px;
     min-height: 100vh;
     position: fixed;
-    transition: all 0.4s;
-    overflow-y: auto;
+    transition: all 0s;
+    overflow-y: scroll;
     overflow-x: hidden;
     top: 0;
     bottom: 0;
@@ -32,13 +110,13 @@ html {
     min-height: 100vh;
     position: absolute;
     right: 0;
-    transition: all 0.4s;
+    /* transition: 0.4s; */
 }
 
 .no-sidebar #sidebar {
     /* width: 0%; */
     margin-left: -200px !important;
-    transition: all 0.4s;
+    /* transition: 0.4s; */
 }
 
 .no-sidebar #content {
@@ -51,21 +129,18 @@ svg {
 }
 
 .svg1 {
-    height: 50%;
-    width: 59.5%;
-    /* height: 70%; */
-    /* width: 100%; */
+    height: 75%;
+    width: 64.5%;
 }
 
 .svg2 {
-    height: 50%;
-    width: 39.8%;
+    height: 75%;
+    width: 34.5%;
 }
 
 .svg3 {
-    height: 24.5%;
-    /* height: 30%; */
-    width: 99.5%
+    height: 25%;
+    width: 100%
 }
 
 .help {
@@ -73,22 +148,24 @@ svg {
 }
 
 .multiselect-container,
-.dropdown-menu,
-.show {
+.dropdown-menu {
     position: fixed !important;
     top: inherit !important;
     left: inherit !important;
     z-index: 1000;
-    transform: scale(0.7);
+    /* transform: scale(0.7); */
 }
 
 
 #ui-id-1 {
     position: absolute !important;
-    /* top: inherit !important; */
-    /* left: inherit !important; */
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
     z-index: 1000;
     transform: scale(0.7);
+    /* top: inherit !important; */
+    /* left: inherit !important; */
 }
 
 /* number spinner for knn parameter skin 1 */
@@ -225,8 +302,12 @@ br {
     transform: scale(0.7);
 }
 
+.scaled1 {
+    transform: scale(0.5);
+}
+
 button.multiselect {
-    height: 2em;
+    height: 2.5em;
     font-size: x-small;
     line-height: 0;
 }

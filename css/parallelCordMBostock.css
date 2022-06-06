@@ -10,8 +10,8 @@ svg {
 .background path {
     fill: none;
     stroke: gray;
-    stroke-opacity: 1;
-    stroke-width: 0.1px;
+    stroke-opacity: 0.5;
+    stroke-width: 0.1;
 }
 
 .foreground path.fade {
