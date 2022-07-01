@@ -1,5 +1,5 @@
 ### VISUAL ANALYSIS OF MOBILE SENSING TIME-SERIES DATA: IDENTIFYING INDIVIDUAL AND RELATIVE BEHAVIOURAL PATTERNS ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.flaskDashboard)
-(Master's thesis project)
+(Master's thesis project) Demo(Will soon deploy this system with dummy data on Heroku)
 
 ### Abstract
 Mental well-being is increasingly demanded due to growing concerns about mental
@@ -16,4 +16,5 @@ features about behavioural indicators like screen usage, calling, and sleep to a
 the daily routine of participants under study. We also present two usage scenarios to
 demonstrate our visual approach’s applicability in exploring the given dataset.
 
+#### Snapshot of the Visualization system:
 ![image](https://user-images.githubusercontent.com/19529402/176933948-6d9ca602-e3ff-4303-a4da-9ba81d823597.png)
