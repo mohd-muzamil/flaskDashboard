@@ -1,4 +1,5 @@
-## flaskDashboard(Master's Thesis project)
+### VISUAL ANALYSIS OF MOBILE SENSING TIME-SERIES DATA: IDENTIFYING INDIVIDUAL AND RELATIVE BEHAVIOURAL PATTERNS ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.flaskDashboard)
+(Master's Thesis project)
 
 ### Abstract
 Mental well-being is increasingly demanded due to growing concerns about mental
