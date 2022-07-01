@@ -1,20 +1,19 @@
 // This script is used to generate visual representations over Glyph View.
 function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
-    // delta = radius / 100
     const config = {
         r: +radius,
         glyphLegendR: 50,
         opacityLow: 0,
         opacityHigh: 1,
-        opacityClickLow: 0.1,
-        opacityClickMid: 0.2,
+        opacityClickLow: 0.2,
+        opacityClickMid: 0.3,
         opacityClickHigh: 0.5,
-        // strokeWidthLow: 0.5 - delta,
-        // strokeWidthHigh: 2 - delta,
         strokeWidthLow: 0,
+        strokeWidthMid: 0.4,
         strokeWidthHigh: 1.5,
         fillColor: "transparent",
         fillColorLasso: "#000000",
+        strokeLasso: "red",
         petals: featurelist.length, //no of petals in the glyph
         labelSize: radius / 2, //size of labels to show over the glyphs
         toggleBrushOrLasso: "lasso",
@@ -23,13 +22,16 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
         max_zoom: 4,
     }
 
-    if (toggleSvgGrid) { config.opacityLow = 0.2; config.strokeWidthLow = 0.2 }
+    if (toggleSvgGrid) {
+        config.opacityLow = 0.4;
+        config.strokeWidthLow = 0.1
+    }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
-    // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
-    // const customPath = 'M 0,0 C -40,-40 15,-50 50,-100 C 0,-50 0,0 0,0'; //curved thin
-    // const customPath = 'M 0,0 C -60,-30 0,-40 0,-100 C 0,-40 60,-30 0,0'; // star1
-    // const customPath = "M 0 0 C 50 -80, 80 -100, 0 -100 C -80 -100, -50 -80, 0 0"; //clover leaf
-    
+        // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
+        // const customPath = 'M 0,0 C -40,-40 15,-50 50,-100 C 0,-50 0,0 0,0'; //curved thin
+        // const customPath = 'M 0,0 C -60,-30 0,-40 0,-100 C 0,-40 60,-30 0,0'; // star1
+        // const customPath = "M 0 0 C 50 -80, 80 -100, 0 -100 C -80 -100, -50 -80, 0 0"; //clover leaf
+
     const colorClusters = d3.scaleOrdinal().domain(labels).range(d3.schemeCategory10)
     var current_zoom_scale = 1
     var lassoSelectedIds = []
@@ -37,13 +39,12 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
     const titleText = "Glyph View"
 
     // reading data directly
-    d3.csv("/getProjections", function (data) {
-
+    d3.csv("/getProjections", function(data) {
         d3.select("#" + chart).selectAll("*").remove()
 
-        const margin = { left: 5, top: 25, right: config.glyphLegendR*2 + config.r, bottom: 5 },
-                width = Math.floor(+$("#" + chart).width()),
-                height = Math.floor(+$("#" + chart).height())
+        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2, bottom: 5 },
+            width = Math.floor(+$("#" + chart).width()),
+            height = Math.floor(+$("#" + chart).height())
 
         const svg = d3.select("#" + chart)
             .style("cursor", "move")
@@ -116,38 +117,31 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("cellover", () => {
                 svg.style("cursor", "pointer")
             })
-            .on("cellclick", function (e) {
+            .on("cellclick", function(e) {
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
-                    .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
+                    .attr("opacity", config.opacityHigh)
                     .attr("stroke", "black")
-                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
                     .style("fill", config.fillColor)
 
                 d3.selectAll(".hovercircle")
                     .filter(d => { return d[classLabel] == e })
                     .classed("selectedLasso", true)
-                    // .attr("opacity", d => { return (d.id == selectedId ? config.opacityClickHigh :d[classLabel] != d["cluster"]) ? config.opacityClickMid : config.opacityClickLow })
                     .attr("opacity", d => {
                         return (d.id == selectedId) ? config.opacityClickHigh : (d[classLabel] != d["cluster"]) ? config.opacityClickMid : config.opacityClickLow
                     })
-                    .attr("stroke", "black")
-                    // .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? 1*config.strokeWidthLow : config.strokeWidthLow })
-                    .attr("stroke-width", d => {
-                        return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthHigh / 3
-                    })
-                    .style("fill", d => {
-                        return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
-                    })
+                    .attr("stroke", config.strokeLasso)
+                    .style("fill", config.fillColorLasso)
                 callParallelCord()
             })
             .on("cellout", () => {
                 svg.style("cursor", "move")
             })
-        
+
         let dwidth = 40
-        if(classLabel=="age_group") dwidth = 80
-        else if(classLabel=="gender") dwidth = 50
+        if (classLabel == "age_group") dwidth = 80
+        else if (classLabel == "gender") dwidth = 50
+
         svg.append("g")
             .attr("class", "legendOrdinal")
             .attr("transform", `translate(${width - dwidth}, ${10}) scale(${1/2})`)
@@ -166,11 +160,11 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .style("border-radius", "5px")
             .style("padding", "1px")
             .style("pointer-events", "none")
-            .style("opacity", 0.8 * config.opacityHigh)
+            .style("opacity", 0.85 * config.opacityHigh)
 
         function tooltip_mousemove(dx = 0, dy = 0) {
-            X = d3.event.pageX + dx - 25
-            Y = d3.event.pageY + dy + 25
+            X = d3.event.pageX + dx - 10
+            Y = d3.event.pageY + dy + 15
             return tooltip.style("left", X + "px").style("top", Y + "px")
         }
 
@@ -189,13 +183,12 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
         const zoom = d3.zoom().scaleExtent([1, config.max_zoom]).extent([
             [0, 0],
             [width, height]
-        ])
-            .on("zoom", zoomed)
+        ]).on("zoom", zoomed)
 
         svg.call(zoom).on("dblclick.zoom", null)
 
         d3.select("body")
-            .on("keydown", function () {
+            .on("keydown", function() {
                 if (d3.event.shiftKey) {
                     svg.style("cursor", "crosshair")
                     svg.on(".zoom", null)
@@ -203,7 +196,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 }
             })
 
-        d3.select("body").on("keyup", function () {
+        d3.select("body").on("keyup", function() {
             svg.style("cursor", "move")
             svg.call(zoom).on("dblclick.zoom", null)
             svgGlyphs.on(".dragstart", null)
@@ -218,14 +211,14 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
 
         const yScale = d3.scaleLinear()
             .domain(d3.extent(data.map(d => d.y)))
-            .range([margin.top+config.r, height-margin.bottom-config.r])
+            .range([margin.top + config.r, height - margin.bottom - config.r])
 
         const glyphLegendScale = d3.scaleLinear()
-        .domain([0, config.petals])
-        .range([0, 360])
+            .domain([0, config.petals])
+            .range([0, 360])
 
         const radians = 0.0174532925,
-              labelYOffset = 4;
+            labelYOffset = 4;
 
         // Scales for polygon glyph
         const xpolygonLine = d3.lineRadial()
@@ -243,15 +236,15 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             svgGlyphs.attr("transform", transform)
         }
 
-        function plotPolygonGlyph(features, legend=false) {
+        function plotPolygonGlyph(features, legend = false) {
             var featurelistTemp = featurelist.slice()
             featurelistTemp.push(featurelist[0])
-            // polygonGlyph
-            svgGlyphs.append("g").attr("class", legend === true ? "glyphLegend":"glyphs")
+                // polygonGlyph
+            svgGlyphs.append("g").attr("class", legend === true ? "glyphLegend" : "glyphs")
                 .selectAll("circle")
                 .data(features)
                 .enter()
-                .each(function (d) {
+                .each(function(d) {
                     d3.select(this)
                         .append("g")
                         .attr("class", "glyph")
@@ -262,49 +255,51 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                         .attr("class", d => { return legend === true ? null : (d.selectedId == selectedId ? "selectedGlyph" : null) })
                         .attr("d", d => {
                             var newPolygonScale = polygonScale
-                            if(legend) newPolygonScale = polygonScaleConst
-                            return xpolygonLine(featurelistTemp.map(a=>d[a]).map((v, i) => [i* 2*Math.PI / config.petals, newPolygonScale(v)]))
+                            if (legend) newPolygonScale = polygonScaleConst
+                            return xpolygonLine(featurelistTemp.map(a => d[a]).map((v, i) => [i * 2 * Math.PI / config.petals, newPolygonScale(v)]))
                         })
                         // .attr("d", d => xpolygonLine([d["open"], d["con"], d["extra"], d["agree"], 10 - d["neuro"], d["open"]].map((v, i) => [i* 2*Math.PI / config.petals, polygonScale(v)])))
                         .attr("transform", () => { return toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})` })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
-                        .attr("stroke-width", config.strokeWidthHigh * 1)
+                        .attr("stroke-width", 1)
                         .attr("fill", colorClusters(d[classLabel]))
                 })
+
             // adding text to show over selected selectedIds
             if (toggleLabels == true) { addSelectedText() }
         }
 
-        function plotFlowerGlyph(features, legend=false) {
+        function plotFlowerGlyph(features, legend = false) {
             // flowerGlyph
-            svgGlyphs.append("g").attr("class", legend === true ? "glyphLegend":"glyphs")
+            svgGlyphs.append("g").attr("class", legend === true ? "glyphLegend" : "glyphs")
                 .selectAll("path")
                 .data(features)
                 .enter()
                 .append('g')
                 .attr("class", d => { return legend === true ? null : (d.selectedId == selectedId ? "selectedGlyph" : null) })
-                .each(function (d) {
-                    const tPetals = featurelist.map(a=>d[a])
+                .each(function(d) {
+                    const tPetals = featurelist.map(a => d[a])
                     d3.select(this)
                         .selectAll("path")
                         .data(tPetals)
                         .enter()
                         .append("path")
-                        .attr("d", function (v) {
+                        .attr("d", function(v) {
                             return customPath
                         })
-                        .attr("transform", function (v, i) {
-                            if(legend) r = config.glyphLegendR
+                        .attr("transform", function(v, i) {
+                            if (legend) r = config.glyphLegendR
                             else r = config.r
                             translate = toggleDGrid == true ? `translate(${xScale(d.x_overlapRemoved)}, ${yScale(d.y_overlapRemoved)})` : `translate(${xScale(d.x)}, ${yScale(d.y)})`
                             return `${translate}, rotate(${360 / config.petals * i}), scale(${v * r / 100})`
                         })
                         .attr("opacity", config.opacityHigh)
                         .attr("stroke", colorClusters(d["cluster"]))
-                        .attr("stroke-width", config.strokeWidthHigh * 5)
+                        .attr("stroke-width", config.strokeWidthHigh * 4)
                         .attr("fill", colorClusters(d[classLabel]));
                 })
+
             // adding text to show over selected selectedIds
             if (toggleLabels == true) { addSelectedText() }
         }
@@ -315,12 +310,16 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .enter()
                 .append("text")
                 .attr("class", "labelText")
-                .attr("x", d => { x = toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x); 
-                return x})
-                .attr("y", d => { y = toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y) ;
-                return y})
-                .attr("dx", (-1.5*config.r ) + "px")
-                .attr("dy", (1.5*config.r) + "px")
+                .attr("x", d => {
+                    x = toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x);
+                    return x
+                })
+                .attr("y", d => {
+                    y = toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y);
+                    return y
+                })
+                .attr("dx", (-1.5 * config.r) + "px")
+                .attr("dy", (1.5 * config.r) + "px")
                 .attr("font-size", config.labelSize.toString() + "px")
                 .attr("opacity", 0.8)
                 .text(d => { return d.id })
@@ -345,24 +344,23 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .attr("cx", dx)
                 .attr("cy", dy)
                 .attr("r", config.glyphLegendR)
-                .attr("opacity", 1/2)
+                .attr("opacity", 1 / 2)
                 .attr("stroke", "black")
-                .attr("stroke-width", 1/5)
+                .attr("stroke-width", 1 / 5)
                 .style("fill", config.fillColor)
 
             svgGlyphLegend.select("line")
                 .data(d3.range(0, config.petals, 1))
                 .enter()
                 .append("line")
-                .attr("x1", d=>{return dx + config.glyphLegendR * Math.sin(glyphLegendScale(d) * radians)})
+                .attr("x1", d => { return dx + config.glyphLegendR * Math.sin(glyphLegendScale(d) * radians) })
                 .attr("x2", dx)
-                .attr("y1", d=>{return dy - config.glyphLegendR * Math.cos(glyphLegendScale(d) * radians)})
+                .attr("y1", d => { return dy - config.glyphLegendR * Math.cos(glyphLegendScale(d) * radians) })
                 .attr("y2", dy)
-                .attr("opacity", 1/2)
+                .attr("opacity", 1 / 2)
                 .attr("stroke", "black")
                 .attr("stroke-width", 1 / 5)
                 .lower();
-
 
             // labels for the glyph legend
             svgGlyphLegend.select("text")
@@ -373,29 +371,31 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .style('font-size', '10px')
                 .style('font-weight', 'lighter')
                 .style("cursor", "default")
-                .attr("transform", d=>{
+                .attr("transform", d => {
                     var x, y
                     x = dx + (config.glyphLegendR + 5) * Math.sin(glyphLegendScale(d) * radians)
                     y = dy - (config.glyphLegendR + 5) * Math.cos(glyphLegendScale(d) * radians) + labelYOffset;
                     return `translate(${x}, ${y}) rotate(0)`
                 })
                 .text(function(d) {
-                    return d+1
+                    // return featurelist[d]
+                    return "||||"
                 })
+                .attr("opacity", 0.2)
                 .on("mousemove", () => {
                     tooltip_mousemove()
                 })
                 .on("mouseover", d => {
-                    tooltip_mouseover(((d+1) + ": " + featurelist[d]))
+                    tooltip_mouseover((featurelist[d]))
                 })
                 .on("mouseout", () => {
                     tooltip_mouseout()
                 });
 
             if (toggleGlyph == "polygonGlyph") {
-                plotPolygonGlyph(features=[glyphLegend], legend=true)
+                plotPolygonGlyph(features = [glyphLegend], legend = true)
             } else if (toggleGlyph == "flowerGlyph") {
-                plotFlowerGlyph(features=[glyphLegend], legend=true)
+                plotFlowerGlyph(features = [glyphLegend], legend = true)
             }
         }
 
@@ -406,14 +406,14 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .data(data)
                 .enter()
                 .append("circle")
-                .attr("class", d => {return d.id == id ? "hovercircle" : "hovercircle" })
+                .attr("class", d => { return d.id == id ? "hovercircle" : "hovercircle" })
                 .attr("cx", d => { return toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x) })
                 .attr("cy", d => { return toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y) })
                 .attr("r", config.r)
                 .classed("selectedGlyph", d => { return d.id == id ? true : false })
-                .attr("opacity", d => { return (d.id == id | d[classLabel] != d["cluster"]) ? config.opacityHigh : config.opacityLow })
+                .attr("opacity", config.opacityHigh)
                 .attr("stroke", "black")
-                .attr("stroke-width", d => { return d.id == id ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? 1*config.strokeWidthLow : config.strokeWidthLow })
+                .attr("stroke-width", d => { return d.id == id ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? config.strokeWidthMid : config.strokeWidthLow })
                 .style("fill", config.fillColor)
                 .on("mousemove", () => {
                     tooltip_mousemove()
@@ -425,10 +425,10 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .on("mouseout", () => {
                     tooltip_mouseout()
                 })
-                .on("click", function (d) {
+                .on("click", function(d) {
                     selectedId = d.id
                     classCurrentSelection = d3.select(this).attr("class")
-                    // case1: pre-selected lasso-selected
+                        // case1: pre-selected lasso-selected
                     if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph") & classCurrentSelection.includes("selectedLasso")) {
                         // console.log("case1")
                         svgGlyphs.selectAll(".hovercircle")
@@ -454,6 +454,9 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                             .attr("opacity", config.opacityClickHigh)
                             .attr("stroke-width", config.strokeWidthHigh)
                             .style("fill", config.fillColorLasso)
+
+                        callParallelCord()
+                        callRadialTime()
                     }
                     // case3: pre-selected not lasso-selected
                     else if (classCurrentSelection.includes("hovercircle") & classCurrentSelection.includes("selectedGlyph")) {
@@ -485,33 +488,29 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                             .attr("opacity", config.opacityHigh)
                             .attr("stroke-width", config.strokeWidthHigh)
                             .style("fill", config.fillColor)
+
+                        callParallelCord()
+                        callRadialTime()
                     }
 
                     addGlyphLegend(d)
-                    callParallelCord()
-                    callRadialTime()
                 })
         }
 
         function addLasso() {
             // ----------------   LASSO STUFF . ----------------
-            var lasso_draw = function () {
+            var lasso_draw = function() {
                 svg.style("cursor", "crosshair")
             }
 
-            var lassoEnd = function () {
+            var lassoEnd = function() {
                 lasso.selectedItems() // lasso.notSelectedItems()
                     .classed("selectedLasso", true)
                     .attr("opacity", (d) => {
                         return (d.id == selectedId) ? config.opacityClickHigh : d[classLabel] != d["cluster"] ? config.opacityClickMid : config.opacityClickLow
                     })
-                    .attr("stroke", "black")
-                    .attr("stroke-width", (d) => {
-                        return (d.id == selectedId) ? config.strokeWidthHigh : config.strokeWidthHigh / 3
-                    })
-                    .style("fill", (d) => {
-                        return (d.id == selectedId) ? config.fillColorLasso : config.fillColorLasso
-                    })
+                    .attr("stroke", config.strokeLasso)
+                    .style("fill", config.fillColorLasso)
                 if (!d3.event.shiftKey) { svg.style("cursor", "move") }
                 callParallelCord()
             }
@@ -522,13 +521,11 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .closePathDistance(100)
                 .items(circles)
                 .targetArea(svgGlyphs)
-                // .on("start",lasso_start)
                 .on("draw", lasso_draw)
                 .on("end", lassoEnd)
 
             svgGlyphs.call(lasso)
         }
-
 
         data.forEach(d => {
             d.x = +d.x
@@ -536,22 +533,21 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             d.x_overlapRemoved = +d.x_overlapRemoved
             d.y_overlapRemoved = +d.y_overlapRemoved
 
-            if (d.id == selectedId){
+            if (d.id == selectedId) {
                 addGlyphLegend(d)
             }
         })
 
         if (toggleGlyph == "polygonGlyph") {
             // plotting the polygon glyphs
-            plotPolygonGlyph(features=data, legend=false)
+            plotPolygonGlyph(features = data, legend = false)
         } else if (toggleGlyph == "flowerGlyph") {
             // plotting the flower glyphs
-            plotFlowerGlyph(features=data, legend=false)
+            plotFlowerGlyph(features = data, legend = false)
         }
 
-
         addHoverCircle(selectedId)
-        // adding text to show over selected selectedIds
+            // adding text to show over selected selectedIds
         if (toggleLabels) {
             addSelectedText()
         }
@@ -575,7 +571,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -50, dy = 0)
+                tooltip_mousemove(dx = -20, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("Help")
@@ -583,7 +579,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("mouseout", () => {
                 tooltip_mouseout()
             })
-            .on("click", function () {
+            .on("click", function() {
                 alert(
                     'This is an alert with basic formatting\n\n' +
                     "\t• list item 1\n" +
@@ -617,7 +613,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -70, dy = 0)
+                tooltip_mousemove(dx = -40, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ClearAll")
@@ -625,14 +621,14 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("mouseout", () => {
                 tooltip_mouseout()
             })
-            .on("click", function () {
+            .on("click", function() {
                 d3.select(this).style("fill", "gray")
                 d3.select(this).transition().duration(1000).style("fill", "transparent")
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
-                    .attr("opacity", d => { return d.id == selectedId ? config.opacityHigh : config.opacityLow })
+                    .attr("opacity", d => { return (d.id == selectedId | d[classLabel] != d["cluster"]) ? config.opacityHigh : config.opacityLow })
                     .attr("stroke", "black")
-                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : config.strokeWidthLow })
+                    .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? config.strokeWidthMid : config.strokeWidthLow })
                     .style("fill", config.fillColor)
                 callParallelCord()
             })
@@ -657,7 +653,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -80, dy = 0)
+                tooltip_mousemove(dx = -50, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("Recenter")
@@ -665,7 +661,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("mouseout", () => {
                 tooltip_mouseout()
             })
-            .on("click", function () {
+            .on("click", function() {
                 d3.select(this).style("fill", "gray")
                 d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
                 svg.transition().duration(config.transition_duration).call(zoom.transform, d3.zoomIdentity)
@@ -696,7 +692,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -70, dy = 0)
+                tooltip_mousemove(dx = -40, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ZoomIn")
@@ -704,7 +700,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("mouseout", () => {
                 tooltip_mouseout()
             })
-            .on("click", function () {
+            .on("click", function() {
                 d3.select(this).style("fill", "gray")
                 d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
                 current_zoom_scale = Math.ceil(d3.zoomTransform(svg.node()).k)
@@ -747,7 +743,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("fill", "transparent")
             .attr("rx", 3)
             .on("mousemove", () => {
-                tooltip_mousemove(dx = -80, dy = 0)
+                tooltip_mousemove(dx = -50, dy = 0)
             })
             .on("mouseover", d => {
                 tooltip_mouseover("ZoomOut")
@@ -755,7 +751,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .on("mouseout", () => {
                 tooltip_mouseout()
             })
-            .on("click", function () {
+            .on("click", function() {
                 d3.select(this).style("fill", "gray")
                 d3.select(this).transition().duration(config.transition_duration).style("fill", "transparent")
                 current_zoom_scale = Math.floor(d3.zoomTransform(svg.node()).k)
@@ -773,20 +769,20 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                         .attr("r", config.r)
                 }
             })
-        
+
         function callRadialTime() {
             updateRadialTime(dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
         }
 
         function callParallelCord() {
             if ($("#featureType").is(':checked')) {
-                featureType = "individualFeatures"
-            } else {
                 featureType = "aggregatedFeatures"
+            } else {
+                featureType = "individualFeatures"
             }
 
             lassoSelectedIds = [selectedId]
-            d3.selectAll(".selectedLasso")["_groups"][0].forEach(function (d) {
+            d3.selectAll(".selectedLasso")["_groups"][0].forEach(function(d) {
                 if (!lassoSelectedIds.includes(d.__data__.id)) { lassoSelectedIds.push(d.__data__.id) }
             })
             lassoSelectedIds = [...new Set(lassoSelectedIds)]

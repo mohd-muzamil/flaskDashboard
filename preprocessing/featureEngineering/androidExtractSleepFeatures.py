@@ -1,6 +1,6 @@
 """
 #################################################################################################################
-Script for extracting below sleep related features using IOS lockstate, brightness, accelerometer and gyroscope data
+Script for extracting below sleep related features using android lockstate, brightness, accelerometer and gyroscope data
 
 Feature1(sleepStartTime): Estimated start time of the sleep
 Feature2(sleepEndTime): Estimated end time of the sleep
@@ -14,7 +14,7 @@ from imports import *
 
 # Filtered participantIds from another notebook. Only data from these will be analysed
 filteredParticipantIds = []
-# filteredParticipantIds = ['PROSITC1005', 'PROSITC1014', 'PROSITC1018', 'PROSITC1025', 'PROSITC1026', 'PROSITC1027', 'PROSITC1029', 'PROSITC1030', 'PROSITC1031', 'PROSITC1033', 'PROSITC1034', 'PROSITC1036', 'PROSITC1037', 'PROSITC1038', 'PROSITC1039', 'PROSITC1040', 'PROSITC1041', 'PROSITC1043', 'PROSITC1044', 'PROSITC1046', 'PROSITC1057', 'PROSITC1061', 'PROSITC1062', 'PROSITC1066', 'PROSITC1070', 'PROSITC1079', 'PROSITC1080', 'PROSITC1082', 'PROSITC1084', 'PROSITC1086', 'PROSITC1089', 'PROSITC1090', 'PROSITC1097', 'PROSITC1100', 'PROSITC1101', 'PROSITC1104', 'PROSITC1109', 'PROSITC1110', 'PROSITC1111', 'PROSITC1119', 'PROSITC1122', 'PROSITC1126', 'PROSITC1128', 'PROSITC1130', 'PROSITC1132', 'PROSITC1135', 'PROSITC1136', 'PROSITC1137', 'PROSITC1140', 'PROSITC1153', 'PROSITC1158', 'PROSITC1174', 'PROSITC1187', 'PROSITC1192', 'PROSITC1193', 'PROSITC1200', 'PROSITC1221', 'PROSITC1222', 'PROSITC1223', 'PROSITC1224', 'PROSITC1227', 'PROSITC1237', 'PROSITC1240', 'PROSITC1244', 'PROSITC1261', 'PROSITC1272', 'PROSITC1293', 'PROSITC1297', 'PROSITC1299', 'PROSITC1304', 'PROSITC1308', 'PROSITC1317', 'PROSITC1325', 'PROSITC1326', 'PROSITC1343', 'PROSITC1369', 'PROSITC1372', 'PROSITC1379', 'PROSITC1412', 'PROSITC1413', 'PROSITC1422', 'PROSITC1424', 'PROSITC1428', 'PROSITC1438', 'PROSITC1493', 'PROSITC1501', 'PROSITC1502', 'PROSITC1512', 'PROSITC1516', 'PROSITC1526', 'PROSITC1529', 'PROSITC1548', 'PROSITC1550', 'PROSITC1553', 'PROSITC1555', 'PROSITC1562', 'PROSITC1564', 'PROSITC1570', 'PROSITC1602', 'PROSITC1615', 'PROSITC1621', 'PROSITC1623', 'PROSITC1625', 'PROSITC1627', 'PROSITC1629', 'PROSITC1635', 'PROSITC1639', 'PROSITC1642', 'PROSITC1663', 'PROSITC1666', 'PROSITC1671', 'PROSITC1672', 'PROSITC1678', 'PROSITC1684', 'PROSITC1685', 'PROSITC1705', 'PROSITC1705', 'PROSITC1712', 'PROSITC1722', 'PROSITC1748', 'PROSITC1754', 'PROSITC1756', 'PROSITC1761', 'PROSITC1762', 'PROSITC1764', 'PROSITC1785', 'PROSITC1795', 'PROSITC1798', 'PROSITC1803', 'PROSITC1807', 'PROSITC1809', 'PROSITC1810', 'PROSITC1823', 'PROSITC1827', 'PROSITC1831', 'PROSITC1835', 'PROSITC1844', 'PROSITC1861', 'PROSITC1863', 'PROSITC1864', 'PROSITC1865', 'PROSITC1874', 'PROSITC1877', 'PROSITC1881', 'PROSITC1895', 'PROSITC1898', 'PROSITC1911', 'PROSITC1914', 'PROSITC1926', 'PROSITC1942', 'PROSITC1958', 'PROSITC1966', 'PROSITC1979', 'PROSITC1980', 'PROSITC1983', 'PROSITC1985', 'PROSITC1996', 'PROSITC1999', 'PROSITC2017', 'PROSITC2029', 'PROSITC2059', 'PROSITC2060', 'PROSITC2065', 'PROSITC2069', 'PROSITC2076', 'PROSITC2096', 'PROSITC2111', 'PROSITC2117', 'PROSITC2129', 'PROSITC2134', 'PROSITC2156', 'PROSITC2162', 'PROSITC2170', 'PROSITC2195', 'PROSITC2202', 'PROSITC2203', 'PROSITC2135', 'PROSITC2207', 'PROSITC2233', 'PROSITC2259', 'PROSITC2264', 'PROSITC2265', 'PROSITC2267', 'PROSITC2269', 'PROSITC2271', 'PROSITC2278', 'PROSITC2281', 'PROSITC2303', 'PROSITC2306', 'PROSITC2315', 'PROSITC2323', 'PROSITC2327', 'PROSITC2330', 'PROSITC2332', 'PROSITC2333', 'PROSITC2360', 'PROSITC2382', 'PROSITC2384', 'PROSITC2394', 'PROSITC2396', 'PROSITC2411', 'PROSITC2928', 'PROSITC2964', 'PROSITC2975', 'PROSITC2977', 'PROSITC2984', 'PROSITC2986', 'PROSITC3001', 'PROSITC3014', 'PROSITC3025', 'PROSITC3029', 'PROSITC3031', 'PROSITC3035', 'PROSITC3037', 'PROSITC3038', 'PROSITC3044', 'PROSITC3053', 'PROSITC3067', 'PROSITC3070', 'PROSITC3071', 'PROSITC3073', 'PROSITC3076', 'PROSITC3078', 'PROSITC3079', 'PROSITC3102', 'PROSITC3110', 'PROSITC3114', 'PROSITC3117', 'PROSITC3121', 'PROSITC3134', 'PROSITC3150']
+filteredParticipantIds = ['aPROSITC0060', 'aPROSITC0064', 'aPROSITC00D', 'aPROSITC00M', 'aPROSITC0103', 'aPROSITC0107', 'aPROSITC0116', 'aPROSITC0118', 'aPROSITC0119', 'aPROSITC0128', 'aPROSITC0130', 'aPROSITC0131', 'aPROSITC0134', 'aPROSITC0144', 'aPROSITC0175', 'aPROSITC0188', 'aPROSITC0200', 'aPROSITC0211', 'aPROSITC0225', 'aPROSITC0229', 'aPROSITC0235', 'aPROSITC0237', 'aPROSITC0252', 'aPROSITC0260', 'aPROSITC0275', 'aPROSITC0279', 'aPROSITC0290', 'aPROSITC0295', 'aPROSITC0301', 'aPROSITC0303', 'aPROSITC0310', 'aPROSITC0326', 'aPROSITC0357', 'aPROSITC0376', 'aPROSITC0379', 'aPROSITC0398', 'aPROSITC0414', 'aPROSITC0416', 'aPROSITC0433', 'aPROSITC0436', 'aPROSITC0437', 'aPROSITC0457', 'aPROSITC0483', 'aPROSITC0497', 'aPROSITC0645', 'aPROSITC0739', 'aPROSITC0753', 'aPROSITC0774', 'aPROSITC0805', 'aPROSITC0838', 'aPROSITC0874', 'aPROSITC1063', 'aPROSITC1065', 'aPROSITC1069', 'aPROSITC1134', 'aPROSITC1147', 'aPROSITC1149', 'aPROSITC1154', 'aPROSITC1155', 'aPROSITC1156', 'aPROSITC1165', 'aPROSITC1170', 'aPROSITC1171', 'aPROSITC1172', 'aPROSITC1175', 'aPROSITC1182', 'aPROSITC1201', 'aPROSITC1204', 'aPROSITC1205', 'aPROSITC1208', 'aPROSITC1215', 'aPROSITC1226', 'aPROSITC1230', 'aPROSITC1233', 'aPROSITC1241', 'aPROSITC1242', 'aPROSITC1255', 'aPROSITC1271', 'aPROSITC1273', 'aPROSITC1277', 'aPROSITC1283', 'aPROSITC1302', 'aPROSITC1303', 'aPROSITC1306', 'aPROSITC1309', 'aPROSITC1312', 'aPROSITC1315', 'aPROSITC1322', 'aPROSITC1337', 'aPROSITC1349', 'aPROSITC1363', 'aPROSITC1368', 'aPROSITC1374', 'aPROSITC1378', 'aPROSITC1381', 'aPROSITC1387', 'aPROSITC1388', 'aPROSITC1392', 'aPROSITC1399', 'aPROSITC1402', 'aPROSITC1403', 'aPROSITC1419', 'aPROSITC1423', 'aPROSITC1425', 'aPROSITC1429', 'aPROSITC1430', 'aPROSITC1431', 'aPROSITC1433', 'aPROSITC1439', 'aPROSITC1444', 'aPROSITC1458', 'aPROSITC1462', 'aPROSITC1473', 'aPROSITC1489', 'aPROSITC1504', 'aPROSITC1536', 'aPROSITC1541', 'aPROSITC1542', 'aPROSITC1565', 'aPROSITC1568', 'aPROSITC1575', 'aPROSITC1604', 'aPROSITC1613', 'aPROSITC1618', 'aPROSITC1620', 'aPROSITC1628', 'aPROSITC1630', 'aPROSITC1638', 'aPROSITC1688', 'aPROSITC1694', 'aPROSITC1697', 'aPROSITC1699', 'aPROSITC1701', 'aPROSITC1709', 'aPROSITC1713', 'aPROSITC1718', 'aPROSITC1734', 'aPROSITC1745', 'aPROSITC1747', 'aPROSITC1770', 'aPROSITC1778', 'aPROSITC1780', 'aPROSITC1787', 'aPROSITC1791', 'aPROSITC1793', 'aPROSITC1796', 'aPROSITC1799', 'aPROSITC1805', 'aPROSITC1818', 'aPROSITC1822', 'aPROSITC1840', 'aPROSITC1855', 'aPROSITC1856', 'aPROSITC1862', 'aPROSITC1873', 'aPROSITC1887', 'aPROSITC1893', 'aPROSITC1903', 'aPROSITC1905', 'aPROSITC1921', 'aPROSITC1928', 'aPROSITC1930', 'aPROSITC1931', 'aPROSITC1941', 'aPROSITC1944', 'aPROSITC1949', 'aPROSITC1963', 'aPROSITC1986', 'aPROSITC1994', 'aPROSITC2009', 'aPROSITC2010', 'aPROSITC2019', 'aPROSITC2039', 'aPROSITC2044', 'aPROSITC2067', 'aPROSITC2089', 'aPROSITC2095', 'aPROSITC2098', 'aPROSITC2101', 'aPROSITC2102', 'aPROSITC2115', 'aPROSITC2130', 'aPROSITC2132', 'aPROSITC2143', 'aPROSITC2160', 'aPROSITC2177', 'aPROSITC2180', 'aPROSITC2185', 'aPROSITC2193', 'aPROSITC2226', 'aPROSITC2232', 'aPROSITC2237', 'aPROSITC2241', 'aPROSITC2255', 'aPROSITC2256', 'aPROSITC2268', 'aPROSITC2285', 'aPROSITC2292', 'aPROSITC2295', 'aPROSITC2298', 'aPROSITC2304', 'aPROSITC2348', 'aPROSITC2349', 'aPROSITC2353', 'aPROSITC2375', 'aPROSITC2392', 'aPROSITC2725', 'aPROSITC2742', 'aPROSITC2743', 'aPROSITC2780', 'aPROSITC2797', 'aPROSITC2825', 'aPROSITC2836', 'aPROSITC2848', 'aPROSITC2876', 'aPROSITC2954', 'aPROSITC2955', 'aPROSITC2973', 'aPROSITC2987', 'aPROSITC2990', 'aPROSITC2992', 'aPROSITC2994', 'aPROSITC2998', 'aPROSITC3000', 'aPROSITC3020', 'aPROSITC3021', 'aPROSITC3036', 'aPROSITC3050', 'aPROSITC3058', 'aPROSITC3087', 'aPROSITC3089', 'aPROSITC3097', 'aPROSITC3108', 'aPROSITC3129', 'aPROSITC3222', 'aPROSITC3232', 'aPROSITC3298']
 
 
 def sleep_analysis(df, sleep_break=30):
@@ -60,8 +60,8 @@ def sleep_analysis(df, sleep_break=30):
 ######################################################################################
 # pre processing lockstate data
 ######################################################################################
-def process_lockstate_ios_data(inputDataPath, dataFilename):
-    print(f"Processing Lockstate IOS data from '{inputDataPath}'...")
+def process_lockstate_android_data(inputDataPath, dataFilename):
+    print(f"Processing Lockstate android data from '{inputDataPath}'...")
     # read file with a header
     header_list = ["id", "participantId", "attribute", "lck", "timestamp", "uploadtimestamp", "id1"]
     lockstate = pd.read_csv(os.path.join(inputDataPath, dataFilename), sep='|', header=None, names=header_list)
@@ -98,7 +98,7 @@ def process_lockstate_ios_data(inputDataPath, dataFilename):
                 lockstate_participantId_date.drop_duplicates(keep="last", inplace=True)
 
                 #keeping only those rows which indicate locking events
-                lockstate_participantId_date = lockstate_participantId_date[(lockstate_participantId_date["lck"] == "UNLOCKED") | (lockstate_participantId_date["lck"] == "LOCKED")].copy()
+                lockstate_participantId_date = lockstate_participantId_date[(lockstate_participantId_date["lck"] == "screen_on") | (lockstate_participantId_date["lck"] == "screen_off")].copy()
                 
                 #sort values
                 lockstate_participantId_date.sort_values(["participantId", "timestamp"], inplace=True, ascending=True, ignore_index=True)
@@ -125,73 +125,10 @@ def process_lockstate_ios_data(inputDataPath, dataFilename):
 
 
 ######################################################################################
-# pre processing brightness data
-######################################################################################
-def process_brightness_ios_data(inputDataPath, dataFilename):
-    print(f"Processing Brightness IOS data from '{inputDataPath}'...")
-    # read file with a header
-    header_list = ["id", "participantId", "attribute", "brt", "timestamp", "uploadtimestamp", "id1"]
-    brightness = pd.read_csv(os.path.join(inputDataPath, dataFilename), sep='|', header=None, names=header_list)
-    
-    # drop unecessary columns
-    brightness.drop(["id", "attribute", "uploadtimestamp", "id1"], axis=1, inplace=True)
-
-    # keep only filtered participantIds
-    if len(filteredParticipantIds)!=0:
-        brightness = brightness[brightness["participantId"].isin(filteredParticipantIds)].reset_index(drop=True)
-
-    #change time to Halifax time
-    brightness["timestamp"] = pd.to_datetime(brightness["timestamp"], utc=True)
-    brightness["timestamp"] = pd.to_datetime(brightness["timestamp"]).dt.tz_convert(tz='America/Halifax')
-    brightness["timestamp"] = pd.to_datetime(brightness["timestamp"], utc=False)
-
-    #add new columns to help extract features
-    brightness["date"] = brightness["timestamp"].dt.date
-
-    # For concatenation
-    brightnessProcessed = pd.DataFrame()
-    # breaking down processing into multiple iterations
-    participantIds = brightness["participantId"].unique()
-    for participantId in tqdm(participantIds):
-        brightness_participantId = brightness[brightness["participantId"] == participantId].copy()
-        dates = brightness_participantId["date"].unique()
-        for date in dates:
-            try:
-                brightness_participantId_date = brightness_participantId[brightness_participantId["date"] == date].copy()
-
-                # drop duplicates
-                brightness_participantId_date.drop_duplicates(inplace=True)
-
-                #sort values
-                brightness_participantId_date.sort_values(["participantId", "timestamp"], inplace=True, ascending=True, ignore_index=True)
-
-                #add necessary columns
-                brightness_participantId_date["timeblock"] = (brightness_participantId_date["timestamp"].dt.hour * 6) + (brightness_participantId_date["timestamp"].dt.minute/10).astype(int)
-
-                # drop timestamp column
-                brightness_participantId_date.drop(["timestamp"], axis=1, inplace=True)
-
-                #Aggregate the data over a period of 10minute timeblocks
-                brightnessAgg = brightness_participantId_date.groupby(["participantId", "date", "timeblock"])["brt"].agg("mean").reset_index()
-                header_list = ["participantId", "date", "timeblock", "brt"]
-                brightnessAgg.columns = header_list
-                brightnessAgg["brt"] = round(brightnessAgg["brt"], 2)
-
-                # concatenating the data into single dataframe
-                brightnessProcessed = pd.concat([brightnessProcessed, brightnessAgg], axis=0)
-
-            except:
-                print(f"An exception occurred on Brightness data for {participantId} {date}")
-
-    print("Preprocessing completed for brightness data")
-    return brightnessProcessed
-
-
-######################################################################################
 # pre processing accelerometer data
 ######################################################################################
-def process_accelerometer_ios_data(inputDataPath, dataFilename):    
-    print(f"Processing Accelerometer IOS data from '{inputDataPath}'...")
+def process_accelerometer_android_data(inputDataPath, dataFilename):    
+    print(f"Processing Accelerometer android data from '{inputDataPath}'...")
     # read file with header
     header_list = ["id", "participantId", "attribute", "accX", "accY", "accZ", "timestamp", "uploadtimestamp", "id1"]
     accelerometer = pd.read_csv(os.path.join(inputDataPath, dataFilename), sep='|', header=None, names=header_list)
@@ -260,8 +197,8 @@ def process_accelerometer_ios_data(inputDataPath, dataFilename):
 ######################################################################################
 # pre processing gyroscope data
 ######################################################################################
-def process_gyroscope_ios_data(inputDataPath, dataFilename):    
-    print(f"Processing Gyroscope IOS data from '{inputDataPath}'...")
+def process_gyroscope_android_data(inputDataPath, dataFilename):    
+    print(f"Processing Gyroscope android data from '{inputDataPath}'...")
     # read file with header
     header_list = ["id", "participantId", "attribute", "gyroX", "gyroY", "gyroZ", "timestamp", "uploadtimestamp", "id1"]
     gyroscope = pd.read_csv(os.path.join(inputDataPath, dataFilename), sep='|', header=None, names=header_list)
@@ -329,8 +266,8 @@ def process_gyroscope_ios_data(inputDataPath, dataFilename):
 ######################################################################################
 # combining all the sensor data to prepare sleep data
 ######################################################################################
-def combine_ios_features(lockstate, brightness, accelerometer, gyroscope):
-    dfs = [lockstate, brightness, accelerometer, gyroscope]
+def combine_android_features(lockstate, accelerometer, gyroscope):
+    dfs = [lockstate, accelerometer, gyroscope]
 
     sleep_data = reduce(lambda left,right: pd.merge(left,right,on=["participantId", "date", "timeblock"], how="outer"), dfs)
     sleep_data.fillna(0, inplace=True)
@@ -356,7 +293,7 @@ def combine_ios_features(lockstate, brightness, accelerometer, gyroscope):
             # sleep_data_participantId_date.loc[sleep_data_participantId_date["gyro_mean"] <= sleep_data_participantId_date["gyro_mean"].quantile(0.1), "gyro_mean"] = 0
 
             # filtering out only those timeblocks which show device usage
-            sleep_data_participantId_date = sleep_data_participantId_date[(sleep_data_participantId_date.lck == "LOCKED") & (sleep_data_participantId_date.acc == 0) & (sleep_data_participantId_date.gyro == 0) & (sleep_data_participantId_date.brt==0)]
+            sleep_data_participantId_date = sleep_data_participantId_date[(sleep_data_participantId_date.lck == "screen_off") & (sleep_data_participantId_date.acc == 0) & (sleep_data_participantId_date.gyro == 0)]
             
             if sleep_data_participantId_date.shape[0]>0:
                 sleep_duration, sleep_start_time, sleep_end_time = sleep_analysis(sleep_data_participantId_date, sleep_break=30)
@@ -366,10 +303,10 @@ def combine_ios_features(lockstate, brightness, accelerometer, gyroscope):
     return sleepFeatures
 
     
-def getIosSleepFeatures(inputDataPath, featurePath):
+def getandroidSleepFeatures(inputDataPath, featurePath):
     '''
     considering below conditions to assign a sleep state to a time block which is chosen as 10mins
-    # screen state  - "Locked"
+    # screen state  - "screen_off"
     # brightness    -   0
     # accelerometer -   0
     # gyroscope     -   0
@@ -382,32 +319,32 @@ def getIosSleepFeatures(inputDataPath, featurePath):
     dbName = inputDataPath.split("/")[-1]
 
     # # screen state data
-    # dataFilename1 = "Lock_state_ios.csv"
-    # # dataFilename1 = "Lock_state_temp_ios.csv"
-    # featureFilename1 = f"ios_Lock_state_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename1 = "powerState_android.csv"
+    # # dataFilename1 = "Lock_state_temp_android.csv"
+    # featureFilename1 = f"android_Lock_state_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # brightness data
-    # dataFilename2 = "Brightness_ios.csv"
-    # dataFilename2 = "Brightness_temp_ios.csv"
-    # featureFilename2 = f"ios_Brightness_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename2 = "Brightness_android.csv"
+    # dataFilename2 = "Brightness_temp_android.csv"
+    # featureFilename2 = f"android_Brightness_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # accelerometer data
-    # dataFilename3 = "Accelerometer_ios.csv"
-    # # dataFilename3 = "Accelerometer_temp_ios.csv"
-    # featureFilename3 = f"ios_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename3 = "accelerometer_m_s2__x_y_z_android.csv"
+    # # dataFilename3 = "Accelerometer_temp_android.csv"
+    # featureFilename3 = f"android_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # gyroscope data
-    # dataFilename4 = "Gyroscope_ios.csv"
-    # # dataFilename4 = "Gyroscope_temp_ios.csv"
-    # featureFilename4 = f"ios_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename4 = "gyroscope_rad_s__x_y_z_android.csv"
+    # # dataFilename4 = "Gyroscope_temp_android.csv"
+    # featureFilename4 = f"android_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
-    finalFeatureFilename = f"ios_sleep_features_{dbName}_{timestamp}_ios.csv"
+    finalFeatureFilename = f"android_sleep_features_{dbName}_{timestamp}_android.csv"
 
     # if not (os.path.exists(os.path.join(inputDataPath, dataFilename1))):
     #     sys.exit(f"{dataFilename1} file does not exist in {inputDataPath} folder \nscript aborted")
     
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
-    #     sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
+    # # if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
+    # #     sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
     
     # if not (os.path.exists(os.path.join(inputDataPath, dataFilename3))):
     #     sys.exit(f"{dataFilename3} file does not exist in {inputDataPath} folder \nscript aborted")
@@ -417,29 +354,27 @@ def getIosSleepFeatures(inputDataPath, featurePath):
 
 
     # # Preprocessing and saving the raw sensor data
-    # lockstate = process_lockstate_ios_data(inputDataPath, dataFilename1)
+    # lockstate = process_lockstate_android_data(inputDataPath, dataFilename1)
     # lockstate.to_csv(os.path.join(featurePath, featureFilename1), header=True, index=False)
 
-    # brightness = process_brightness_ios_data(inputDataPath, dataFilename2)
-    # brightness.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
+    # # brightness = process_brightness_android_data(inputDataPath, dataFilename2)
+    # # brightness.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
 
-    # accelerometer = process_accelerometer_ios_data(inputDataPath, dataFilename3)
+    # accelerometer = process_accelerometer_android_data(inputDataPath, dataFilename3)
     # accelerometer.to_csv(os.path.join(featurePath, featureFilename3), header=True, index=False)
 
-    # gyroscope = process_gyroscope_ios_data(inputDataPath, dataFilename4)
+    # gyroscope = process_gyroscope_android_data(inputDataPath, dataFilename4)
     # gyroscope.to_csv(os.path.join(featurePath, featureFilename4), header=True, index=False)
 
     # reading preprocessed files:
-    lockstate = pd.read_csv(os.path.join(featurePath, "ios_Lock_state_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
+    lockstate = pd.read_csv(os.path.join(featurePath, "android_Lock_state_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
 
-    brightness = pd.read_csv(os.path.join(featurePath, "ios_Brightness_processed_for_sleepFeatures_allNoLoc_20220614_111633AM.csv"))
+    accelerometer = pd.read_csv(os.path.join(featurePath, "android_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
 
-    accelerometer = pd.read_csv(os.path.join(featurePath, "ios_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
-
-    gyroscope = pd.read_csv(os.path.join(featurePath, "ios_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
+    gyroscope = pd.read_csv(os.path.join(featurePath, "android_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
 
 
-    sleepFeatures = combine_ios_features(lockstate, brightness, accelerometer, gyroscope)    
+    sleepFeatures = combine_android_features(lockstate, accelerometer, gyroscope)    
     #saving the file
     sleepFeatures.to_csv(os.path.join(featurePath, finalFeatureFilename), header=True, index=False)
     print("Extraction of Sleep features completed")
@@ -449,14 +384,14 @@ if __name__ == "__main__":
     # config
     inputDataPath1 = "../../data/allNoLoc"
     # inputDataPath2 = "/csv/backup"
-    featurePath = "../../data/processedData"
+    featurePath = "../../data/processedData/newIntermediateFiles"
 
     strTime = time.time()
-    getIosSleepFeatures(inputDataPath1, featurePath)
+    getandroidSleepFeatures(inputDataPath1, featurePath)
     endTime = time.time()
 
     # strTime = time.time()
-    # getIosSleepFeatures(inputDataPath2, featurePath)
+    # getandroidSleepFeatures(inputDataPath2, featurePath)
     # endTime = time.time()
 
     print(f"run time: {round((endTime - strTime)/60, 2)}")

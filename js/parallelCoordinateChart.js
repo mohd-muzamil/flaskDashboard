@@ -4,10 +4,10 @@
 // https://gist.github.com/kotomiDu/d1fd0fe9397db41f5f8ce1bfb92ad20d
 // https://gist.github.com/titipignataro/47135818bad65a439174038227e0eb20
 
-function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurelist, classLabel , labels, starting_min_date, starting_max_date) {
+function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurelist, classLabel, labels, starting_min_date, starting_max_date) {
     var featuresNames
     var importanceScores
-    const line_color = "#636363"  //dark gray
+    const line_color = "#636363" //dark gray
     const titleLegend = "Feature Importance"
 
     postForm = { "featureColumns": featurelist, "classLabel": classLabel }
@@ -26,7 +26,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
     const margin = { left: 20, top: 25, right: 40, bottom: 30 },
         width = Math.floor(+$("#" + chart).width()),
         height = Math.floor(+$("#" + chart).height());
-    var        
+    var
         xHigh = (width - margin.left - margin.right),
         yHigh = (height - margin.top - margin.bottom)
 
@@ -47,7 +47,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
         featureLength = featurelist.length - 1
         if (!featuresNames.includes("date_num")) {
             featuresNames.unshift("date_num")
-            // importanceScores.unshift(0)
+                // importanceScores.unshift(0)
         }
     }
 
@@ -113,16 +113,15 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                     .style("padding", "1px")
                     .style("pointer-events", "none")
                     .style("opacity", 0.8)
-                
+
                 function tooltip_mousemove() {
                     X = d3.event.pageX
                     Y = d3.event.pageY
-                    if(X > width/2){
+                    if (X > width / 2) {
                         dx = -10
-                    }
-                    else dx = 0
-                    X =  X - dx
-                    Y = d3.event.pageY + 5
+                    } else dx = 0
+                    X = X - dx
+                    Y = d3.event.pageY + 15
                     return tooltip.style("left", X + "px").style("top", Y + "px")
                 }
 
@@ -217,21 +216,29 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                     })
                     .attr("stroke", function(d) {
                         if (featureType == "aggregatedFeatures") {
-                            return d.id != selectedId ?  colorClusters(d[classLabel]) : "#000";
+                            return d.id != selectedId ? colorClusters(d[classLabel]) : "#000";
                         } else {
                             return line_color
                         }
                     })
                     .attr("stroke-width", function(d) {
                         if (featureType == "aggregatedFeatures") {
-                            if (d.id != selectedId){
+                            if (d.id != selectedId) {
                                 d3.select(this).lower();
-                            }
-                            else{d3.select(this).raise();}
+                            } else { d3.select(this).raise(); }
                             return d.id != selectedId ? 1 : 1.5;
                         } else {
                             return 1.5
                         }
+                    })
+                    .on("mousemove", () => {
+                        tooltip_mousemove()
+                    })
+                    .on("mouseover", d => {
+                        tooltip_mouseover(d.id)
+                    })
+                    .on("mouseout", () => {
+                        tooltip_mouseout()
                     })
 
 
@@ -262,12 +269,12 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                             transition(background).attr("d", path);
                         })
                     );
-                
+
                 // add boxes behind each axis 
                 g.append("svg:g")
                     .attr("class", "featureImportance")
-                    .filter(d=>{ if(d!="date_num"){return d} })
-                    .each(function(){ d3.select(this).append("rect") })
+                    .filter(d => { if (d != "date_num") { return d } })
+                    .each(function() { d3.select(this).append("rect") })
                     .append("rect")
                     .attr("class", "boxes")
                     .attr("width", 6)
@@ -279,7 +286,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                     .attr("stroke-width", 0.4)
                     .attr("opacity", 1)
 
-            
+
                 // Add an axis and title.
                 g.append("g")
                     .attr("class", "axis")

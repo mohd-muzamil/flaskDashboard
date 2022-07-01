@@ -26,18 +26,18 @@ from removeOverlap.dgrid import *
 personalityFile = "PersonalityScores.csv"
 featureFile = "featureData.csv"
 featureAggFile = "featureDataAgg.csv"
-brightnessFile = "Brightness_processed.csv"
-accelerometerFile = "Accelerometer_processed.csv"
-gyroscopeFile = "Gyroscope_processed.csv"
-lockStateFile = "Lock_state_processed.csv"
-noiseFile = "Sleep_Noise_processed.csv"
+brightnessFile = "Brightness_processed_ios.csv"
+accelerometerFile = "Accelerometer_processed_ios.csv"
+gyroscopeFile = "Gyroscope_processed_ios.csv"
+lockStateFile = "Lock_state_processed_ios.csv"
+noiseFile = "Sleep_Noise_processed_ios.csv"
 
 def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     # Overlap removal of projections
     x = np.expand_dims(dimReduxProjections[:, 0], axis=1)
     y = np.expand_dims(dimReduxProjections[:, 1], axis=1)
     cords = np.concatenate((x, y), axis=1)
-    icon_width = 1.1*(1/(width/(2*radius)))
+    icon_width = 1.35*(1/(width/(2*radius)))
     icon_height = 1.1*(1/(height/(2*radius)))
 
     dimReduxProjectionsOverlapRemoved = DGrid(icon_width, icon_height, delta=1).fit_transform(cords)
@@ -46,21 +46,20 @@ def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     return resultX, resultY
 
 
-def getTSNE(df, columns, width, height, radius):
+def getTSNE(df, width, height, radius):
     #TSNE projection
-    tsne = TSNE(n_components=2, verbose=1,
-                perplexity=40, n_iter=300, init='random', learning_rate="auto")
-    tsneResult = tsne.fit_transform(df.loc[:, columns])
+    tsne = TSNE(n_components=2, verbose=1, perplexity=40, n_iter=300, init='random', learning_rate="auto")
+    tsneResult = tsne.fit_transform(df)
     tsneResult = np.round(MinMaxScaler().fit_transform(tsneResult), 3)
     tsneX, tsneY = tsneResult[:, 0], tsneResult[:, 1]
     tsneX_overlapRemoved, tsneY_overlapRemoved = DGridRemoveOverlap(tsneResult, width, height, radius)
     return tsneX, tsneY, tsneX_overlapRemoved, tsneY_overlapRemoved
 
 
-def getPCA(df, columns, width, height, radius):
+def getPCA(df, width, height, radius):
     #PCA projection
     pca = PCA(n_components=2)
-    pcaResult = pca.fit_transform(df.loc[:, columns])
+    pcaResult = pca.fit_transform(df)
     pcaResult = np.round(MinMaxScaler().fit_transform(pcaResult), 3)
     pcaX, pcaY = pcaResult[:, 0], pcaResult[:, 1]
     pcaX_overlapRemoved, pcaY_overlapRemoved = DGridRemoveOverlap(pcaResult, width, height, radius)
@@ -132,7 +131,7 @@ def getAutoN():
         classLabel = content["classLabel"]
         featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
         featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
-        columns = [col for col in list(featureData.columns) if col not in ["id", "date_num", "age", "gender", "dass1", "dass2", "age_group"]]
+        columns = [col for col in list(featureData.columns) if col not in ["id", "date_num", "age", "gender", "label1", "label2", "age_group"]]
         featuresWithImportance = getImportance(featureDataAgg, columns, classLabel)
         print("*"*100, list(featuresWithImportance.keys()))
         Nfeatures = list(featuresWithImportance.keys())[:autoN]
@@ -146,22 +145,25 @@ def getClassLabels():
         content = request.get_json()
         classLabel = content["classLabel"]
         personalityData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
-        labels = sorted(personalityData[classLabel].unique().tolist())
-        # if classLabel == "age":
-        #     classLabel = "age_group"
-        #     bins= [0,12,18,39,59,200]
-        #     labels = ['Child','Teen','Adult','Mid-Adult','Senior-Adult']
-        #     # labels = range(len(bins)-1)
-        #     personalityData['age_group'] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
-        #     labels = sorted(personalityData[classLabel].unique().tolist())
-        #     personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
+        labels = sorted(personalityData[classLabel].unique().astype("str").tolist())
+        if classLabel == "age":
+            classLabel = "age_group"
+            # bins= [12,18,25,59,200]
+            # labels = ['1_Teen','2_Adult','3_Mid-Adult','4_Senior-Adult']
+            bins = [15, 24, 64, 100]
+            labels = ["Youth(15-24)", "Adults(25-64)", "Seniors(65+)"]
+            # labels = range(len(bins)-1)
+            personalityData[classLabel] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
+            labels = sorted(personalityData[classLabel].unique().tolist())
+        #     # personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
         #     # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
-        #     personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
+            personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
         return jsonify(labels)
 
 
 @app.route('/dimReduceIds', methods=['POST'])
 def dimReduceIds():
+    # featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
     featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
     if request.method == 'POST':
         content = request.get_json()
@@ -172,12 +174,17 @@ def dimReduceIds():
         k = int(content["k"])
         toggleDimRedux = content["toggleDimRedux"]
         classLabel = content["classLabel"]
-
         # dim reduction
+
+        # featureDataAgg = featureData.loc[:, ["id"]+columns].groupby(['id'], as_index=False).agg(["mean"]).reset_index()
+        # df = featureData.loc[:, ["id"]+columns].groupby(['id'], as_index=False).agg(["mean", "std"]).reset_index()
+        # df.drop(["id"], axis=1, inplace=True)
+        # df.fillna(0, inplace=True)
+        df = featureDataAgg.loc[:,columns]
         if toggleDimRedux == "tsne":
-            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(featureDataAgg, columns, width, height, radius)
+            x, y, x_overlapRemoved, y_overlapRemoved = getTSNE(df, width, height, radius)
         elif toggleDimRedux == "pca":
-            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(featureDataAgg, columns, width, height, radius)
+            x, y, x_overlapRemoved, y_overlapRemoved = getPCA(df, width, height, radius)
 
         cluster = getClusters(featureDataAgg, columns, classLabel, k)    #KNN clustering
         featureDataAgg["x"], featureDataAgg["y"] = x, y
@@ -221,7 +228,7 @@ def getProjections():
     if request.method == 'GET':
         data = pd.read_csv(os.path.join(
             "data/processedData", featureAggFile))
-        cols = [col for col in data.columns if col not in ['id', 'age', 'gender', 'dass1', 'dass2', 'age_group', 'x', 'y', 'x_overlapRemoved', 'y_overlapRemoved', 'cluster']]
+        cols = [col for col in data.columns if col not in ['id', 'age', 'gender', 'label1', 'label2', 'age_group', 'x', 'y', 'x_overlapRemoved', 'y_overlapRemoved', 'cluster']]
         data[cols] = np.round(MinMaxScaler().fit_transform(data[cols]), 3)
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=personalityScores.csv"
@@ -369,7 +376,7 @@ def getIndividualFeatures():
         id = content['id']
 
         featureData = pd.read_csv(os.path.join(
-            "data/rawData", featureFile))
+            "data/processedData", featureFile))
         # Fetching data for selected id
         featureData = featureData[featureData["id"] == id].copy()
 
@@ -439,11 +446,11 @@ def getFeatureImportance():
 
         featureData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
         if len(columns) <= 1:
-            columns = [col for col in list(featureData.columns) if col not in ["id", "age", "gender", "dass1", "dass2", "age_group"]]
+            columns = [col for col in list(featureData.columns) if col not in ["id", "age", "gender", "label1", "label2", "age_group"]]
         featuresWithImportance = getImportance(featureData, columns, classLabel)
         return jsonify(featuresWithImportance)
 
 
 if __name__ == "__main__":
-    app.run(port=5008, debug=True)
+    app.run(port=5011, debug=True)
     #age_groups ["Millennial", "GenX", "Boomer", "Silent"] [(18-34), (35-50), (51-69), (70-87)]

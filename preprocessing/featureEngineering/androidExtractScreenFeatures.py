@@ -1,6 +1,6 @@
 """
 ####################################################################################################
-Script for extracting below screen usage related features using IOS lockstate data
+Script for extracting below screen usage related features using android powerstate data
 
 Feature1: No of screen unlocks in a daily section
 Feature2: First screen unlock event in a day
@@ -18,25 +18,25 @@ input/output file names need to be specifed in the code below #config
 
 from imports import *
 
-def getIosScreenFeatures(dataPath, featurePath):
+def getAndroidScreenFeatures(dataPath, featurePath):
     """
-    Feature Engineering - "Screenstate (LOCKED/UNLOCKED)"
+    Feature Engineering - "Screenstate (screen_off/screen_on)"
     This script will read files from predefined location and write feature data into predefined location
 
-    dataPath: path to folder which has ios screen data
+    dataPath: path to folder which has android screen data
     featurePath: path to store the extracted features
     """
     print("Begin extraction - Screen features")
     
     # config
-    dataFilename = "Lock_state_ios.csv"
+    dataFilename = "powerState_android.csv"
     date = datetime.now().strftime("%Y%m%d_%I%M%S%p")
-    featureFilename = "ios_screen_features_" + dataPath.split("/")[-1] + "_" + date + ".csv"
+    featureFilename = "android_screen_features_" + dataPath.split("/")[-1] + "_" + date + ".csv"
 
     if not (os.path.exists(os.path.join(dataPath, dataFilename))):
         sys.exit(f"{dataFilename} file does not exist in {dataPath} folder \nscript aborted")
 
-    #read ios file
+    #read android file
     screenstate = pd.read_csv(os.path.join(dataPath, dataFilename), sep="|", header=None)
     screenstate.columns = ["id", "participantId", "attribute", "lockstate", "timestamp", "uploadtimestamp", "id1"]
 
@@ -51,13 +51,14 @@ def getIosScreenFeatures(dataPath, featurePath):
 
     # decided not to filter out participantIds at this stage
     # codeblock to get participantIds who have data greater that some range
-    # filtering_df = screenstate.groupby(["participantId", "date"]).size().reset_index().groupby("participantId").size().reset_index(name="noOfDays")
+    filtering_df = screenstate.groupby(["participantId", "date"]).size().reset_index().groupby("participantId").size().reset_index(name="noOfDays")
     # filtering_df = filtering_df[(filtering_df.noOfDays >= 7) & (filtering_df.noOfDays <= 35)]
-    # filtering_df = filtering_df[(filtering_df.noOfDays >= 7)]
-    # filtered_participantIds = filtering_df.participantId.unique().tolist()
+    filtering_df = filtering_df[(filtering_df.noOfDays >= 15)]
+    filtered_participantIds = filtering_df.participantId.unique().tolist()
+    filtered_participantIds = [id for id in filtered_participantIds if "aPROSITC" in id]
 
     #filter the df to take only the required participantIds
-    # screenstate = screenstate[screenstate.participantId.isin(filtered_participantIds)].copy()
+    screenstate = screenstate[screenstate.participantId.isin(filtered_participantIds)].copy()
 
     # sort data, remove duplicates and drop unecessary columns
     screenstate = screenstate.sort_values(["participantId", "timestamp"]).reset_index(drop=True)
@@ -65,7 +66,7 @@ def getIosScreenFeatures(dataPath, featurePath):
     screenstate.drop(["id", "attribute", "uploadtimestamp", "id1"], axis=1, inplace=True)
 
     #keeping only those rows which indicate screen usage
-    screenstate = screenstate[(screenstate.lockstate == "LOCKED") | (screenstate.lockstate == "UNLOCKED")]
+    screenstate = screenstate[(screenstate.lockstate == "screen_off") | (screenstate.lockstate == "screen_on")]
 
     df_screen_state_processed = pd.DataFrame()
 
@@ -92,46 +93,45 @@ def getIosScreenFeatures(dataPath, featurePath):
                 # adding first and last events to help detect screen usage from time 0 to time 1440 minutes of the day
                 #first_event in a daily section
                 first_event = screenstate_participantId_date.iloc[:1, :].copy()
-                if first_event.lockstate.item() == "LOCKED":
-                    first_event.lockstate = "UNLOCKED"
-                elif first_event.lockstate.item() == "UNLOCKED":
-                    first_event.lockstate = "LOCKED"
+                if first_event.lockstate.item() == "screen_off":
+                    first_event.lockstate = "screen_on"
+                elif first_event.lockstate.item() == "screen_on":
+                    first_event.lockstate = "screen_off"
                 
                 #last_event in a daily section
                 last_event = screenstate_participantId_date.iloc[-1:, :].copy()
-                if last_event.lockstate.item() == "LOCKED":
-                    last_event.lockstate = "UNLOCKED"
-                elif last_event.lockstate.item() == "UNLOCKED":
-                    last_event.lockstate = "LOCKED"
+                if last_event.lockstate.item() == "screen_off":
+                    last_event.lockstate = "screen_on"
+                elif last_event.lockstate.item() == "screen_on":
+                    last_event.lockstate = "screen_off"
                 
                 screenstate_participantId_date = pd.concat([first_event, screenstate_participantId_date, last_event], ignore_index=True)
                 screenstate_participantId_date["screen_on_time"] = 0
                 screenstate_participantId_date["screen_off_time"] = 0
                 
                 #logic to calculate screen_time
-                index = (screenstate_participantId_date.lockstate == "UNLOCKED" ) & (screenstate_participantId_date.lockstate.shift(-1) == "LOCKED" )
+                index = (screenstate_participantId_date.lockstate == "screen_on" ) & (screenstate_participantId_date.lockstate.shift(-1) == "screen_off" )
                 screenstate_participantId_date.loc[index, "screen_on_time"] = (screenstate_participantId_date.timestamp.shift(-1)[index] - screenstate_participantId_date.timestamp[index]).astype('timedelta64[s]')
                 
-                index = (screenstate_participantId_date.lockstate == "LOCKED" ) & (screenstate_participantId_date.lockstate.shift(-1) == "UNLOCKED" )
+                index = (screenstate_participantId_date.lockstate == "screen_off" ) & (screenstate_participantId_date.lockstate.shift(-1) == "screen_on" )
                 screenstate_participantId_date.loc[index, "screen_off_time"] = (screenstate_participantId_date.timestamp.shift(-1)[index] - screenstate_participantId_date.timestamp[index]).astype('timedelta64[s]')
                 
-                screenstate_participantId_date.screen_on_time = np.round(screenstate_participantId_date.screen_on_time / 60)    #use /60 here to convert time to minutes
-                screenstate_participantId_date.screen_off_time = np.round(screenstate_participantId_date.screen_off_time / 60)  #use /60 here to convert time to minutes
+                screenstate_participantId_date.screen_on_time = np.round(screenstate_participantId_date.screen_on_time / 3600, 2)    #use /3600 here to convert time to hrs
+                screenstate_participantId_date.screen_off_time = np.round(screenstate_participantId_date.screen_off_time / 3600, 2)  #use /3600 here to convert time to hrs
                 
                 df_screen_state_processed = pd.concat([df_screen_state_processed, screenstate_participantId_date], ignore_index=True)
 
-    df_screen_state_processed[df_screen_state_processed.screen_on_time < 0]
     df_screen_state_processed = df_screen_state_processed[df_screen_state_processed.screen_on_time >= 0]
 
-    df1 = (df_screen_state_processed[df_screen_state_processed.lockstate=="UNLOCKED"].groupby(["participantId", "date"]).size().reset_index(name="no_of_unlocks"))
-    df2 = (df_screen_state_processed[df_screen_state_processed.lockstate=="UNLOCKED"].groupby(["participantId", "date"])["screen_on_time"].agg("max").reset_index(name="max_screen_on_time"))
-    df3 = (df_screen_state_processed[df_screen_state_processed.lockstate=="UNLOCKED"].groupby(["participantId", "date"])["screen_on_time"].agg("sum").reset_index(name="total_screen_on_time"))
-    df4 = (df_screen_state_processed[df_screen_state_processed.lockstate=="UNLOCKED"].groupby(["participantId", "date"])["time"].agg("min").reset_index(name="first_screen_unlock_time"))
-    df5 = (df_screen_state_processed[df_screen_state_processed.lockstate=="LOCKED"].groupby(["participantId", "date"])["time"].agg("max").reset_index(name="last_screen_lock_time"))
+    df1 = (df_screen_state_processed[df_screen_state_processed.lockstate=="screen_on"].groupby(["participantId", "date"]).size().reset_index(name="no_of_unlocks"))
+    df2 = (df_screen_state_processed[df_screen_state_processed.lockstate=="screen_on"].groupby(["participantId", "date"])["screen_on_time"].agg("max").reset_index(name="max_screen_on_time"))
+    df3 = (df_screen_state_processed[df_screen_state_processed.lockstate=="screen_on"].groupby(["participantId", "date"])["screen_on_time"].agg("sum").reset_index(name="total_screen_on_time"))
+    df4 = (df_screen_state_processed[df_screen_state_processed.lockstate=="screen_on"].groupby(["participantId", "date"])["time"].agg("min").reset_index(name="first_screen_unlock_time"))
+    df5 = (df_screen_state_processed[df_screen_state_processed.lockstate=="screen_off"].groupby(["participantId", "date"])["time"].agg("max").reset_index(name="last_screen_lock_time"))
 
     df_list = [df1, df2, df3, df4, df5]
 
-    df = df1.merge(df2, how="right")
+    df = df1.merge(df2, on=["participantId", "date"], how="inner")
     for next_df in df_list[2:]:
         df = df.merge(next_df, on=["participantId", "date"], how="inner")
     
@@ -142,7 +142,7 @@ def getIosScreenFeatures(dataPath, featurePath):
     # df["first_screen_unlock_time"] = round((df["first_screen_unlock_time"].dt.hour * 60 + df["first_screen_unlock_time"].dt.minute)/60, 2)
     # decided to use hour for first screen on time
     df["first_screen_unlock_time"] = df["first_screen_unlock_time"].dt.hour
-
+    
     df["last_screen_lock_time"] = pd.to_datetime(df["last_screen_lock_time"], format='%H:%M:%S')
     # df["last_screen_lock_time"] = round((df["last_screen_lock_time"].dt.hour * 60 + df["last_screen_lock_time"].dt.minute)/60, 2)
     # decided to use hour for last screen on time
@@ -156,16 +156,16 @@ def getIosScreenFeatures(dataPath, featurePath):
 
 if __name__ == "__main__":
     # config
-    dataPath1 = "/csv/backup_frigg1"
-    dataPath2 = "/csv/backup"
-    featurePath = "/csv/features"
+    dataPath1 = "../../data/allNoLoc"
+    # dataPath2 = "/csv/backup"
+    featurePath = "../../data/processedData/newIntermediateFiles"
 
     strTime = time.time()
-    getIosScreenFeatures(dataPath1, featurePath)
+    getAndroidScreenFeatures(dataPath1, featurePath)
     endTime = time.time()
     print(f"run time: {round((endTime - strTime)/60, 2)}")
 
-    strTime = time.time()
-    getIosScreenFeatures(dataPath2, featurePath)
-    endTime = time.time()
-    print(f"run time: {round((endTime - strTime)/60, 2)}")
+    # strTime = time.time()
+    # getAndroidScreenFeatures(dataPath2, featurePath)
+    # endTime = time.time()
+    # print(f"run time: {round((endTime - strTime)/60, 2)}")

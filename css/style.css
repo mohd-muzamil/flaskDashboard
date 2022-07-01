@@ -1,81 +1,173 @@
-@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+body,
 html {
     height: 100%;
-    /* overflow-x: hidden; */
+    /* background-image: */
+    /* linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), */
+    /* url("https://unsplash.com/photos/yI3weKNBRTc"); */
+    overflow: hidden;
 }
 
-body {
-    margin: 0;
-    height: 100%;
-    /* overflow-x: hidden; */
+#wrapper {
+    /* display: flex; */
+    width: 100%;
 }
 
-#container {
-    height: 100%;
+:root {
+    --code-color: darkred;
+    --code-bg-color: #aaaaaa;
+    --code-font-size: 14px;
+    --code-line-height: 1.4;
+    --scroll-bar-color: RGB(26, 97, 247);
+    --scroll-bar-bg-color: #f6f6f6;
+}
+
+pre {
+    color: var(--code-color);
+    font-size: var(--code-font-size);
+    line-height: var(--code-line-height);
+    background-color: var(--code-bg-color);
+}
+
+.code-block {
+    max-height: 100px;
+    overflow: auto;
+    padding: 8px 7px 5px 15px;
+    margin: 0px 0px 0px 0px;
+    border-radius: 7px;
+}
+
+* {
+    scrollbar-width: none;
+    scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
+}
+
+
+/* Works on Chrome, Edge, and Safari */
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-bar-color);
+    border-radius: 20px;
+    border: 3px solid var(--scroll-bar-bg-color);
+}
+
+.rotate {
+    position: absolute;
+    animation: rotation 1s infinite linear;
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.rotate1 {
+    position: absolute;
+    animation: rotation1 1s infinite;
+}
+
+@keyframes rotation1 {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+.glyphLegend1 {
+    rotate: -45;
 }
 
 #sidebar {
-    display: inline-block;
-    position: sticky;
-    vertical-align: top;
-    height: 100%;
-    width: 180px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
-
-#content {
-    display: inline-block;
-    vertical-align: top;
-    height: 100%;
     width: 200px;
-    overflow-x: hidden;
-    /* overflow-y: hidden; */
-}
-
-#header {
-    /* background-color: red; */
-    height: 40px;
-}
-
-
-/* #sidebar-nav {
-    width: 180px;
+    min-height: 100vh;
+    position: fixed;
+    transition: all 0.2s;
     overflow-y: scroll;
-    position: relative;
-    width: 150px;
+    overflow-x: hidden;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-} */
+    z-index: 1000;
+    /* background: gray; */
+}
+
+#content {
+    width: calc(100% - 200px);
+    min-height: 100vh;
+    position: absolute;
+    right: 0;
+    transition: 0.2s;
+}
+
+.no-sidebar #sidebar {
+    /* width: 0%; */
+    margin-left: -200px !important;
+    /* transition: 0.4s; */
+}
+
+.no-sidebar #content {
+    width: 100%;
+}
+
+svg {
+    border: solid 1px #000;
+    margin-top: 3px;
+    top: 0;
+    left: 0;
+}
+
+.svg1 {
+    height: 75%;
+    width: 64.5%;
+}
+
+.svg2 {
+    height: 75%;
+    width: 34.8%;
+}
+
+.svg3 {
+    height: 25%;
+    width: 99.6%
+}
 
 .help {
     cursor: pointer;
 }
 
-#dashboard {
-    height: calc(100% - 30px);
-    width: calc(100% - 180px);
-    overflow-y: hidden;
-    /* min-width: 100vw; */
-    /* height: 100%; */
-    /* position: sticky; */
-    /* height: calc(100% - 30px);
-        width: calc(100% - 220px);
-        overflow: hidden;
-        margin-left: 180px; */
-    /* background-color: gray; */
+.multiselect-container,
+.dropdown-menu {
+    position: fixed !important;
+    top: inherit !important;
+    left: inherit !important;
+    z-index: 1000;
+    /* transform: scale(0.7); */
 }
 
-.scaled {
-    transform: scale(0.9);
-}
-
-.num-block {
-    float: left;
-    width: 100%;
-    padding: 0px 15px 0px 30px;
+#ui-id-1 {
+    position: absolute !important;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 1000;
+    transform: scale(0.7);
+    /* top: inherit !important; */
+    /* left: inherit !important; */
 }
 
 
@@ -142,50 +234,21 @@ body {
 
 hr {
     margin-top: 0em !important;
-    margin-bottom: 1em !important;
+    margin-bottom: 5px !important;
+    /* background-color: gray; */
 }
 
 hr.double {
     margin-top: 0em !important;
     margin-bottom: 0em !important;
     border-width: 3px;
+    /* background-color: gray; */
 }
 
 br {
     display: block;
     content: "";
-    margin: 5px 0;
-}
-
-p {
-    padding: 5px;
-    margin: 0px
-}
-
-svg {
-    border: solid 1px #000;
-    margin-top: 3px;
-}
-
-.svg1 {
-    height: 50%;
-    width: 59%;
-    /* width: 58.6%; */
-}
-
-.svg2 {
-    height: 49%;
-    width: 39%;
-}
-
-.svg3 {
-    height: 24.5%;
-    width: 99%
-}
-
-#dashboardHeader {
-    text-align: center;
-    margin: 0px;
+    margin: 2px 0;
 }
 
 .slider {
@@ -202,54 +265,22 @@ svg {
     border-radius: 50%;
 }
 
-.multiselect {
-    transform: scale(0.8);
+
+/* toggle button styling */
+
+.toggle.round,
+.toggle-on.round,
+.toggle-off.round {
+    border-radius: 20rem;
 }
 
-
-/* .axis { */
-
-
-/* font: 12px sans-serif; */
-
-
-/* } */
-
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
-
-#ex1Slider .slider-selection {
-    background: #BABABA;
-}
-
-td {
-    text-align: center;
-    /* center checkbox horizontally */
-    vertical-align: middle;
-    /* center checkbox vertically */
-}
-
-.selectedLabel {
-    color: #0275d8;
-    box-sizing: border-box;
-    width: 100%;
-    border: solid #808080 .2px;
-    border-radius: 5px;
-    padding-left: 50px 0;
-}
-
-.ui-autocomplete {
-    height: 200px;
-    overflow-y: auto;
+.toggle.round .toggle-handle {
+    border-radius: 20rem;
 }
 
 .lasso path {
     stroke: rgb(80, 80, 80);
-    stroke-width: 1.5px;
+    stroke-width: 1px;
 }
 
 .lasso .drawn {
@@ -270,15 +301,16 @@ td {
     cursor: wait;
 }
 
-
-/* toggle button styling */
-
-.toggle.round,
-.toggle-on.round,
-.toggle-off.round {
-    border-radius: 20rem;
+.scaled {
+    transform: scale(0.7);
 }
 
-.toggle.round .toggle-handle {
-    border-radius: 20rem;
+.scaled1 {
+    transform: scale(0.5);
+}
+
+button.multiselect {
+    height: 2.5em;
+    font-size: x-small;
+    line-height: 0;
 }

@@ -1,0 +1,284 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+html {
+    height: 100%;
+    /* overflow-x: hidden; */
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    /* overflow-x: hidden; */
+}
+
+#container {
+    height: 100%;
+}
+
+#sidebar {
+    display: inline-block;
+    position: sticky;
+    vertical-align: top;
+    height: 100%;
+    width: 180px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#content {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    width: 200px;
+    overflow-x: hidden;
+    /* overflow-y: hidden; */
+}
+
+#header {
+    /* background-color: red; */
+    height: 40px;
+}
+
+
+/* #sidebar-nav {
+    width: 180px;
+    overflow-y: scroll;
+    position: relative;
+    width: 150px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+} */
+
+.help {
+    cursor: pointer;
+}
+
+#dashboard {
+    height: calc(100% - 30px);
+    width: calc(100% - 180px);
+    overflow-y: hidden;
+    /* min-width: 100vw; */
+    /* height: 100%; */
+    /* position: sticky; */
+    /* height: calc(100% - 30px);
+        width: calc(100% - 220px);
+        overflow: hidden;
+        margin-left: 180px; */
+    /* background-color: gray; */
+}
+
+.scaled {
+    transform: scale(0.9);
+}
+
+.num-block {
+    float: left;
+    width: 100%;
+    padding: 0px 15px 0px 30px;
+}
+
+
+/* number spinner for knn parameter skin 1 */
+
+.skin-1 .num-in {
+    float: left;
+    width: 94;
+}
+
+.skin-1 .num-in span {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 25px;
+    line-height: 32px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.skin-1 .num-in span.dis:before {
+    background-color: #ccc !important;
+}
+
+.skin-1 .num-in input {
+    float: left;
+    width: 30px;
+    height: 25px;
+    border: 1px solid #6E6F7A;
+    border-radius: 5px;
+    color: #000;
+    text-align: center;
+    padding: 0;
+}
+
+.skin-1 .num-in span.minus:before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+    left: 0;
+}
+
+.skin-1 .num-in span.plus:before,
+.skin-1 .num-in span.plus:after {
+    content: '';
+    position: absolute;
+    right: 0px;
+    width: 15px;
+    height: 2px;
+    background-color: RGB(26, 97, 247);
+    top: 50%;
+}
+
+.skin-1 .num-in span.plus:after {
+    -webkit-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+hr {
+    margin-top: 0em !important;
+    margin-bottom: 1em !important;
+}
+
+hr.double {
+    margin-top: 0em !important;
+    margin-bottom: 0em !important;
+    border-width: 3px;
+}
+
+br {
+    display: block;
+    content: "";
+    margin: 5px 0;
+}
+
+p {
+    padding: 5px;
+    margin: 0px
+}
+
+svg {
+    border: solid 1px #000;
+    margin-top: 3px;
+}
+
+.svg1 {
+    height: 50%;
+    width: 59%;
+    /* width: 58.6%; */
+}
+
+.svg2 {
+    height: 49%;
+    width: 39%;
+}
+
+.svg3 {
+    height: 24.5%;
+    width: 99%
+}
+
+#dashboardHeader {
+    text-align: center;
+    margin: 0px;
+}
+
+.slider {
+    width: 90%;
+    height: 100%;
+}
+
+.button {
+    background-color: rgb(18, 113, 249);
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.multiselect {
+    transform: scale(0.8);
+}
+
+
+/* .axis { */
+
+
+/* font: 12px sans-serif; */
+
+
+/* } */
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+#ex1Slider .slider-selection {
+    background: #BABABA;
+}
+
+td {
+    text-align: center;
+    /* center checkbox horizontally */
+    vertical-align: middle;
+    /* center checkbox vertically */
+}
+
+.selectedLabel {
+    color: #0275d8;
+    box-sizing: border-box;
+    width: 100%;
+    border: solid #808080 .2px;
+    border-radius: 5px;
+    padding-left: 50px 0;
+}
+
+.ui-autocomplete {
+    height: 200px;
+    overflow-y: auto;
+}
+
+.lasso path {
+    stroke: rgb(80, 80, 80);
+    stroke-width: 1.5px;
+}
+
+.lasso .drawn {
+    fill-opacity: 0.05;
+}
+
+.lasso .loop_close {
+    fill: none;
+    stroke-dasharray: 4, 4;
+}
+
+.lasso .origin {
+    /* fill:#3399FF; */
+    fill-opacity: .5;
+}
+
+.lassoselect {
+    cursor: wait;
+}
+
+
+/* toggle button styling */
+
+.toggle.round,
+.toggle-on.round,
+.toggle-off.round {
+    border-radius: 20rem;
+}
+
+.toggle.round .toggle-handle {
+    border-radius: 20rem;
+}

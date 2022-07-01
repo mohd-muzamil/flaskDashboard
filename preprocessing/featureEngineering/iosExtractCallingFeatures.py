@@ -32,7 +32,7 @@ def getIosCallingFeatures(dataPath, featurePath):
     print("Begin extraction - Calling features")
 
     # config
-    dataFilename = "Call.csv"
+    dataFilename = "Call_ios.csv"
     date = datetime.now().strftime("%Y%m%d_%I%M%S%p")
     featureFilename = "ios_call_features_" + dataPath.split("/")[-1] + "_" + date + ".csv"
 
@@ -40,7 +40,7 @@ def getIosCallingFeatures(dataPath, featurePath):
         sys.exit(f"{dataFilename} file does not exist in {dataPath} folder \nscript aborted")
 
     # Call IOS data
-    header_list = ["id", "participantId", "attribute", "callevent", "timestamp", "uploadtimestamp"]
+    header_list = ["id", "participantId", "attribute", "callevent", "timestamp", "uploadtimestamp", "id1"]
     #read ios file
     call = pd.read_csv(os.path.join(dataPath, dataFilename), sep="|", header=None)
     call.columns = header_list
@@ -58,7 +58,7 @@ def getIosCallingFeatures(dataPath, featurePath):
     #Drop duplicates and sort as per timestamp
     call = call.sort_values(["participantId", "timestamp"]).reset_index(drop=True)
     call.drop_duplicates(subset=["participantId", "timestamp", "callevent"], keep="last", inplace=True)
-    call.drop(["id", "attribute", "uploadtimestamp"], axis=1, inplace=True)
+    call.drop(["id", "attribute", "uploadtimestamp", "id1"], axis=1, inplace=True)
 
     #keeping only those rows which indicate calling events
     call = call[call.callevent.isin(['CALL_INCOMING', 'CALL_CONNECTED', 'CALL_DISCONNECTED', 'CALL_DIALING', 'CALL_ON_HOLD'])]
