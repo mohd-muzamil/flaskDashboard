@@ -1,5 +1,5 @@
 ### VISUAL ANALYSIS OF MOBILE SENSING TIME-SERIES DATA: IDENTIFYING INDIVIDUAL AND RELATIVE BEHAVIOURAL PATTERNS ![visitors](https://visitor-badge.glitch.me/badge?page_id=mohd-muzamil.flaskDashboard)
-(Master's thesis project) Demo(Will soon deploy this system with dummy data on Heroku)
+Master's thesis project <B>Demo</b>(Will soon deploy this system with dummy data on Heroku)
 
 ### Abstract
 Mental well-being is increasingly demanded due to growing concerns about mental
