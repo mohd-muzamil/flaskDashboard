@@ -1,7 +1,6 @@
 """
 ####################################################################################################
 Script for extracting below screen usage related features using IOS lockstate data
-
 Feature1: No of screen unlocks in a daily section
 Feature2: First screen unlock event in a day
 Feature3: Last screen lock event in a day
@@ -18,12 +17,12 @@ input/output file names need to be specifed in the code below #config
 
 from imports import *
 
-def getIosScreenFeatures(dataPath, featurePath):
+def getIosScreenFeatures(inputDataPath, featurePath):
     """
     Feature Engineering - "Screenstate (LOCKED/UNLOCKED)"
     This script will read files from predefined location and write feature data into predefined location
 
-    dataPath: path to folder which has ios screen data
+    inputDataPath: path to folder which has ios screen data
     featurePath: path to store the extracted features
     """
     print("Begin extraction - Screen features")
@@ -31,13 +30,13 @@ def getIosScreenFeatures(dataPath, featurePath):
     # config
     dataFilename = "Lock_state_ios.csv"
     date = datetime.now().strftime("%Y%m%d_%I%M%S%p")
-    featureFilename = "ios_screen_features_" + dataPath.split("/")[-1] + "_" + date + ".csv"
+    featureFilename = "ios_screen_features_" + inputDataPath.split("/")[-1] + "_" + date + ".csv"
 
-    if not (os.path.exists(os.path.join(dataPath, dataFilename))):
-        sys.exit(f"{dataFilename} file does not exist in {dataPath} folder \nscript aborted")
+    if not (os.path.exists(os.path.join(inputDataPath, dataFilename))):
+        sys.exit(f"{dataFilename} file does not exist in {inputDataPath} folder \nscript aborted")
 
     #read ios file
-    screenstate = pd.read_csv(os.path.join(dataPath, dataFilename), sep="|", header=None)
+    screenstate = pd.read_csv(os.path.join(inputDataPath, dataFilename), sep="|", header=None)
     screenstate.columns = ["id", "participantId", "attribute", "lockstate", "timestamp", "uploadtimestamp", "id1"]
 
     #change time to Halifax time
@@ -51,13 +50,14 @@ def getIosScreenFeatures(dataPath, featurePath):
 
     # decided not to filter out participantIds at this stage
     # codeblock to get participantIds who have data greater that some range
-    # filtering_df = screenstate.groupby(["participantId", "date"]).size().reset_index().groupby("participantId").size().reset_index(name="noOfDays")
+    filtering_df = screenstate.groupby(["participantId", "date"]).size().reset_index().groupby("participantId").size().reset_index(name="noOfDays")
     # filtering_df = filtering_df[(filtering_df.noOfDays >= 7) & (filtering_df.noOfDays <= 35)]
-    # filtering_df = filtering_df[(filtering_df.noOfDays >= 7)]
-    # filtered_participantIds = filtering_df.participantId.unique().tolist()
+    filtering_df = filtering_df[(filtering_df.noOfDays >= 15)]
+    filtered_participantIds = filtering_df.participantId.unique().tolist()
+    filtered_participantIds = [id for id in filtered_participantIds if "iPROSITC" in id]
 
     #filter the df to take only the required participantIds
-    # screenstate = screenstate[screenstate.participantId.isin(filtered_participantIds)].copy()
+    screenstate = screenstate[screenstate.participantId.isin(filtered_participantIds)].copy()
 
     # sort data, remove duplicates and drop unecessary columns
     screenstate = screenstate.sort_values(["participantId", "timestamp"]).reset_index(drop=True)
@@ -77,7 +77,6 @@ def getIosScreenFeatures(dataPath, featurePath):
     5: append to processed_df
     """ 
     participantIds = screenstate["participantId"].unique()
-    # participantIds = ["PROSIT0004","PROSIT001", "PROSIT00A"]
     for participantId in tqdm(participantIds):
         screenstate_participantId = screenstate[screenstate.participantId == participantId].copy()
         dates = screenstate_participantId.date.unique()
@@ -91,20 +90,20 @@ def getIosScreenFeatures(dataPath, featurePath):
                 
                 # adding first and last events to help detect screen usage from time 0 to time 1440 minutes of the day
                 #first_event in a daily section
-                first_event = screenstate_participantId_date.iloc[:1, :].copy()
-                if first_event.lockstate.item() == "LOCKED":
-                    first_event.lockstate = "UNLOCKED"
-                elif first_event.lockstate.item() == "UNLOCKED":
-                    first_event.lockstate = "LOCKED"
+                # first_event = screenstate_participantId_date.iloc[:1, :].copy()
+                # if first_event.lockstate.item() == "LOCKED":
+                #     first_event.lockstate = "UNLOCKED"
+                # elif first_event.lockstate.item() == "UNLOCKED":
+                #     first_event.lockstate = "LOCKED"
                 
-                #last_event in a daily section
-                last_event = screenstate_participantId_date.iloc[-1:, :].copy()
-                if last_event.lockstate.item() == "LOCKED":
-                    last_event.lockstate = "UNLOCKED"
-                elif last_event.lockstate.item() == "UNLOCKED":
-                    last_event.lockstate = "LOCKED"
+                # #last_event in a daily section
+                # last_event = screenstate_participantId_date.iloc[-1:, :].copy()
+                # if last_event.lockstate.item() == "LOCKED":
+                #     last_event.lockstate = "UNLOCKED"
+                # elif last_event.lockstate.item() == "UNLOCKED":
+                #     last_event.lockstate = "LOCKED"
                 
-                screenstate_participantId_date = pd.concat([first_event, screenstate_participantId_date, last_event], ignore_index=True)
+                # screenstate_participantId_date = pd.concat([first_event, screenstate_participantId_date, last_event], ignore_index=True)
                 screenstate_participantId_date["screen_on_time"] = 0
                 screenstate_participantId_date["screen_off_time"] = 0
                 
@@ -115,8 +114,8 @@ def getIosScreenFeatures(dataPath, featurePath):
                 index = (screenstate_participantId_date.lockstate == "LOCKED" ) & (screenstate_participantId_date.lockstate.shift(-1) == "UNLOCKED" )
                 screenstate_participantId_date.loc[index, "screen_off_time"] = (screenstate_participantId_date.timestamp.shift(-1)[index] - screenstate_participantId_date.timestamp[index]).astype('timedelta64[s]')
                 
-                screenstate_participantId_date.screen_on_time = np.round(screenstate_participantId_date.screen_on_time / 60)    #use /60 here to convert time to minutes
-                screenstate_participantId_date.screen_off_time = np.round(screenstate_participantId_date.screen_off_time / 60)  #use /60 here to convert time to minutes
+                screenstate_participantId_date.screen_on_time = np.round(screenstate_participantId_date.screen_on_time / 3600, 2)    #use /60 here to convert time to minutes
+                screenstate_participantId_date.screen_off_time = np.round(screenstate_participantId_date.screen_off_time / 3600, 2)  #use /60 here to convert time to minutes
                 
                 df_screen_state_processed = pd.concat([df_screen_state_processed, screenstate_participantId_date], ignore_index=True)
 
@@ -156,16 +155,16 @@ def getIosScreenFeatures(dataPath, featurePath):
 
 if __name__ == "__main__":
     # config
-    dataPath1 = "/csv/backup_frigg1"
-    dataPath2 = "/csv/backup"
-    featurePath = "/csv/features"
+    inputinputinputDataPath1 = "../../data/allNoLoc"
+    # inputinputinputDataPath2 = "/csv/backup"
+    featurePath = "../../data/processedData/newIntermediateFiles"
 
     strTime = time.time()
-    getIosScreenFeatures(dataPath1, featurePath)
+    getIosScreenFeatures(inputinputinputDataPath1, featurePath)
     endTime = time.time()
     print(f"run time: {round((endTime - strTime)/60, 2)}")
 
-    strTime = time.time()
-    getIosScreenFeatures(dataPath2, featurePath)
-    endTime = time.time()
-    print(f"run time: {round((endTime - strTime)/60, 2)}")
+    # strTime = time.time()
+    # getIosScreenFeatures(inputinputinputDataPath2, featurePath)
+    # endTime = time.time()
+    # print(f"run time: {round((endTime - strTime)/60, 2)}")

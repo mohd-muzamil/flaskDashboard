@@ -1,7 +1,6 @@
 """
 #################################################################################################################
 Script for extracting below sleep related features using IOS lockstate, brightness, accelerometer and gyroscope data
-
 Feature1(sleepStartTime): Estimated start time of the sleep
 Feature2(sleepEndTime): Estimated end time of the sleep
 Feature3(sleepDuration): Estimated sleep duration
@@ -14,7 +13,7 @@ from imports import *
 
 # Filtered participantIds from another notebook. Only data from these will be analysed
 filteredParticipantIds = []
-# filteredParticipantIds = ['PROSITC1005', 'PROSITC1014', 'PROSITC1018', 'PROSITC1025', 'PROSITC1026', 'PROSITC1027', 'PROSITC1029', 'PROSITC1030', 'PROSITC1031', 'PROSITC1033', 'PROSITC1034', 'PROSITC1036', 'PROSITC1037', 'PROSITC1038', 'PROSITC1039', 'PROSITC1040', 'PROSITC1041', 'PROSITC1043', 'PROSITC1044', 'PROSITC1046', 'PROSITC1057', 'PROSITC1061', 'PROSITC1062', 'PROSITC1066', 'PROSITC1070', 'PROSITC1079', 'PROSITC1080', 'PROSITC1082', 'PROSITC1084', 'PROSITC1086', 'PROSITC1089', 'PROSITC1090', 'PROSITC1097', 'PROSITC1100', 'PROSITC1101', 'PROSITC1104', 'PROSITC1109', 'PROSITC1110', 'PROSITC1111', 'PROSITC1119', 'PROSITC1122', 'PROSITC1126', 'PROSITC1128', 'PROSITC1130', 'PROSITC1132', 'PROSITC1135', 'PROSITC1136', 'PROSITC1137', 'PROSITC1140', 'PROSITC1153', 'PROSITC1158', 'PROSITC1174', 'PROSITC1187', 'PROSITC1192', 'PROSITC1193', 'PROSITC1200', 'PROSITC1221', 'PROSITC1222', 'PROSITC1223', 'PROSITC1224', 'PROSITC1227', 'PROSITC1237', 'PROSITC1240', 'PROSITC1244', 'PROSITC1261', 'PROSITC1272', 'PROSITC1293', 'PROSITC1297', 'PROSITC1299', 'PROSITC1304', 'PROSITC1308', 'PROSITC1317', 'PROSITC1325', 'PROSITC1326', 'PROSITC1343', 'PROSITC1369', 'PROSITC1372', 'PROSITC1379', 'PROSITC1412', 'PROSITC1413', 'PROSITC1422', 'PROSITC1424', 'PROSITC1428', 'PROSITC1438', 'PROSITC1493', 'PROSITC1501', 'PROSITC1502', 'PROSITC1512', 'PROSITC1516', 'PROSITC1526', 'PROSITC1529', 'PROSITC1548', 'PROSITC1550', 'PROSITC1553', 'PROSITC1555', 'PROSITC1562', 'PROSITC1564', 'PROSITC1570', 'PROSITC1602', 'PROSITC1615', 'PROSITC1621', 'PROSITC1623', 'PROSITC1625', 'PROSITC1627', 'PROSITC1629', 'PROSITC1635', 'PROSITC1639', 'PROSITC1642', 'PROSITC1663', 'PROSITC1666', 'PROSITC1671', 'PROSITC1672', 'PROSITC1678', 'PROSITC1684', 'PROSITC1685', 'PROSITC1705', 'PROSITC1705', 'PROSITC1712', 'PROSITC1722', 'PROSITC1748', 'PROSITC1754', 'PROSITC1756', 'PROSITC1761', 'PROSITC1762', 'PROSITC1764', 'PROSITC1785', 'PROSITC1795', 'PROSITC1798', 'PROSITC1803', 'PROSITC1807', 'PROSITC1809', 'PROSITC1810', 'PROSITC1823', 'PROSITC1827', 'PROSITC1831', 'PROSITC1835', 'PROSITC1844', 'PROSITC1861', 'PROSITC1863', 'PROSITC1864', 'PROSITC1865', 'PROSITC1874', 'PROSITC1877', 'PROSITC1881', 'PROSITC1895', 'PROSITC1898', 'PROSITC1911', 'PROSITC1914', 'PROSITC1926', 'PROSITC1942', 'PROSITC1958', 'PROSITC1966', 'PROSITC1979', 'PROSITC1980', 'PROSITC1983', 'PROSITC1985', 'PROSITC1996', 'PROSITC1999', 'PROSITC2017', 'PROSITC2029', 'PROSITC2059', 'PROSITC2060', 'PROSITC2065', 'PROSITC2069', 'PROSITC2076', 'PROSITC2096', 'PROSITC2111', 'PROSITC2117', 'PROSITC2129', 'PROSITC2134', 'PROSITC2156', 'PROSITC2162', 'PROSITC2170', 'PROSITC2195', 'PROSITC2202', 'PROSITC2203', 'PROSITC2135', 'PROSITC2207', 'PROSITC2233', 'PROSITC2259', 'PROSITC2264', 'PROSITC2265', 'PROSITC2267', 'PROSITC2269', 'PROSITC2271', 'PROSITC2278', 'PROSITC2281', 'PROSITC2303', 'PROSITC2306', 'PROSITC2315', 'PROSITC2323', 'PROSITC2327', 'PROSITC2330', 'PROSITC2332', 'PROSITC2333', 'PROSITC2360', 'PROSITC2382', 'PROSITC2384', 'PROSITC2394', 'PROSITC2396', 'PROSITC2411', 'PROSITC2928', 'PROSITC2964', 'PROSITC2975', 'PROSITC2977', 'PROSITC2984', 'PROSITC2986', 'PROSITC3001', 'PROSITC3014', 'PROSITC3025', 'PROSITC3029', 'PROSITC3031', 'PROSITC3035', 'PROSITC3037', 'PROSITC3038', 'PROSITC3044', 'PROSITC3053', 'PROSITC3067', 'PROSITC3070', 'PROSITC3071', 'PROSITC3073', 'PROSITC3076', 'PROSITC3078', 'PROSITC3079', 'PROSITC3102', 'PROSITC3110', 'PROSITC3114', 'PROSITC3117', 'PROSITC3121', 'PROSITC3134', 'PROSITC3150']
+filteredParticipantIds = ['iPROSITC0003','iPROSITC0007','iPROSITC0010','iPROSITC0019','iPROSITC0022','iPROSITC0030','iPROSITC0037','iPROSITC0041','iPROSITC0043','iPROSITC0048','iPROSITC0052','iPROSITC0057','iPROSITC0059','iPROSITC0061','iPROSITC0063','iPROSITC0067','iPROSITC0072','iPROSITC0074','iPROSITC0078','iPROSITC0083','iPROSITC0086','iPROSITC0087','iPROSITC0088','iPROSITC0090','iPROSITC0094','iPROSITC0096','iPROSITC0100','iPROSITC0102','iPROSITC0108','iPROSITC0110','iPROSITC0117','iPROSITC0121','iPROSITC0122','iPROSITC0124','iPROSITC0138','iPROSITC0146','iPROSITC0154','iPROSITC0155','iPROSITC0170','iPROSITC0181','iPROSITC0185','iPROSITC0189','iPROSITC0204','iPROSITC0208','iPROSITC0215','iPROSITC0219','iPROSITC0222','iPROSITC0226','iPROSITC0234','iPROSITC0244','iPROSITC0247','iPROSITC0253','iPROSITC0261','iPROSITC0270','iPROSITC0278','iPROSITC0292','iPROSITC0297','iPROSITC0309','iPROSITC0312','iPROSITC0323','iPROSITC0329','iPROSITC0331','iPROSITC0332','iPROSITC0333','iPROSITC0337','iPROSITC0345','iPROSITC0346','iPROSITC0350','iPROSITC0387','iPROSITC0389','iPROSITC0390','iPROSITC0399','iPROSITC0405','iPROSITC0408','iPROSITC0411','iPROSITC0425','iPROSITC0429','iPROSITC0430','iPROSITC0431','iPROSITC0439','iPROSITC0445','iPROSITC0447','iPROSITC0448','iPROSITC0451','iPROSITC0455','iPROSITC0456','iPROSITC0464','iPROSITC0474','iPROSITC0505','iPROSITC0506','iPROSITC0509','iPROSITC0510','iPROSITC0511','iPROSITC0513','iPROSITC0516','iPROSITC0526','iPROSITC0528','iPROSITC0529','iPROSITC0530','iPROSITC0531','iPROSITC0546','iPROSITC0560','iPROSITC0561','iPROSITC0569','iPROSITC0573','iPROSITC0580','iPROSITC0583','iPROSITC0586','iPROSITC0592','iPROSITC0595','iPROSITC0596','iPROSITC0599','iPROSITC0622','iPROSITC0625','iPROSITC0636','iPROSITC0640','iPROSITC0861','iPROSITC0876','iPROSITC0878','iPROSITC0890','iPROSITC0909','iPROSITC0919','iPROSITC0926','iPROSITC0928','iPROSITC0942','iPROSITC0961','iPROSITC0974','iPROSITC0978','iPROSITC0980','iPROSITC0981','iPROSITC0984','iPROSITC0992','iPROSITC0996','iPROSITC1005','iPROSITC1014','iPROSITC1018','iPROSITC1025','iPROSITC1026','iPROSITC1027','iPROSITC1029','iPROSITC1030','iPROSITC1031','iPROSITC1033','iPROSITC1034','iPROSITC1036','iPROSITC1037','iPROSITC1038','iPROSITC1039','iPROSITC1040','iPROSITC1041','iPROSITC1044','iPROSITC1046','iPROSITC1057','iPROSITC1061','iPROSITC1062','iPROSITC1066','iPROSITC1070','iPROSITC1079','iPROSITC1080','iPROSITC1086','iPROSITC1089','iPROSITC1090','iPROSITC1097','iPROSITC1100','iPROSITC1101','iPROSITC1104','iPROSITC1109','iPROSITC1110','iPROSITC1111','iPROSITC1119','iPROSITC1122','iPROSITC1126','iPROSITC1128','iPROSITC1135','iPROSITC1136','iPROSITC1137','iPROSITC1140','iPROSITC1153','iPROSITC1158','iPROSITC1174','iPROSITC1187','iPROSITC1192','iPROSITC1193','iPROSITC1221','iPROSITC1222','iPROSITC1223','iPROSITC1224','iPROSITC1227','iPROSITC1237','iPROSITC1240','iPROSITC1244','iPROSITC1261','iPROSITC1272','iPROSITC1293','iPROSITC1297','iPROSITC1299','iPROSITC1304','iPROSITC1317','iPROSITC1325','iPROSITC1326','iPROSITC1343','iPROSITC1369','iPROSITC1372','iPROSITC1379','iPROSITC1412','iPROSITC1413','iPROSITC1422','iPROSITC1424','iPROSITC1428','iPROSITC1501','iPROSITC1502','iPROSITC1512','iPROSITC1516','iPROSITC1526','iPROSITC1529','iPROSITC1548','iPROSITC1550','iPROSITC1553','iPROSITC1555','iPROSITC1562','iPROSITC1564','iPROSITC1602','iPROSITC1615','iPROSITC1621','iPROSITC1623','iPROSITC1627','iPROSITC1629','iPROSITC1635','iPROSITC1639','iPROSITC1642','iPROSITC1663','iPROSITC1666','iPROSITC1671','iPROSITC1678','iPROSITC1684','iPROSITC1685','iPROSITC1705','iPROSITC1712','iPROSITC1722','iPROSITC1742','iPROSITC1748','iPROSITC1754','iPROSITC1756','iPROSITC1761','iPROSITC1762','iPROSITC1763','iPROSITC1764','iPROSITC1785','iPROSITC1795','iPROSITC1798','iPROSITC1803','iPROSITC1807','iPROSITC1809','iPROSITC1810','iPROSITC1823','iPROSITC1826','iPROSITC1827','iPROSITC1835','iPROSITC1844','iPROSITC1861','iPROSITC1863','iPROSITC1864','iPROSITC1865','iPROSITC1874','iPROSITC1877','iPROSITC1898','iPROSITC1911','iPROSITC1914','iPROSITC1926','iPROSITC1942','iPROSITC1966','iPROSITC1979','iPROSITC1980','iPROSITC1983','iPROSITC1985','iPROSITC1996','iPROSITC1999','iPROSITC2002','iPROSITC2029','iPROSITC2037','iPROSITC2059','iPROSITC2065','iPROSITC2069','iPROSITC2076','iPROSITC2096','iPROSITC2111','iPROSITC2117','iPROSITC2129','iPROSITC2134','iPROSITC2135','iPROSITC2156','iPROSITC2162','iPROSITC2170','iPROSITC2195','iPROSITC2202','iPROSITC2203','iPROSITC2207','iPROSITC2219','iPROSITC2239','iPROSITC2247','iPROSITC2259','iPROSITC2264','iPROSITC2265','iPROSITC2267','iPROSITC2269','iPROSITC2271','iPROSITC2278','iPROSITC2303','iPROSITC2306','iPROSITC2315','iPROSITC2323','iPROSITC2330','iPROSITC2332','iPROSITC2333','iPROSITC2360','iPROSITC2382','iPROSITC2384','iPROSITC2394','iPROSITC2928','iPROSITC2964','iPROSITC2986','iPROSITC3001','iPROSITC3014','iPROSITC3025','iPROSITC3029','iPROSITC3031','iPROSITC3035','iPROSITC3037','iPROSITC3038','iPROSITC3044','iPROSITC3053','iPROSITC3070','iPROSITC3071','iPROSITC3076','iPROSITC3078','iPROSITC3079','iPROSITC3101','iPROSITC3102','iPROSITC3110','iPROSITC3111','iPROSITC3114','iPROSITC3117','iPROSITC3121','iPROSITC3124','iPROSITC3148','iPROSITC3150','iPROSITC3169','iPROSITC3172','iPROSITC3196','iPROSITC3201','iPROSITC3213','iPROSITC3214','iPROSITC3217','iPROSITC3219','iPROSITC3221','iPROSITC3226','iPROSITC3227','iPROSITC3229','iPROSITC3230','iPROSITC3233','iPROSITC3234','iPROSITC3235','iPROSITC3244','iPROSITC3249','iPROSITC3259','iPROSITC3261','iPROSITC3279','iPROSITC3282','iPROSITC3305']
 
 
 def sleep_analysis(df, sleep_break=30):
@@ -382,61 +381,61 @@ def getIosSleepFeatures(inputDataPath, featurePath):
     dbName = inputDataPath.split("/")[-1]
 
     # # screen state data
-    # dataFilename1 = "Lock_state_ios.csv"
+    dataFilename1 = "Lock_state_ios.csv"
     # # dataFilename1 = "Lock_state_temp_ios.csv"
-    # featureFilename1 = f"ios_Lock_state_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    featureFilename1 = f"ios_Lock_state_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # brightness data
-    # dataFilename2 = "Brightness_ios.csv"
+    dataFilename2 = "Brightness_ios.csv"
     # dataFilename2 = "Brightness_temp_ios.csv"
-    # featureFilename2 = f"ios_Brightness_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    featureFilename2 = f"ios_Brightness_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # accelerometer data
-    # dataFilename3 = "Accelerometer_ios.csv"
+    dataFilename3 = "Accelerometer_ios.csv"
     # # dataFilename3 = "Accelerometer_temp_ios.csv"
-    # featureFilename3 = f"ios_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    featureFilename3 = f"ios_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # gyroscope data
-    # dataFilename4 = "Gyroscope_ios.csv"
+    dataFilename4 = "Gyroscope_ios.csv"
     # # dataFilename4 = "Gyroscope_temp_ios.csv"
-    # featureFilename4 = f"ios_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    featureFilename4 = f"ios_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     finalFeatureFilename = f"ios_sleep_features_{dbName}_{timestamp}_ios.csv"
 
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename1))):
-    #     sys.exit(f"{dataFilename1} file does not exist in {inputDataPath} folder \nscript aborted")
+    if not (os.path.exists(os.path.join(inputDataPath, dataFilename1))):
+        sys.exit(f"{dataFilename1} file does not exist in {inputDataPath} folder \nscript aborted")
     
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
-    #     sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
+    if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
+        sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
     
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename3))):
-    #     sys.exit(f"{dataFilename3} file does not exist in {inputDataPath} folder \nscript aborted")
+    if not (os.path.exists(os.path.join(inputDataPath, dataFilename3))):
+        sys.exit(f"{dataFilename3} file does not exist in {inputDataPath} folder \nscript aborted")
 
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename4))):
-    #     sys.exit(f"{dataFilename4} file does not exist in {inputDataPath} folder \nscript aborted")
+    if not (os.path.exists(os.path.join(inputDataPath, dataFilename4))):
+        sys.exit(f"{dataFilename4} file does not exist in {inputDataPath} folder \nscript aborted")
 
 
-    # # Preprocessing and saving the raw sensor data
-    # lockstate = process_lockstate_ios_data(inputDataPath, dataFilename1)
-    # lockstate.to_csv(os.path.join(featurePath, featureFilename1), header=True, index=False)
+    # Preprocessing and saving the raw sensor data
+    lockstate = process_lockstate_ios_data(inputDataPath, dataFilename1)
+    lockstate.to_csv(os.path.join(featurePath, featureFilename1), header=True, index=False)
 
-    # brightness = process_brightness_ios_data(inputDataPath, dataFilename2)
-    # brightness.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
+    brightness = process_brightness_ios_data(inputDataPath, dataFilename2)
+    brightness.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
 
-    # accelerometer = process_accelerometer_ios_data(inputDataPath, dataFilename3)
-    # accelerometer.to_csv(os.path.join(featurePath, featureFilename3), header=True, index=False)
+    accelerometer = process_accelerometer_ios_data(inputDataPath, dataFilename3)
+    accelerometer.to_csv(os.path.join(featurePath, featureFilename3), header=True, index=False)
 
-    # gyroscope = process_gyroscope_ios_data(inputDataPath, dataFilename4)
-    # gyroscope.to_csv(os.path.join(featurePath, featureFilename4), header=True, index=False)
+    gyroscope = process_gyroscope_ios_data(inputDataPath, dataFilename4)
+    gyroscope.to_csv(os.path.join(featurePath, featureFilename4), header=True, index=False)
 
     # reading preprocessed files:
-    lockstate = pd.read_csv(os.path.join(featurePath, "ios_Lock_state_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
+    # lockstate = pd.read_csv(os.path.join(featurePath, "ios_Lock_state_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
 
-    brightness = pd.read_csv(os.path.join(featurePath, "ios_Brightness_processed_for_sleepFeatures_allNoLoc_20220614_111633AM.csv"))
+    # brightness = pd.read_csv(os.path.join(featurePath, "ios_Brightness_processed_for_sleepFeatures_allNoLoc_20220614_111633AM.csv"))
 
-    accelerometer = pd.read_csv(os.path.join(featurePath, "ios_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
+    # accelerometer = pd.read_csv(os.path.join(featurePath, "ios_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
 
-    gyroscope = pd.read_csv(os.path.join(featurePath, "ios_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
+    # gyroscope = pd.read_csv(os.path.join(featurePath, "ios_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220614_125752AM.csv"))
 
 
     sleepFeatures = combine_ios_features(lockstate, brightness, accelerometer, gyroscope)    
@@ -449,7 +448,7 @@ if __name__ == "__main__":
     # config
     inputDataPath1 = "../../data/allNoLoc"
     # inputDataPath2 = "/csv/backup"
-    featurePath = "../../data/processedData"
+    featurePath = "../../data/processedData/newIntermediateFiles"
 
     strTime = time.time()
     getIosSleepFeatures(inputDataPath1, featurePath)

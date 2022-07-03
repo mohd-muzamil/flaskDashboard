@@ -20,7 +20,7 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
     };
 
     //fetcing filtered id data from flask server
-    d3.csv("/filterparticipantIdsNew")
+    d3.csv("/filterparticipantIds")
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {

@@ -1,7 +1,6 @@
 """
 #################################################################################################################
-Script for extracting below sleep related features using android lockstate, brightness, accelerometer and gyroscope data
-
+Script for extracting below sleep related features using android lockstate, accelerometer and gyroscope data
 Feature1(sleepStartTime): Estimated start time of the sleep
 Feature2(sleepEndTime): Estimated end time of the sleep
 Feature3(sleepDuration): Estimated sleep duration
@@ -14,7 +13,7 @@ from imports import *
 
 # Filtered participantIds from another notebook. Only data from these will be analysed
 filteredParticipantIds = []
-filteredParticipantIds = ['aPROSITC0060', 'aPROSITC0064', 'aPROSITC00D', 'aPROSITC00M', 'aPROSITC0103', 'aPROSITC0107', 'aPROSITC0116', 'aPROSITC0118', 'aPROSITC0119', 'aPROSITC0128', 'aPROSITC0130', 'aPROSITC0131', 'aPROSITC0134', 'aPROSITC0144', 'aPROSITC0175', 'aPROSITC0188', 'aPROSITC0200', 'aPROSITC0211', 'aPROSITC0225', 'aPROSITC0229', 'aPROSITC0235', 'aPROSITC0237', 'aPROSITC0252', 'aPROSITC0260', 'aPROSITC0275', 'aPROSITC0279', 'aPROSITC0290', 'aPROSITC0295', 'aPROSITC0301', 'aPROSITC0303', 'aPROSITC0310', 'aPROSITC0326', 'aPROSITC0357', 'aPROSITC0376', 'aPROSITC0379', 'aPROSITC0398', 'aPROSITC0414', 'aPROSITC0416', 'aPROSITC0433', 'aPROSITC0436', 'aPROSITC0437', 'aPROSITC0457', 'aPROSITC0483', 'aPROSITC0497', 'aPROSITC0645', 'aPROSITC0739', 'aPROSITC0753', 'aPROSITC0774', 'aPROSITC0805', 'aPROSITC0838', 'aPROSITC0874', 'aPROSITC1063', 'aPROSITC1065', 'aPROSITC1069', 'aPROSITC1134', 'aPROSITC1147', 'aPROSITC1149', 'aPROSITC1154', 'aPROSITC1155', 'aPROSITC1156', 'aPROSITC1165', 'aPROSITC1170', 'aPROSITC1171', 'aPROSITC1172', 'aPROSITC1175', 'aPROSITC1182', 'aPROSITC1201', 'aPROSITC1204', 'aPROSITC1205', 'aPROSITC1208', 'aPROSITC1215', 'aPROSITC1226', 'aPROSITC1230', 'aPROSITC1233', 'aPROSITC1241', 'aPROSITC1242', 'aPROSITC1255', 'aPROSITC1271', 'aPROSITC1273', 'aPROSITC1277', 'aPROSITC1283', 'aPROSITC1302', 'aPROSITC1303', 'aPROSITC1306', 'aPROSITC1309', 'aPROSITC1312', 'aPROSITC1315', 'aPROSITC1322', 'aPROSITC1337', 'aPROSITC1349', 'aPROSITC1363', 'aPROSITC1368', 'aPROSITC1374', 'aPROSITC1378', 'aPROSITC1381', 'aPROSITC1387', 'aPROSITC1388', 'aPROSITC1392', 'aPROSITC1399', 'aPROSITC1402', 'aPROSITC1403', 'aPROSITC1419', 'aPROSITC1423', 'aPROSITC1425', 'aPROSITC1429', 'aPROSITC1430', 'aPROSITC1431', 'aPROSITC1433', 'aPROSITC1439', 'aPROSITC1444', 'aPROSITC1458', 'aPROSITC1462', 'aPROSITC1473', 'aPROSITC1489', 'aPROSITC1504', 'aPROSITC1536', 'aPROSITC1541', 'aPROSITC1542', 'aPROSITC1565', 'aPROSITC1568', 'aPROSITC1575', 'aPROSITC1604', 'aPROSITC1613', 'aPROSITC1618', 'aPROSITC1620', 'aPROSITC1628', 'aPROSITC1630', 'aPROSITC1638', 'aPROSITC1688', 'aPROSITC1694', 'aPROSITC1697', 'aPROSITC1699', 'aPROSITC1701', 'aPROSITC1709', 'aPROSITC1713', 'aPROSITC1718', 'aPROSITC1734', 'aPROSITC1745', 'aPROSITC1747', 'aPROSITC1770', 'aPROSITC1778', 'aPROSITC1780', 'aPROSITC1787', 'aPROSITC1791', 'aPROSITC1793', 'aPROSITC1796', 'aPROSITC1799', 'aPROSITC1805', 'aPROSITC1818', 'aPROSITC1822', 'aPROSITC1840', 'aPROSITC1855', 'aPROSITC1856', 'aPROSITC1862', 'aPROSITC1873', 'aPROSITC1887', 'aPROSITC1893', 'aPROSITC1903', 'aPROSITC1905', 'aPROSITC1921', 'aPROSITC1928', 'aPROSITC1930', 'aPROSITC1931', 'aPROSITC1941', 'aPROSITC1944', 'aPROSITC1949', 'aPROSITC1963', 'aPROSITC1986', 'aPROSITC1994', 'aPROSITC2009', 'aPROSITC2010', 'aPROSITC2019', 'aPROSITC2039', 'aPROSITC2044', 'aPROSITC2067', 'aPROSITC2089', 'aPROSITC2095', 'aPROSITC2098', 'aPROSITC2101', 'aPROSITC2102', 'aPROSITC2115', 'aPROSITC2130', 'aPROSITC2132', 'aPROSITC2143', 'aPROSITC2160', 'aPROSITC2177', 'aPROSITC2180', 'aPROSITC2185', 'aPROSITC2193', 'aPROSITC2226', 'aPROSITC2232', 'aPROSITC2237', 'aPROSITC2241', 'aPROSITC2255', 'aPROSITC2256', 'aPROSITC2268', 'aPROSITC2285', 'aPROSITC2292', 'aPROSITC2295', 'aPROSITC2298', 'aPROSITC2304', 'aPROSITC2348', 'aPROSITC2349', 'aPROSITC2353', 'aPROSITC2375', 'aPROSITC2392', 'aPROSITC2725', 'aPROSITC2742', 'aPROSITC2743', 'aPROSITC2780', 'aPROSITC2797', 'aPROSITC2825', 'aPROSITC2836', 'aPROSITC2848', 'aPROSITC2876', 'aPROSITC2954', 'aPROSITC2955', 'aPROSITC2973', 'aPROSITC2987', 'aPROSITC2990', 'aPROSITC2992', 'aPROSITC2994', 'aPROSITC2998', 'aPROSITC3000', 'aPROSITC3020', 'aPROSITC3021', 'aPROSITC3036', 'aPROSITC3050', 'aPROSITC3058', 'aPROSITC3087', 'aPROSITC3089', 'aPROSITC3097', 'aPROSITC3108', 'aPROSITC3129', 'aPROSITC3222', 'aPROSITC3232', 'aPROSITC3298']
+filteredParticipantIds = ['aPROSITC0060','aPROSITC0064','aPROSITC00D','aPROSITC00M','aPROSITC0103','aPROSITC0107','aPROSITC0116','aPROSITC0118','aPROSITC0119','aPROSITC0128','aPROSITC0130','aPROSITC0131','aPROSITC0134','aPROSITC0144','aPROSITC0175','aPROSITC0188','aPROSITC0200','aPROSITC0211','aPROSITC0229','aPROSITC0235','aPROSITC0237','aPROSITC0252','aPROSITC0260','aPROSITC0275','aPROSITC0279','aPROSITC0290','aPROSITC0295','aPROSITC0301','aPROSITC0303','aPROSITC0310','aPROSITC0326','aPROSITC0357','aPROSITC0376','aPROSITC0379','aPROSITC0398','aPROSITC0414','aPROSITC0416','aPROSITC0433','aPROSITC0436','aPROSITC0437','aPROSITC0457','aPROSITC0483','aPROSITC0497','aPROSITC0645','aPROSITC0739','aPROSITC0753','aPROSITC0774','aPROSITC0805','aPROSITC0838','aPROSITC0874','aPROSITC1063','aPROSITC1065','aPROSITC1069','aPROSITC1134','aPROSITC1147','aPROSITC1149','aPROSITC1154','aPROSITC1155','aPROSITC1156','aPROSITC1165','aPROSITC1170','aPROSITC1171','aPROSITC1172','aPROSITC1175','aPROSITC1182','aPROSITC1201','aPROSITC1204','aPROSITC1205','aPROSITC1208','aPROSITC1215','aPROSITC1226','aPROSITC1230','aPROSITC1233','aPROSITC1241','aPROSITC1242','aPROSITC1255','aPROSITC1271','aPROSITC1273','aPROSITC1277','aPROSITC1283','aPROSITC1302','aPROSITC1303','aPROSITC1306','aPROSITC1309','aPROSITC1312','aPROSITC1315','aPROSITC1322','aPROSITC1337','aPROSITC1349','aPROSITC1363','aPROSITC1368','aPROSITC1374','aPROSITC1378','aPROSITC1381','aPROSITC1387','aPROSITC1388','aPROSITC1392','aPROSITC1399','aPROSITC1402','aPROSITC1403','aPROSITC1419','aPROSITC1423','aPROSITC1425','aPROSITC1429','aPROSITC1430','aPROSITC1431','aPROSITC1433','aPROSITC1439','aPROSITC1444','aPROSITC1458','aPROSITC1462','aPROSITC1473','aPROSITC1489','aPROSITC1504','aPROSITC1536','aPROSITC1541','aPROSITC1542','aPROSITC1565','aPROSITC1568','aPROSITC1575','aPROSITC1604','aPROSITC1613','aPROSITC1618','aPROSITC1620','aPROSITC1628','aPROSITC1630','aPROSITC1638','aPROSITC1688','aPROSITC1694','aPROSITC1697','aPROSITC1699','aPROSITC1701','aPROSITC1709','aPROSITC1713','aPROSITC1718','aPROSITC1734','aPROSITC1745','aPROSITC1747','aPROSITC1770','aPROSITC1778','aPROSITC1780','aPROSITC1787','aPROSITC1791','aPROSITC1793','aPROSITC1796','aPROSITC1805','aPROSITC1818','aPROSITC1822','aPROSITC1840','aPROSITC1862','aPROSITC1873','aPROSITC1887','aPROSITC1893','aPROSITC1903','aPROSITC1905','aPROSITC1921','aPROSITC1928','aPROSITC1930','aPROSITC1941','aPROSITC1944','aPROSITC1949','aPROSITC1963','aPROSITC1986','aPROSITC2010','aPROSITC2019','aPROSITC2039','aPROSITC2044','aPROSITC2067','aPROSITC2089','aPROSITC2095','aPROSITC2098','aPROSITC2101','aPROSITC2102','aPROSITC2115','aPROSITC2130','aPROSITC2132','aPROSITC2143','aPROSITC2160','aPROSITC2177','aPROSITC2180','aPROSITC2185','aPROSITC2193','aPROSITC2226','aPROSITC2232','aPROSITC2237','aPROSITC2241','aPROSITC2255','aPROSITC2256','aPROSITC2268','aPROSITC2285','aPROSITC2292','aPROSITC2295','aPROSITC2298','aPROSITC2304','aPROSITC2348','aPROSITC2349','aPROSITC2353','aPROSITC2375','aPROSITC2392','aPROSITC2725','aPROSITC2742','aPROSITC2743','aPROSITC2780','aPROSITC2797','aPROSITC2825','aPROSITC2836','aPROSITC2848','aPROSITC2876','aPROSITC2954','aPROSITC2973','aPROSITC2987','aPROSITC2990','aPROSITC2992','aPROSITC2994','aPROSITC2998','aPROSITC3000','aPROSITC3020','aPROSITC3021','aPROSITC3036','aPROSITC3050','aPROSITC3058','aPROSITC3087','aPROSITC3097','aPROSITC3108','aPROSITC3129']
 
 
 def sleep_analysis(df, sleep_break=30):
@@ -307,7 +306,6 @@ def getandroidSleepFeatures(inputDataPath, featurePath):
     '''
     considering below conditions to assign a sleep state to a time block which is chosen as 10mins
     # screen state  - "screen_off"
-    # brightness    -   0
     # accelerometer -   0
     # gyroscope     -   0
     analysis of continious timeblocks decides the start and end time of sleep duration and no of sleep interruptions.
@@ -323,58 +321,47 @@ def getandroidSleepFeatures(inputDataPath, featurePath):
     # # dataFilename1 = "Lock_state_temp_android.csv"
     # featureFilename1 = f"android_Lock_state_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
-    # # brightness data
-    # dataFilename2 = "Brightness_android.csv"
-    # dataFilename2 = "Brightness_temp_android.csv"
-    # featureFilename2 = f"android_Brightness_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
-
     # # accelerometer data
-    # dataFilename3 = "accelerometer_m_s2__x_y_z_android.csv"
-    # # dataFilename3 = "Accelerometer_temp_android.csv"
-    # featureFilename3 = f"android_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename2 = "accelerometer_m_s2__x_y_z_android.csv"
+    # # dataFilename2 = "Accelerometer_temp_android.csv"
+    # featureFilename2 = f"android_Accelerometer_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     # # gyroscope data
-    # dataFilename4 = "gyroscope_rad_s__x_y_z_android.csv"
-    # # dataFilename4 = "Gyroscope_temp_android.csv"
-    # featureFilename4 = f"android_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
+    # dataFilename3 = "gyroscope_rad_s__x_y_z_android.csv"
+    # # dataFilename3 = "Gyroscope_temp_android.csv"
+    # featureFilename3 = f"android_Gyroscope_processed_for_sleepFeatures_{dbName}_{timestamp}.csv"
 
     finalFeatureFilename = f"android_sleep_features_{dbName}_{timestamp}_android.csv"
 
     # if not (os.path.exists(os.path.join(inputDataPath, dataFilename1))):
     #     sys.exit(f"{dataFilename1} file does not exist in {inputDataPath} folder \nscript aborted")
     
-    # # if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
-    # #     sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
-    
+    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename2))):
+    #     sys.exit(f"{dataFilename2} file does not exist in {inputDataPath} folder \nscript aborted")
+
     # if not (os.path.exists(os.path.join(inputDataPath, dataFilename3))):
     #     sys.exit(f"{dataFilename3} file does not exist in {inputDataPath} folder \nscript aborted")
-
-    # if not (os.path.exists(os.path.join(inputDataPath, dataFilename4))):
-    #     sys.exit(f"{dataFilename4} file does not exist in {inputDataPath} folder \nscript aborted")
 
 
     # # Preprocessing and saving the raw sensor data
     # lockstate = process_lockstate_android_data(inputDataPath, dataFilename1)
     # lockstate.to_csv(os.path.join(featurePath, featureFilename1), header=True, index=False)
 
-    # # brightness = process_brightness_android_data(inputDataPath, dataFilename2)
-    # # brightness.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
+    # accelerometer = process_accelerometer_android_data(inputDataPath, dataFilename2)
+    # accelerometer.to_csv(os.path.join(featurePath, featureFilename2), header=True, index=False)
 
-    # accelerometer = process_accelerometer_android_data(inputDataPath, dataFilename3)
-    # accelerometer.to_csv(os.path.join(featurePath, featureFilename3), header=True, index=False)
-
-    # gyroscope = process_gyroscope_android_data(inputDataPath, dataFilename4)
-    # gyroscope.to_csv(os.path.join(featurePath, featureFilename4), header=True, index=False)
+    # gyroscope = process_gyroscope_android_data(inputDataPath, dataFilename3)
+    # gyroscope.to_csv(os.path.join(featurePath, featureFilename3), header=True, index=False)
 
     # reading preprocessed files:
-    lockstate = pd.read_csv(os.path.join(featurePath, "android_Lock_state_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
+    lockstate = pd.read_csv(os.path.join(featurePath, "android_Lock_state_processed_for_sleepFeatures_allNoLoc_20220702_094702PM.csv"))
 
-    accelerometer = pd.read_csv(os.path.join(featurePath, "android_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
+    accelerometer = pd.read_csv(os.path.join(featurePath, "android_Accelerometer_processed_for_sleepFeatures_allNoLoc_20220702_094702PM.csv"))
 
-    gyroscope = pd.read_csv(os.path.join(featurePath, "android_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220630_054948PM.csv"))
+    gyroscope = pd.read_csv(os.path.join(featurePath, "android_Gyroscope_processed_for_sleepFeatures_allNoLoc_20220702_094702PM.csv"))
 
 
-    sleepFeatures = combine_android_features(lockstate, accelerometer, gyroscope)    
+    sleepFeatures = combine_android_features(lockstate, accelerometer, gyroscope)
     #saving the file
     sleepFeatures.to_csv(os.path.join(featurePath, finalFeatureFilename), header=True, index=False)
     print("Extraction of Sleep features completed")

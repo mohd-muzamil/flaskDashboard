@@ -327,7 +327,7 @@
                         <div class="form-check form-switch pl-1" style="text-align: left">
                             <div>
                                 <span onclick=alertOverlap()><i class="fa-solid fa-circle-question help"></i></span>
-                                <input class="pl-3" type="checkbox" checked data-toggle="toggle" data-style="round" data-size="xs" data-width=90 data-on="Remove" data-off="Keep" id="toggleDGrid">
+                                <input class="pl-3" type="checkbox" data-toggle="toggle" data-style="round" data-size="xs" data-width=90 data-on="Remove" data-off="Keep" id="toggleDGrid">
                                 <label style="font-size: 13px; font-weight:500;">Overlap</label>
                             </div>
                         </div>
@@ -422,7 +422,7 @@
         {
             $('#toggleDimRedux').bootstrapToggle('on') //on-tsne off-pca
             $('#toggleGlyph').bootstrapToggle('on') //on-flower off-polygon
-            $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
+            $('#toggleDGrid').bootstrapToggle('off') //on-overlapRemove off-keepOverlap
             $('#toggleLabels').bootstrapToggle('on') //on-hideLabels off-showLabels
             $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
             $('#featureType').bootstrapToggle('on') //on-aggregatedFeatures off-individualFeatures

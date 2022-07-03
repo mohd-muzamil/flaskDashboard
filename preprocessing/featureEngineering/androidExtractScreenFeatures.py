@@ -1,7 +1,6 @@
 """
 ####################################################################################################
 Script for extracting below screen usage related features using android powerstate data
-
 Feature1: No of screen unlocks in a daily section
 Feature2: First screen unlock event in a day
 Feature3: Last screen lock event in a day
@@ -78,7 +77,6 @@ def getAndroidScreenFeatures(dataPath, featurePath):
     5: append to processed_df
     """ 
     participantIds = screenstate["participantId"].unique()
-    # participantIds = ["PROSIT0004","PROSIT001", "PROSIT00A"]
     for participantId in tqdm(participantIds):
         screenstate_participantId = screenstate[screenstate.participantId == participantId].copy()
         dates = screenstate_participantId.date.unique()
@@ -92,20 +90,20 @@ def getAndroidScreenFeatures(dataPath, featurePath):
                 
                 # adding first and last events to help detect screen usage from time 0 to time 1440 minutes of the day
                 #first_event in a daily section
-                first_event = screenstate_participantId_date.iloc[:1, :].copy()
-                if first_event.lockstate.item() == "screen_off":
-                    first_event.lockstate = "screen_on"
-                elif first_event.lockstate.item() == "screen_on":
-                    first_event.lockstate = "screen_off"
+                # first_event = screenstate_participantId_date.iloc[:1, :].copy()
+                # if first_event.lockstate.item() == "screen_off":
+                #     first_event.lockstate = "screen_on"
+                # elif first_event.lockstate.item() == "screen_on":
+                #     first_event.lockstate = "screen_off"
                 
-                #last_event in a daily section
-                last_event = screenstate_participantId_date.iloc[-1:, :].copy()
-                if last_event.lockstate.item() == "screen_off":
-                    last_event.lockstate = "screen_on"
-                elif last_event.lockstate.item() == "screen_on":
-                    last_event.lockstate = "screen_off"
+                # #last_event in a daily section
+                # last_event = screenstate_participantId_date.iloc[-1:, :].copy()
+                # if last_event.lockstate.item() == "screen_off":
+                #     last_event.lockstate = "screen_on"
+                # elif last_event.lockstate.item() == "screen_on":
+                #     last_event.lockstate = "screen_off"
                 
-                screenstate_participantId_date = pd.concat([first_event, screenstate_participantId_date, last_event], ignore_index=True)
+                # screenstate_participantId_date = pd.concat([first_event, screenstate_participantId_date, last_event], ignore_index=True)
                 screenstate_participantId_date["screen_on_time"] = 0
                 screenstate_participantId_date["screen_off_time"] = 0
                 

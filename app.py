@@ -3,6 +3,7 @@ import time
 from flask import Flask, render_template, jsonify, request, redirect, url_for, send_file, make_response
 import pandas as pd
 import numpy as np
+from re import search
 
 # sklearn
 from sklearn.neighbors import KNeighborsClassifier
@@ -31,6 +32,9 @@ accelerometerFile = "Accelerometer_processed_ios.csv"
 gyroscopeFile = "Gyroscope_processed_ios.csv"
 lockStateFile = "Lock_state_processed_ios.csv"
 noiseFile = "Sleep_Noise_processed_ios.csv"
+accelerometerFileAndroid = "Accelerometer_processed_android.csv"
+gyroscopeFileAndroid = "Gyroscope_processed_android.csv"
+lockStateFileAndroid = "powerState_processed_android.csv"
 
 def DGridRemoveOverlap(dimReduxProjections, width, height, radius):
     # Overlap removal of projections
@@ -68,7 +72,7 @@ def getPCA(df, width, height, radius):
 
 def getClusters(df, columns, classLabel, k):
     # KNN clustering
-    X = df.loc[:, columns]
+    X = df.loc[:, columns].fillna(0)
     Y = df.loc[:, classLabel]    #change the column here-use glyph color column for knn
     clusters = []
     knn = KNeighborsClassifier(n_neighbors=k)
@@ -154,7 +158,7 @@ def getClassLabels():
             labels = ["Youth(15-24)", "Adults(25-64)", "Seniors(65+)"]
             # labels = range(len(bins)-1)
             personalityData[classLabel] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
-            labels = sorted(personalityData[classLabel].unique().tolist())
+            # labels = sorted(personalityData[classLabel].unique().tolist())
         #     # personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
         #     # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
             personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
@@ -237,51 +241,7 @@ def getProjections():
 
 
 @app.route('/filterparticipantIds', methods=['POST'])
-def filterparticipantIdsDummy():
-    """
-    Returns Data for Chart2: Radial chart to visualize sleep/awake activity using 
-    brightness, accelerometer and gyroscope data
-    dummy data
-    """
-    if request.method == 'POST':
-        content = request.get_json()
-
-        # filename = content['filename']
-        id = content['id']
-        attributes = content["attributes"]
-
-        strt = time.time()
-        filenames = {"brt": brightnessFile,
-                     "acc": accelerometerFile, "gyro": gyroscopeFile}
-        data = pd.DataFrame()
-        for attr, checkState in attributes.items():
-            if checkState:
-                df = pd.read_csv(os.path.join(
-                    "data/rawData", filenames[attr]))
-                df = df[df["id"] == id]
-
-                # Randomly removing data for night time, this step wont be necessary once the proper synthetic data is made
-                for i in range(np.ceil(df.shape[0]/1440)):
-                    x = np.random.randint(0, 3*60)
-                    sleepDur = np.random.randint(6, 9)
-                    startindex = i * 1440 + x
-                    df.iloc[startindex:(startindex+sleepDur*60), -1] = 0
-                    # data = data[data.iloc[:,-1] != 0]
-
-                data = pd.concat([data, df])
-
-        resp = make_response(data.to_csv(index=False))
-        resp.headers["Content-Disposition"] = "attachment; filename=filteredparticipantIds.csv"
-        resp.headers["Content-Type"] = "text/csv"
-        return resp
-        # return jsonify(f"post works filename:{filename} id:{id}")
-
-    else:
-        return jsonify("no post requests")
-
-
-@app.route('/filterparticipantIdsNew', methods=['POST'])
-def filterparticipantIdsNew():
+def filterparticipantIds():
     """
     Returns Data for Chart2: Radial chart to visualize sleep/awake activity using 
     brightness, accelerometer and gyroscope data
@@ -292,13 +252,21 @@ def filterparticipantIdsNew():
         id = content['id']
         attributes = content["attributes"]
 
-        filenames = {"lck": lockStateFile, "noise": noiseFile, "brt": brightnessFile, "acc": accelerometerFile,
+        if search("iPROSITC", id):
+            filenames = {"lck": lockStateFile, "noise": noiseFile, "brt": brightnessFile, "acc": accelerometerFile,
                      "gyro": gyroscopeFile}
+        elif search("aPROSITC", id):
+            filenames = {"lck": lockStateFileAndroid, "noise": None, "brt": None, "acc": accelerometerFileAndroid,
+                     "gyro": gyroscopeFileAndroid}
+
         data = pd.DataFrame()
         for attr, checkState in attributes.items():
             if checkState:
+                if filenames[attr] == None:
+                    print("#"*100)
+                    continue
                 df = pd.read_csv(os.path.join(
-                    "data/rawData", filenames[attr]))
+                    "data/rawData", filenames[attr]), sep="|")
                 df = df[df["id"] == id]
                 
                 dfImputed = pd.DataFrame()
@@ -330,7 +298,7 @@ def filterparticipantIdsNew():
                     #     dfImputed.drop("lck", axis=1, inplace=True)
 
                 data = pd.concat([data, dfImputed])
-
+        print(data)
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredparticipantIds.csv"
         resp.headers["Content-Type"] = "text/csv"
