@@ -226,7 +226,7 @@
                             </div>
                         </div>
                         <div class="m-0 p-0 pl-2">
-                            <input type="range" min="5" max="15" value="10" steps='1' class="slider" id="myRange">
+                            <input type="range" min="5" max="8" value="6" steps='1' class="slider" id="myRange">
                         </div>
                     </div>
                 </div>
@@ -249,7 +249,7 @@
                         </div>
                         <div class="classLabel">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age" name="colorCheckbox">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="age" name="colorCheckbox" checked>
                                 <label class="form-check-label" for="inlineCheckbox1">Age</label>
                             </div>
                             <div class="form-check form-check-inline">
@@ -257,7 +257,7 @@
                                 <label class="form-check-label" for="inlineCheckbox2">Gender</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="label1" name="colorCheckbox" checked>
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="label1" name="colorCheckbox">
                                 <label class="form-check-label" for="inlineCheckbox3">Label1</label>
                             </div>
                             <div class="form-check form-check-inline">
@@ -289,20 +289,12 @@
                                 <label class="form-check-label" for="inlineCheckbox1">Lck</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input id="brtCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox2">
-                                <label class="form-check-label" for="inlineCheckbox2">Brt</label>
-                            </div>
-                            <div class="form-check form-check-inline">
                                 <input id="accCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox3" checked>
                                 <label class="form-check-label" for="inlineCheckbox3">Acc</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input id="gyrCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox3" checked>
                                 <label class="form-check-label" for="inlineCheckbox3">Gyro</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input id="sleepNoiseCheckBox" class="form-check-input" type="checkbox" id="inlineCheckbox3">
-                                <label class="form-check-label" for="inlineCheckbox3">Noise</label>
                             </div>
                         </div>
                     </div>
@@ -422,7 +414,7 @@
         {
             $('#toggleDimRedux').bootstrapToggle('on') //on-tsne off-pca
             $('#toggleGlyph').bootstrapToggle('on') //on-flower off-polygon
-            $('#toggleDGrid').bootstrapToggle('off') //on-overlapRemove off-keepOverlap
+            $('#toggleDGrid').bootstrapToggle('on') //on-overlapRemove off-keepOverlap
             $('#toggleLabels').bootstrapToggle('on') //on-hideLabels off-showLabels
             $('#toggleSvgGrid').bootstrapToggle('on') //on-keepGrid off-hideGrid
             $('#featureType').bootstrapToggle('on') //on-aggregatedFeatures off-individualFeatures
@@ -464,10 +456,8 @@
         var classLabel
         var labels
         var lckChecked
-        var brtChecked
         var accChecked
         var gyrChecked
-        var sleepNoiseChecked
         var delayInMilliseconds = 250
 
         {
@@ -511,12 +501,6 @@
                 lckChecked = false
             }
 
-            if ($("#brtCheckBox").is(':checked')) {
-                brtChecked = true
-            } else {
-                brtChecked = false
-            }
-
             if ($("#accCheckBox").is(':checked')) {
                 accChecked = true
             } else {
@@ -527,12 +511,6 @@
                 gyrChecked = true
             } else {
                 gyrChecked = false
-            }
-
-            if ($("#sleepNoiseCheckBox").is(':checked')) {
-                sleepNoiseChecked = true
-            } else {
-                sleepNoiseChecked = false
             }
 
             $('input[name="colorCheckbox"]:checked').each(function() {
@@ -782,6 +760,7 @@
                 $('input[name="colorCheckbox"]:checked').each(function() {
                     classLabel = this.value
                         // Get all the distinct label values from server
+                    if (classLabel == "age") classLabel = "age_group"
                     postForm = {
                         "classLabel": classLabel
                     }
@@ -833,16 +812,6 @@
                 }
             })
 
-            // checkbox to render brightness data
-            $("#brtCheckBox").on('change', function() {
-                // console.log(brtChecked)
-                if ($(this).is(':checked')) {
-                    brtChecked = true
-                } else {
-                    brtChecked = false
-                }
-            })
-
             // checkbox to render accelerometer data
             $("#accCheckBox").on('change', function() {
                 // console.log(accChecked)
@@ -860,16 +829,6 @@
                     gyrChecked = true
                 } else {
                     gyrChecked = false
-                }
-            })
-
-            // checkbox to render sleepnoise data
-            $("#sleepNoiseCheckBox").on('change', function() {
-                // console.log(sleepNoiseChecked)
-                if ($(this).is(':checked')) {
-                    sleepNoiseChecked = true
-                } else {
-                    sleepNoiseChecked = false
                 }
             })
 
@@ -1013,11 +972,11 @@
 
         function callGlyphs() {
             radius = +document.getElementById("myRange").value
-            updateGlyphs(chart1, chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+            updateGlyphs(chart1, chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, accChecked, gyrChecked)
         }
 
         function callRadialTime() {
-            updateRadialTime(chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+            updateRadialTime(chart2, chart3, selectedId, featureType, featurelist, classLabel, labels, accChecked, gyrChecked, lckChecked)
         }
 
         function callParallelCord() {

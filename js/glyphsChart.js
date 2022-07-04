@@ -1,5 +1,5 @@
 // This script is used to generate visual representations over Glyph View.
-function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, accChecked, gyrChecked) {
     const config = {
         r: +radius,
         glyphLegendR: 50,
@@ -8,9 +8,9 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
         opacityClickLow: 0.2,
         opacityClickMid: 0.3,
         opacityClickHigh: 0.5,
-        strokeWidthLow: 0,
-        strokeWidthMid: 0.4,
-        strokeWidthHigh: 1.5,
+        strokeWidthLow: 0.3,
+        strokeWidthMid: 0.5,
+        strokeWidthHigh: 2,
         fillColor: "transparent",
         fillColorLasso: "#000000",
         strokeLasso: "red",
@@ -24,7 +24,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
 
     if (toggleSvgGrid) {
         config.opacityLow = 0.4;
-        config.strokeWidthLow = 0.1
+        config.strokeWidthLow = 0.3
     }
     const customPath = "M 0 0 C 20 -60, 20 -100, 0 -100 C -20 -100, -20 -60, 0 0" // flower petals
         // const customPath = 'M 0,0 C -30,-30 -30,-30 0,-100 C 30,-30 30,-30 0,0'; //star
@@ -42,7 +42,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
     d3.csv("/getProjections", function(data) {
         d3.select("#" + chart).selectAll("*").remove()
 
-        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2, bottom: 5 },
+        const margin = { left: 5, top: 15, right: config.glyphLegendR * 2 + config.r, bottom: 5 },
             width = Math.floor(+$("#" + chart).width()),
             height = Math.floor(+$("#" + chart).height())
 
@@ -87,7 +87,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("x2", d => { return d })
             .attr("y2", height)
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1 : config.opacityLow * 0.3
             })
             .style("stroke", "black")
             .style("stroke-width", config.strokeWidthLow)
@@ -101,7 +101,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             .attr("x2", width)
             .attr("y2", d => { return d })
             .style("opacity", (d, i) => {
-                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1.25 : config.opacityLow * 0.6
+                return i % Math.ceil(100 / config.grid_size) == 0 ? config.opacityLow * 1 : config.opacityLow * 0.3
             })
             .style("stroke", "black")
             .style("stroke-width", config.strokeWidthLow)
@@ -121,7 +121,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
                     .attr("opacity", config.opacityHigh)
-                    .attr("stroke", "black")
+                    .attr("stroke", d => { return colorClusters(d[classLabel]) })
                     .style("fill", config.fillColor)
 
                 d3.selectAll(".hovercircle")
@@ -310,18 +310,23 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .enter()
                 .append("text")
                 .attr("class", "labelText")
-                .attr("x", d => {
-                    x = toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x);
-                    return x
-                })
-                .attr("y", d => {
-                    y = toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y);
-                    return y
-                })
+                // .attr("x", d => {
+                //     x = toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x);
+                //     return x
+                // })
+                // .attr("y", d => {
+                //     y = toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y);
+                //     return y
+                // })
                 .attr("dx", (-1.5 * config.r) + "px")
                 .attr("dy", (1.5 * config.r) + "px")
                 .attr("font-size", config.labelSize.toString() + "px")
                 .attr("opacity", 0.8)
+                .attr("transform", d => {
+                    x = toggleDGrid == true ? xScale(d.x_overlapRemoved) : xScale(d.x);
+                    y = toggleDGrid == true ? yScale(d.y_overlapRemoved) : yScale(d.y);
+                    return `translate(${x}, ${y}) rotate(-30)`
+                })
                 .text(d => { return d.id })
         }
 
@@ -345,7 +350,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .attr("cy", dy)
                 .attr("r", config.glyphLegendR)
                 .attr("opacity", 1 / 2)
-                .attr("stroke", "black")
+                .attr("stroke", d => { return colorClusters(d[classLabel]) })
                 .attr("stroke-width", 1 / 5)
                 .style("fill", config.fillColor)
 
@@ -358,7 +363,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .attr("y1", d => { return dy - config.glyphLegendR * Math.cos(glyphLegendScale(d) * radians) })
                 .attr("y2", dy)
                 .attr("opacity", 1 / 2)
-                .attr("stroke", "black")
+                .attr("stroke", d => { return colorClusters(d[classLabel]) })
                 .attr("stroke-width", 1 / 5)
                 .lower();
 
@@ -412,9 +417,10 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 .attr("r", config.r)
                 .classed("selectedGlyph", d => { return d.id == id ? true : false })
                 .attr("opacity", config.opacityHigh)
-                .attr("stroke", "black")
+                .attr("stroke", d => { return colorClusters(d[classLabel]) })
                 .attr("stroke-width", d => { return d.id == id ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? config.strokeWidthMid : config.strokeWidthLow })
                 .style("fill", config.fillColor)
+                .lower()
                 .on("mousemove", () => {
                     tooltip_mousemove()
                 })
@@ -442,7 +448,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                         // console.log("case2")
                         svgGlyphs.selectAll(".selectedGlyph")
                             .classed("selectedGlyph", false)
-                            .attr("opacity", config.opacityLow)
+                            .attr("opacity", config.opacityHigh)
                             .attr("stroke-width", config.strokeWidthLow)
                             .style("fill", config.fillColor)
                         svgGlyphs.selectAll(".selectedLasso")
@@ -476,7 +482,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                         // console.log("case4")
                         svgGlyphs.selectAll(".selectedGlyph")
                             .classed("selectedGlyph", false)
-                            .attr("opacity", config.opacityLow)
+                            .attr("opacity", config.opacityHigh)
                             .attr("stroke-width", config.strokeWidthLow)
                             .style("fill", config.fillColor)
                         svgGlyphs.selectAll(".selectedLasso")
@@ -626,8 +632,8 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
                 d3.select(this).transition().duration(1000).style("fill", "transparent")
                 d3.selectAll(".hovercircle")
                     .classed("selectedLasso", false)
-                    .attr("opacity", d => { return (d.id == selectedId | d[classLabel] != d["cluster"]) ? config.opacityHigh : config.opacityLow })
-                    .attr("stroke", "black")
+                    .attr("opacity", config.opacityHigh)
+                    .attr("stroke", d => { return colorClusters(d[classLabel]) })
                     .attr("stroke-width", d => { return d.id == selectedId ? config.strokeWidthHigh : d[classLabel] != d["cluster"] ? config.strokeWidthMid : config.strokeWidthLow })
                     .style("fill", config.fillColor)
                 callParallelCord()
@@ -771,7 +777,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             })
 
         function callRadialTime() {
-            updateRadialTime(dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked)
+            updateRadialTime(dependentChart1, dependentChart2, selectedId, featureType, featurelist, classLabel, labels, accChecked, gyrChecked, lckChecked)
         }
 
         function callParallelCord() {
@@ -794,7 +800,7 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
 }
 
 
-function updateGlyphs(chart, dependendChart1, dependendChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked) {
+function updateGlyphs(chart, dependendChart1, dependendChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, accChecked, gyrChecked) {
     // only individual parallel cord  will be updated from here.
-    glyphs(chart, dependendChart1, dependendChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, brtChecked, accChecked, gyrChecked, sleepNoiseChecked)
+    glyphs(chart, dependendChart1, dependendChart2, selectedId, featureType, featurelist, classLabel, labels, radius, toggleGlyph, toggleDGrid, toggleLabels, toggleSvgGrid, lckChecked, accChecked, gyrChecked)
 }

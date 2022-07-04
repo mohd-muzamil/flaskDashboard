@@ -58,6 +58,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
+                console.log("data", data)
                 var filteredData = data
                 if (featureType == "aggregatedFeatures") {
                     if (lassoSelectedIds.length > 1) {
@@ -71,6 +72,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                         if (d.date >= starting_min_date & d.date <= starting_max_date)
                             return d
                     })
+                    console.log("filtered data", filteredData)
                 }
 
                 d3.select("#" + chart).selectAll('*').remove();
@@ -140,7 +142,8 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                 featuresCodes.forEach(function(d) {
                     // Coerce values to numbers.
                     if (d == "date_num") {
-                        data.forEach(function(p) { p[d] = formatDecimal(p[d]) });
+                        // data.forEach(function(p, i) { p[d] = formatDecimal(p[d]) });
+                        data.forEach(function(p, i) { p[d] = i + 1 });
                         y[d] = d3.scaleLinear()
                             .domain(d3.extent(data, function(p) { return +p[d]; }))
                             .range([yHigh, 0])
@@ -226,7 +229,7 @@ function parallelCord(chart, selectedId, lassoSelectedIds, featureType, featurel
                             if (d.id != selectedId) {
                                 d3.select(this).lower();
                             } else { d3.select(this).raise(); }
-                            return d.id != selectedId ? 1 : 1.5;
+                            return d.id != selectedId ? 0.75 : 1.5;
                         } else {
                             return 1.5
                         }

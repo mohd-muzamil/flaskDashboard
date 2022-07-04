@@ -4,6 +4,7 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 import pandas as pd
 import numpy as np
 from re import search
+from sklearn import cluster
 
 # sklearn
 from sklearn.neighbors import KNeighborsClassifier
@@ -72,12 +73,20 @@ def getPCA(df, width, height, radius):
 
 def getClusters(df, columns, classLabel, k):
     # KNN clustering
-    X = df.loc[:, columns].fillna(0)
-    Y = df.loc[:, classLabel]    #change the column here-use glyph color column for knn
+    X = df.loc[:, columns].copy()
+    Y = df.loc[:, classLabel].copy()    #change the column here-use glyph color column for knn
+    if classLabel == "age_group":
+        mapping_dict = {0:"Youth(15-24)", 1:"Adults(25-64)", 2:"Seniors(65+)"}
+        Y.mask(Y == "Youth(15-24)" ,0, inplace=True)
+        Y.mask(Y == "Adults(25-64)" ,1, inplace=True)
+        Y.mask(Y == "Seniors(65+)" ,2, inplace=True)
+        Y = Y.astype('int')
     clusters = []
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X, Y)
     clusters = knn.predict(X)
+    if classLabel == "age_group":
+        clusters = [mapping_dict[x] for x in clusters]
     return clusters
 
 
@@ -89,7 +98,7 @@ def getImportance(df, columns, classLabel):
 
     X, y = df.loc[:, columns], df.loc[:, "classLabel"]
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05, random_state=42)
-    X_train, y_train = X, y     #no test set, since all of the instances are needed to calculate the feature importance
+    X_train, y_train = X, y    #no test set, since all of the instances are needed to calculate the feature importance
     
     xgb_clf = xgb.XGBClassifier()
     xgb_clf.fit(X_train, y_train)
@@ -135,9 +144,8 @@ def getAutoN():
         classLabel = content["classLabel"]
         featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
         featureData = pd.read_csv(os.path.join("data/rawData", featureAggFile))
-        columns = [col for col in list(featureData.columns) if col not in ["id", "date_num", "age", "gender", "label1", "label2", "age_group"]]
+        columns = [col for col in list(featureData.columns) if col not in ["id", "age", "gender", "label1", "label2", "age_group"]]
         featuresWithImportance = getImportance(featureDataAgg, columns, classLabel)
-        print("*"*100, list(featuresWithImportance.keys()))
         Nfeatures = list(featuresWithImportance.keys())[:autoN]
         return jsonify(Nfeatures)
 
@@ -149,19 +157,20 @@ def getClassLabels():
         content = request.get_json()
         classLabel = content["classLabel"]
         personalityData = pd.read_csv(os.path.join("data/processedData", featureAggFile))
-        labels = sorted(personalityData[classLabel].unique().astype("str").tolist())
-        if classLabel == "age":
-            classLabel = "age_group"
-            # bins= [12,18,25,59,200]
-            # labels = ['1_Teen','2_Adult','3_Mid-Adult','4_Senior-Adult']
-            bins = [15, 24, 64, 100]
+        if classLabel == "age_group":
             labels = ["Youth(15-24)", "Adults(25-64)", "Seniors(65+)"]
-            # labels = range(len(bins)-1)
-            personalityData[classLabel] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
-            # labels = sorted(personalityData[classLabel].unique().tolist())
-        #     # personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
-        #     # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
-            personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
+        else:
+            labels = sorted(personalityData[classLabel].unique().astype("str").tolist())
+        # if classLabel == "age_group":
+        #     # bins= [12,18,25,59,200]
+        #     # labels = ['1_Teen','2_Adult','3_Mid-Adult','4_Senior-Adult']
+        #     bins = [15, 24, 64, 100]
+        #     labels = ["Youth(15-24)", "Adults(25-64)", "Seniors(65+)"]
+        #     personalityData[classLabel] = pd.cut(personalityData['age'], bins=bins, labels=labels, right=False)
+        #     labels = sorted(personalityData[classLabel].unique().tolist())
+        # #     # personalityData["age_group"] = LabelEncoder().fit_transform(personalityData["age_group"].values)
+        # #     # personalityData["age_group"] = le.transform(personalityData["age_group"].values)
+        #     personalityData.to_csv(os.path.join("data/processedData", featureAggFile), index=False, header=True)
         return jsonify(labels)
 
 
@@ -169,6 +178,7 @@ def getClassLabels():
 def dimReduceIds():
     # featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
     featureDataAgg = pd.read_csv(os.path.join("data/processedData", featureAggFile))
+    featureDataAgg.fillna(0, inplace=True)
     if request.method == 'POST':
         content = request.get_json()
         columns = content["featureColumns"]
@@ -179,7 +189,6 @@ def dimReduceIds():
         toggleDimRedux = content["toggleDimRedux"]
         classLabel = content["classLabel"]
         # dim reduction
-
         # featureDataAgg = featureData.loc[:, ["id"]+columns].groupby(['id'], as_index=False).agg(["mean"]).reset_index()
         # df = featureData.loc[:, ["id"]+columns].groupby(['id'], as_index=False).agg(["mean", "std"]).reset_index()
         # df.drop(["id"], axis=1, inplace=True)
@@ -262,11 +271,10 @@ def filterparticipantIds():
         data = pd.DataFrame()
         for attr, checkState in attributes.items():
             if checkState:
-                if filenames[attr] == None:
-                    print("#"*100)
+                if filenames[attr] is None:
                     continue
                 df = pd.read_csv(os.path.join(
-                    "data/rawData", filenames[attr]), sep="|")
+                    "data/rawData", filenames[attr]))
                 df = df[df["id"] == id]
                 
                 dfImputed = pd.DataFrame()
@@ -298,7 +306,6 @@ def filterparticipantIds():
                     #     dfImputed.drop("lck", axis=1, inplace=True)
 
                 data = pd.concat([data, dfImputed])
-        print(data)
         resp = make_response(data.to_csv(index=False))
         resp.headers["Content-Disposition"] = "attachment; filename=filteredparticipantIds.csv"
         resp.headers["Content-Type"] = "text/csv"
@@ -343,8 +350,7 @@ def getIndividualFeatures():
         content = request.get_json()
         id = content['id']
 
-        featureData = pd.read_csv(os.path.join(
-            "data/processedData", featureFile))
+        featureData = pd.read_csv(os.path.join("data/processedData", featureFile))
         # Fetching data for selected id
         featureData = featureData[featureData["id"] == id].copy()
 

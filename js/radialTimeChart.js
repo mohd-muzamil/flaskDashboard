@@ -24,6 +24,7 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
         .header("Content-Type", "application/json")
         .post(JSON.stringify(postForm),
             function(data) {
+                if (data.length == 0) { console.log("No data for this ", { selectedId, attributes }) }
                 data.forEach(function(d) {
                     d.minuteOfTheDay = +d.minuteOfTheDay;
                     d.brt = +d.brt;
@@ -276,7 +277,7 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
                         .attr("fill", "transparent")
                         .attr("rx", 3)
                         .on("mousemove", () => {
-                            tooltip_mousemove(dx = -70, dy = 0)
+                            tooltip_mousemove(dx = -40, dy = 0)
                         })
                         .on("mouseover", d => {
                             tooltip_mouseover("ClearAll")
@@ -287,13 +288,15 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
                         .on("click", function() {
                             d3.select(this).style("fill", "gray")
                             d3.select(this).transition().duration(1000).style("fill", "transparent")
-                            console.log("button clicked")
+                            d3.select("#" + chart).selectAll('.brush').remove();
+                            brushSlider(min = sliderMin, max = sliderMax);
+                            tooltip_mouseout();
                         })
                 }
 
 
                 // Code for brush
-                function brushSlider(min, max, starting_min = min, starting_max = max) {
+                function brushSlider(min, max, starting_min = min, starting_max = max + 1) {
 
                     var range = [min, max + 1]
                     var starting_range = [starting_min, starting_max]
@@ -372,8 +375,8 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
                                 d3.select("#" + chart).selectAll('.gridLines').remove();
                                 d3.select("#" + chart).selectAll('.hourLabel').remove();
                                 d3.select("#" + chart).selectAll('.dayLabel').remove();
+                                d3.select("#" + chart).selectAll('.clearall').remove();
                                 deltaLegend = 1;
-
                                 plotRadial(starting_min, starting_max)
                                 starting_min_date = Object.keys(d2i).find(key => d2i[key] === starting_min)
                                 starting_max_date = Object.keys(d2i).find(key => d2i[key] === starting_max)
@@ -385,6 +388,7 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
                                 }
 
                                 if (featureType == "individualFeatures") {
+                                    console.log(starting_min_date, starting_max_date)
                                     updateParallelCord(dependentChart1, selectedId, lassoSelectedIds = [], featureType, featurelist, classLabel, labels, starting_min_date, starting_max_date)
                                 }
                             }
@@ -452,12 +456,12 @@ function radialTime(chart, dependentChart1, selectedId, featureType, featurelist
 }
 
 
-function updateRadialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, brtChecked, accChecked, gyrChecked, lckChecked, sleepNoiseChecked) {
+function updateRadialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, accChecked, gyrChecked, lckChecked) {
     /* This method is used to call the plotting method for different sensor attributes*/
 
     buffering(chart, selectedId); //calling method that plots buffering symbol
 
-    attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked, "noise": sleepNoiseChecked }
+    attributes = { "acc": accChecked, "gyro": gyrChecked, "lck": lckChecked }
         // attributes = { "acc": accChecked, "gyro": gyrChecked, "brt": brtChecked, "lck": lckChecked}
     radialTime(chart, dependentChart1, selectedId, featureType, featurelist, classLabel, labels, attributes)
 }
