@@ -587,15 +587,9 @@ function glyphs(chart, dependentChart1, dependentChart2, selectedId, featureType
             })
             .on("click", function() {
                 alert(
-                    'This is an alert with basic formatting\n\n' +
-                    "\t• list item 1\n" +
-                    '\t• list item 2\n' +
-                    '\t• list item 3\n\n' +
-                    '▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬\n\n' +
-                    'Simple table\n\n' +
-                    'Char\t| Result\n' +
-                    '\\n\t| line break\n' +
-                    '\\t\t| tab space'
+                    'Glyph View shows all the data points in the form of either a flower glyph or a polygon glyph.\n' +
+                    'fill color of each glyph represents its true class whereas stroke color each Gglyph represents the class predicted using KNN classifier.\n' +
+                    'Feature View shows all the data points in the form of parallel coordinate lines. The data point selected in the Glyph View is highlighted with a bold black line to show its relevance compared to the rest of the data points or lasso selected data points.'
                 )
             })
 

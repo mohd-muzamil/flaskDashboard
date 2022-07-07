@@ -707,8 +707,11 @@
             $("#btn-featureSelection").click(function() {
                 selectedId = d3.select("#" + chart1).select(".selectedGlyph").datum().id;
                 processDimRedux()
-                callGlyphs()
-                callParallelCord()
+                featurelist = $('#featureSelect').val()
+                if (featurelist.length > 1) {
+                    callGlyphs()
+                    callParallelCord()
+                }
             })
 
             $("#btn-FeatureAutoSelect").click(function() {
@@ -910,12 +913,12 @@
 
         // function to call the server route which computes the ML algorithms.
         function processDimRedux() {
-            buffering(chart1, selectedId, toggleText = false)
             radius = +document.getElementById("myRange").value
             featurelist = $('#featureSelect').val()
             if (featurelist.length < 2) {
                 alert("Please select more than one column in Feature selection drop down!!!")
             } else {
+                buffering(chart1, selectedId, toggleText = false)
                 w = Math.floor($('.svg1')[0].getBoundingClientRect().width)
                 h = Math.floor($('.svg1')[0].getBoundingClientRect().height)
                 var postForm = {
