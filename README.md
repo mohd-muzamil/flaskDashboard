@@ -15,7 +15,7 @@ mental health. We developed a visualization system to interact with extracted
 features about behavioural indicators like screen usage, calling, and sleep to assess
 the daily routine of participants under study. We also present two usage scenarios to
 demonstrate our visual approach’s applicability in exploring the given dataset.
-![Thesis_report](https://dalspace.library.dal.ca/handle/10222/81757)
+[Thesis_report](https://dalspace.library.dal.ca/handle/10222/81757)
 
 #### Snapshot of the Visualization system:
 ![image](https://user-images.githubusercontent.com/19529402/176933948-6d9ca602-e3ff-4303-a4da-9ba81d823597.png)
