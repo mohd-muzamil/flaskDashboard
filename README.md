@@ -25,8 +25,8 @@ Tech Stack:
 | SL No | Architecture | Tech stack | Usage description |
 | --------------- | --------------- | --------------- | --------------- |
 |1 | front-end | HTML/CSS/JavaScript | User Interface(UI) development |
-|2 | front-end |Bootstrap | input section features |
-|3 | front-end | bootstrap-multiselect | dropdown selection feature |
+|2 | ^^ |Bootstrap | input section features |
+|3 | ^^ | bootstrap-multiselect | dropdown selection feature |
 |4 | front-end | d3.js | Custom charting/visualization |
 |5 | front-end | Jquery | Event handling and client-server data connectivity 
 |6 | back-end | Python3 | Data preprocessing and data manipulation at Back-end |
