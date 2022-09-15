@@ -25,10 +25,10 @@ demonstrate our visual approach’s applicability in exploring the given dataset
 <table>
     <thead>
         <tr>
-            <th>sl no</th>
+            <th>Sl no</th>
             <th>Architecture</th>
             <th>Tech</th>
-            <th>usage description</th>
+            <th>Usage description</th>
         </tr>
     </thead>
     <tbody>
