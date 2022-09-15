@@ -39,7 +39,7 @@ Tech Stack:
     <thead>
         <tr>
             <th>sl no</th>
-            <th rowspan=2>Architecture</th>
+            <th>Architecture</th>
             <th>Tech</th>
             <th>usage description</th>
         </tr>
@@ -47,7 +47,7 @@ Tech Stack:
     <tbody>
         <tr>
             <td>1</td>
-          <td>front-end</td>
+            <td rowspan=4>L1 Name</td>
           <td>HTML</td>
           <td>UI</td>
         </tr>
