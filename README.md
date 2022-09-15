@@ -39,7 +39,7 @@ Tech Stack:
     <thead>
         <tr>
             <th>sl no</th>
-            <th>Architecture</th>
+            <th rowspan=2>Architecture</th>
             <th>Tech</th>
             <th>usage description</th>
         </tr>
