@@ -21,20 +21,7 @@ demonstrate our visual approach’s applicability in exploring the given dataset
 #### Snapshot of the Visualization system:
 ![image](https://user-images.githubusercontent.com/19529402/176933948-6d9ca602-e3ff-4303-a4da-9ba81d823597.png)
 
-Tech Stack:
-| SL No | Architecture | Tech stack | Usage description |
-| --------------- | --------------- | --------------- | --------------- |
-|1 | front-end | HTML/CSS/JavaScript | User Interface(UI) development |
-|2 | ^^ |Bootstrap | input section features |
-|3 | ^^ | bootstrap-multiselect | dropdown selection feature |
-|4 | front-end | d3.js | Custom charting/visualization |
-|5 | front-end | Jquery | Event handling and client-server data connectivity 
-|6 | back-end | Python3 | Data preprocessing and data manipulation at Back-end |
-|7 | back-end | pandas | Data preprocessing and feature Engineering |
-|8 | back-end | scikit-learn | Implementation of ML algorithms |
-|9 | back-end | Distance Grid(DGrid) | Removal of overlap in glyphs|
-
-
+#### Tech Stack
 <table>
     <thead>
         <tr>
@@ -47,15 +34,50 @@ Tech Stack:
     <tbody>
         <tr>
             <td>1</td>
-            <td rowspan=4>L1 Name</td>
-          <td>HTML</td>
-          <td>UI</td>
+            <td rowspan=5>Front-end</td>
+            <td>HTML/CSS/JavaScript</td>
+            <td>User Interface(UI) development</td>
         </tr>
-              <tr>
+        <tr>
             <td>2</td>
-          <td>HTML</td>
-          <td>UI</td>
+            <td>Bootstrap</td>
+            <td>Input section features</td>
         </tr>
-
+        <tr>
+            <td>3</td>
+            <td>bootstrap-multiselect</td>
+            <td>Dropdown selection feature</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>d3.js</td>
+            <td>Custom charting/Visualization</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Jquery</td>
+            <td>Event handling and client-server data connectivity</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td rowspan=4>Back-end</td>
+            <td>Python3</td>
+            <td>Data preprocessing and data manipulation at Back-end</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>pandas</td>
+            <td>Data preprocessing and feature Engineering</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>scikit-learn</td>
+            <td>Implementation of ML algorithms</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Distance Grid(DGrid)</td>
+            <td>Removal of overlap in glyphs</td>
+        </tr>
     </tbody>
 </table>
