@@ -32,3 +32,9 @@ Tech Stack:
 |7 | back-end pandas [9] Data preprocessing and feature Engineering
 |8 | scikit-learn [12] Implementation of ML algorithms
 |9 | Distance Grid(DGrid) [4] Removal of ove
+
+
+<table>
+<th> a & b</th>
+ <tr> c & d</tr>
+</table>
