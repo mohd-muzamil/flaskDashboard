@@ -23,7 +23,7 @@ demonstrate our visual approach’s applicability in exploring the given dataset
 
 Tech Stack:
 | SL No | Architecture | Tech stack | Usage description |
-<!-- | --------------- | --------------- | --------------- | -->
+| --------------- | --------------- | --------------- | --------------- |
 |1 | front-end | HTML/CSS/JavaScript | User Interface(UI) development |
 |2 | front-end |Bootstrap | input section features |
 |3 | front-end | bootstrap-multiselect | dropdown selection feature |
