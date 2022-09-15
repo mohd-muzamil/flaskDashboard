@@ -33,3 +33,29 @@ Tech Stack:
 |7 | back-end | pandas | Data preprocessing and feature Engineering |
 |8 | back-end | scikit-learn | Implementation of ML algorithms |
 |9 | back-end | Distance Grid(DGrid) | Removal of overlap in glyphs|
+
+
+<table>
+    <thead>
+        <tr>
+            <th>sl no</th>
+            <th>Architecture</th>
+            <th>Tech</th>
+            <th>usage description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+          <td>front-end</td>
+          <td>HTML</td>
+          <td>UI</td>
+        </tr>
+              <tr>
+            <td>2</td>
+          <td>HTML</td>
+          <td>UI</td>
+        </tr>
+
+    </tbody>
+</table>
