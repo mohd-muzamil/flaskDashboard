@@ -76,7 +76,7 @@ demonstrate our visual approach’s applicability in exploring the given dataset
         </tr>
         <tr>
             <td>5</td>
-            <td>Distance Grid(DGrid)</td>
+            <td>[Distance Grid(DGrid)](https://github.com/fpaulovich/dimensionality-reduction.git)</td>
             <td>Removal of overlap in glyphs</td>
         </tr>
     </tbody>
