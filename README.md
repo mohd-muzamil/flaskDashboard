@@ -22,20 +22,14 @@ demonstrate our visual approach’s applicability in exploring the given dataset
 ![image](https://user-images.githubusercontent.com/19529402/176933948-6d9ca602-e3ff-4303-a4da-9ba81d823597.png)
 
 Tech Stack:
-| SL No | Architecture | Tech stack Usage description
-|1 | HTML/CSS/JavaScript | front-end | User Interface(UI) development
-|2 | Bootstrap [1] front-end input features
-|3 | front-end bootstrap-multiselect [2] front-end dropdown feature
-|4 | Jquery [7] Event handling and client-server data connectivity
-|5 | d3.js [3] Custom charting/visualization
-|6 | Python3 [11] Data preprocessing and data manipulation at Back-end
-|7 | back-end pandas [9] Data preprocessing and feature Engineering
-|8 | scikit-learn [12] Implementation of ML algorithms
-|9 | Distance Grid(DGrid) [4] Removal of ove
-
-
-| Column 1 Header | Column 2 Header | Column 3 Header |
+| SL No | Architecture | Tech stack Usage description |
 | --------------- | --------------- | --------------- |
-| Row 1 Column 1 | Row 1 Column 2 | Row 1 Column 3 |
-| Row 2 Column 1 | Row 2 Column 2 | Row 2 Column 3 |
-| Row 3 Column 1 | Row 3 Column 2 | Row 3 Column 3 |
+|1 | HTML/CSS/JavaScript | front-end | User Interface(UI) development |
+|2 | Bootstrap | front-end input features |
+|3 | bootstrap-multiselect | front-end dropdown feature |
+|4 | Jquery | Event handling and client-server data connectivity |
+|5 | d3.js | Custom charting/visualization |
+|6 | Python3 | Data preprocessing and data manipulation at Back-end |
+|7 | back-end pandas | Data preprocessing and feature Engineering |
+|8 | scikit-learn | Implementation of ML algorithms |
+|9 | Distance Grid(DGrid) | Removal of overlap in glyphs|
